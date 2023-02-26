@@ -1,16 +1,42 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="./main.css">
-    <title>Edyan Cruz</title>
-  </head>
-  <body>
-    <div class="container py-4 px-3 mx-auto">
-      <h1>Edyan Cruz</h1>
-      <button class="btn btn-primary">Primary button</button>
-    </div>
-    <script src="./main.js"></script>
-  </body>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="./main.css">
+  <title>Edyan Cruz</title>
+</head>
+
+<body>
+  <div class="d-flex flex-column justify-content-center align-items-center vw-auto vh-100" id="anim-bg">
+    <h1 class="text-light">Edyan Cruz</h1>
+    <p class="text-light">My personal page</p>
+    <!-- TODO: Add description of myself and some shortcuts -->
+  </div>
+  <div class="container">
+    <!-- TODO: Add the sections for the page -->
+  </div>
+  <script src="./main.js"></script>
+  <!-- TODO: Use npm package for Vanta.js instead-->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vanta/dist/vanta.waves.min.js"></script>
+  <script>
+    VANTA.WAVES({
+      el: "#anim-bg",
+      mouseControls: true,
+      touchControls: true,
+      gyroControls: false,
+      minHeight: 200.00,
+      minWidth: 200.00,
+      scale: 1.00,
+      scaleMobile: 1.00,
+      color: 0x51086a,
+      shininess: 57.00,
+      waveHeight: 20.00,
+      zoom: 1.00
+    })
+  </script>
+</body>
+
 </html>
