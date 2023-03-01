@@ -9,34 +9,41 @@
 </head>
 
 <body>
-  <div class="d-flex flex-column justify-content-center align-items-center vw-auto vh-100" id="anim-bg">
-    <h1 class="text-light">Edyan Cruz</h1>
-    <p class="text-light">My personal page</p>
-    <!-- TODO: Add description of myself and some shortcuts -->
-  </div>
-  <div class="container">
-    <!-- TODO: Add the sections for the page -->
+  <div class="d-flex justify-content-center align-items-center vw-auto vh-100 fixed-top" id="anim-bg">
+    <div class="flex-column align-items-center">
+      <div class="container p-4 text-bg-light rounded">
+        <div class="tab-content" id="content">
+          <div class="tab-pane fade show active" id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">
+            <h1>Edyan Cruz</h1>
+            <p>Student of University of Puerto Rico Mayagüez</p>
+          </div>
+          <div class="tab-pane fade" id="projects-tab-pane" role="tabpanel" aria-labelledby="projects-tab" tabindex="0">
+            <h1>Projects</h1>
+            <p>My projects</p>
+          </div>
+          <div class="tab-pane fade" id="contact-tab-pane" role="tabpanel" aria-labelledby="contact-tab" tabindex="0">
+            <h1>Contact</h1>
+            <p>My contact info</p>
+          </div>
+        </div>
+        <ul class="nav nav-pills nav-fill">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home-tab-pane" type="button" role="tab" aria-controls="home-tab-pane" aria-selected="true">Home</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="projects-tab" data-bs-toggle="tab" data-bs-target="#projects-tab-pane" type="button" role="tab" aria-controls="projects-tab-pane" aria-selected="false">Projects</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="contact-tab" data-bs-toggle="tab" data-bs-target="#contact-tab-pane" type="button" role="tab" aria-controls="contact-tab-pane" aria-selected="false">Contact me</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <a class="nav-link" id="resume-link"  href="https://edyan.me/resume_edyan.pdf">Resume</a>
+          </li>
+        </ul>
+      </div>
+    </div>
   </div>
   <script src="./main.js"></script>
-  <!-- TODO: Use npm package for Vanta.js instead-->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/vanta/dist/vanta.waves.min.js"></script>
-  <script>
-    VANTA.WAVES({
-      el: "#anim-bg",
-      mouseControls: true,
-      touchControls: true,
-      gyroControls: false,
-      minHeight: 200.00,
-      minWidth: 200.00,
-      scale: 1.00,
-      scaleMobile: 1.00,
-      color: 0x51086a,
-      shininess: 57.00,
-      waveHeight: 20.00,
-      zoom: 1.00
-    })
-  </script>
 </body>
 
 </html>
