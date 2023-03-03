@@ -9,37 +9,43 @@
 </head>
 
 <body>
-  <div class="d-flex justify-content-center align-items-center vw-auto vh-100 fixed-top" id="anim-bg">
-    <div class="flex-column align-items-center">
-      <div class="container p-4 text-bg-light rounded">
-        <div class="tab-content" id="content">
-          <div class="tab-pane fade show active" id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">
-            <h1>Edyan Cruz</h1>
-            <p>Student of University of Puerto Rico Mayagüez</p>
-          </div>
-          <div class="tab-pane fade" id="projects-tab-pane" role="tabpanel" aria-labelledby="projects-tab" tabindex="0">
-            <h1>Projects</h1>
-            <p>My projects</p>
-          </div>
-          <div class="tab-pane fade" id="contact-tab-pane" role="tabpanel" aria-labelledby="contact-tab" tabindex="0">
-            <h1>Contact</h1>
-            <p>My contact info</p>
-          </div>
+  <nav class="navbar navbar-expand fixed-bottom bg-light">
+    <div class="container-fluid">
+      <div class="mx-auto">
+        <div class="navbar-nav nav-pills" id="myTab" role="tablist">
+          <a class="nav-link active mx-2" id="home-tab" data-bs-toggle="tab" data-bs-target="#home" type="button" role="tab"
+            aria-controls="home" aria-selected="true" aria-current="page">Home</a>
+          <a class="nav-link mx-2" id="projects-tab" data-bs-toggle="tab" data-bs-target="#projects" type="button" role="tab"
+            aria-controls="projects" aria-selected="false">Projects</a>
+          <a class="nav-link mx-2" id="contact-tab" data-bs-toggle="tab" data-bs-target="#contact" type="button" role="tab"
+            aria-controls="contact" aria-selected="false">Contact</a>
         </div>
-        <ul class="nav nav-pills nav-fill">
-          <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home-tab-pane" type="button" role="tab" aria-controls="home-tab-pane" aria-selected="true">Home</button>
-          </li>
-          <li class="nav-item" role="presentation">
-            <button class="nav-link" id="projects-tab" data-bs-toggle="tab" data-bs-target="#projects-tab-pane" type="button" role="tab" aria-controls="projects-tab-pane" aria-selected="false">Projects</button>
-          </li>
-          <li class="nav-item" role="presentation">
-            <button class="nav-link" id="contact-tab" data-bs-toggle="tab" data-bs-target="#contact-tab-pane" type="button" role="tab" aria-controls="contact-tab-pane" aria-selected="false">Contact me</button>
-          </li>
-          <li class="nav-item" role="presentation">
-            <a class="nav-link" id="resume-link"  href="https://edyan.me/resume_edyan.pdf">Resume</a>
-          </li>
-        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div id="vanta-background"></div>
+
+  <div>
+    <div class="container text-center p-4 my-4 bg-light rounded">
+      <h1>Edyan Cruz</h1>
+    </div>
+    <div class="container p-4 my-4 tab-content bg-light rounded vw-card" id="content">
+      <div class="tab-pane active" id="home" role="tabpanel" aria-labelledby="home-tab" tabindex="0">
+        <h1>About me</h1>
+        <p>I am a Software Engineering student at the University of Puerto Rico Mayagüez with a passion for
+          programming. Currently, I am part of the Software Architecture division at RUMarino, developing an
+          unmanned underwater vehicle (UUV). My areas of expertise include Python, C++, HTML, and CSS, with some
+          experience in C#. I am also proficient in ROS and Bootstrap and am familiar with working on Linux, web servers,
+          and Docker.</p>
+      </div>
+      <div class="tab-pane" id="projects" role="tabpanel" aria-labelledby="projects-tab" tabindex="0">
+        <h1>Projects</h1>
+        <p>My projects</p>
+      </div>
+      <div class="tab-pane" id="contact" role="tabpanel" aria-labelledby="contact-tab" tabindex="0">
+        <h1>Contact</h1>
+        <p>My contact info</p>
       </div>
     </div>
   </div>

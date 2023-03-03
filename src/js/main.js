@@ -9,7 +9,7 @@ import * as THREE from 'three'
 import WAVES from 'vanta/dist/vanta.waves.min'
 
 WAVES({
-    el: "#anim-bg",
+    el: "#vanta-background",
     THREE: THREE,
     mouseControls: true,
     touchControls: true,
