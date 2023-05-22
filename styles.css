@@ -1,6 +1,9 @@
 :root {
     --primary-color: #f26c0d;
     --secondary-color: #b366ff;
+    --primary-dark-color: #ffdec4;
+    --secondary-dark-color: #debaff;
+    --nav-bar-height: 4rem;
 }
 
 *, *::before, **::after {
@@ -20,13 +23,13 @@ body {
 
 #navbar {
     background-color: var(--primary-color);
-    border-bottom: 1px solid #3c3c3c;
+    border-bottom: 1px solid #bebebe;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     padding: 1rem 0;
     position: fixed;
     top: 0;
     width: 100%;
-    height: 4rem;
+    height: var(--nav-bar-height);
 }
 
 #navbar nav ul {
@@ -56,4 +59,41 @@ body {
         font-size: 1.6rem;
         padding: 1rem;
     }
+}
+
+#welcome-section {
+    height: 100vh;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    flex-direction: column;
+    background: linear-gradient(
+        45deg,
+        var(--primary-dark-color),
+        var(--secondary-dark-color)
+    );
+}
+
+#welcome-section p {
+    font-size: 2rem;
+}
+
+h1 {
+    font-size: 5rem;
+    margin: 1rem;
+}
+
+h2 {
+    font-size: 3rem;
+    margin: 1rem;
+    text-align: center;
+}
+
+section {
+    padding: 1rem 2rem;
+    margin: 2rem;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
