@@ -8,8 +8,10 @@
     --nav-bar-height: 4rem;
 }
 
-*, *::before, **::after {
-  box-sizing: border-box;
+*,
+*::before,
+**::after {
+    box-sizing: border-box;
 }
 
 html {
@@ -53,6 +55,7 @@ p {
     top: 0;
     width: 100%;
     height: var(--nav-bar-height);
+    z-index: 1000;
 }
 
 #navbar nav ul {
@@ -76,6 +79,18 @@ p {
     transition: color 0.1s ease-in-out;
 }
 
+@keyframes text-fall-fade {
+    0% {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
 #welcome-section {
     height: 100vh;
     width: 100%;
@@ -84,18 +99,21 @@ p {
     align-items: center;
     text-align: center;
     flex-direction: column;
-    background: radial-gradient(
-        ellipse 150% 125% at top,
-        var(--secondary-light-color) 0%,
-        var(--secondary-light-color) 10%,
-        var(--primary-light-color) 70%,
-        var(--primary-light-color)
+    background: radial-gradient(ellipse 150% 125% at top,
+            var(--secondary-light-color) 0%,
+            var(--secondary-light-color) 10%,
+            var(--primary-light-color) 70%,
+            var(--primary-light-color));
+}
 
-    );
+#welcome-section h1,
+#welcome-section p {
+    animation: text-fall-fade 1s ease-out;
 }
 
 #welcome-section p {
     font-size: 3rem;
+    max-width: 50%;
 }
 
 h1 {
@@ -127,6 +145,11 @@ section {
 .project-tile {
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease;
+}
+
+.project-tile:hover {
+    transform: scale(1.05);
 }
 
 .project-tile img {
@@ -161,11 +184,12 @@ section {
     align-items: center;
     flex-direction: column;
     margin: 2rem auto;
+    transition: transform 0.3s ease;
 }
 
 .social-icons a:hover {
     color: var(--secondary-color);
-    transition: color 0.1s ease-in-out;
+    transform: scale(1.05);
 }
 
 .social-icons a i {
@@ -180,6 +204,32 @@ section {
     margin-left: 1rem;
 }
 
+.btn-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.btn {
+    background-color: var(--primary-color);
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    color: #fff !important;
+    cursor: pointer;
+    font-size: 2rem;
+    margin: 1rem;
+    padding: 1rem 2rem;
+    transition: transform 0.3s ease;
+    text-align: center;
+}
+
+.btn:hover {
+    background-color: var(--secondary-color);
+    transform: scale(1.05);
+}
+
+
 @media only screen and (max-width: 1280px) {
     section {
         margin: 2rem 8rem;
@@ -187,8 +237,9 @@ section {
 
     #welcome-section p {
         font-size: 2.5rem;
+        max-width: 60%;
     }
-    
+
     h1 {
         font-size: 6rem;
     }
@@ -198,6 +249,11 @@ section {
     section {
         margin: 2rem 4rem;
     }
+
+    #welcome-section p {
+        max-width: 70%;
+    }
+
     .social-icons {
         grid-template-columns: repeat(2, 1fr);
     }
@@ -207,12 +263,17 @@ section {
     section {
         margin: 2rem 2rem;
     }
+
+    #welcome-section p {
+        max-width: 80%;
+    }
 }
 
 @media only screen and (max-width: 640px) {
     section {
         margin: 2rem 1rem;
     }
+
     .social-icons {
         grid-template-columns: 1fr;
     }
