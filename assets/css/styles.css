@@ -114,6 +114,7 @@ p {
 #welcome-section p {
     font-size: 3rem;
     max-width: 50%;
+    line-height: 3.5rem;
 }
 
 h1 {
@@ -139,22 +140,6 @@ section {
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     background-color: #fff;
-}
-
-.skills-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    grid-gap: 2rem;
-}
-
-.skills-tile h4 {
-    font-size: 2.5rem;
-    margin: 1rem;
-}
-
-.skills-tile ul li {
-    font-size: 1.6rem;
-    line-height: 2rem;
 }
 
 .projects-grid {
@@ -303,6 +288,12 @@ section {
 }
 
 @media only screen and (max-width: 480px) {
+    h1 {
+        font-size: 4rem;
+    }
+    #welcome-section p {
+        font-size: 2rem;
+    }
     #navbar nav ul li a {
         font-size: 1.6rem;
         padding: 1rem;
