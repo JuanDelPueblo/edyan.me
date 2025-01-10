@@ -106,15 +106,20 @@ p {
             var(--primary-light-color));
 }
 
-#welcome-section h1,
-#welcome-section p {
-    animation: text-fall-fade 1s ease-out;
+#welcome-section {
+    animation: text-fall-fade 1.5s ease-out;
 }
 
 #welcome-section p {
     font-size: 3rem;
     max-width: 50%;
     line-height: 3.5rem;
+}
+
+#welcome-section img {
+    max-height: 400px;
+    max-width: 400px;
+    margin: 2rem;
 }
 
 h1 {
