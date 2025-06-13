@@ -15,7 +15,9 @@
       }
       
       a {
-        display: block;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
         padding: 0.75rem 1rem;
         text-decoration: none;
         color: inherit;
@@ -23,6 +25,17 @@
         transition: all 0.2s ease;
         width: 100%;
         box-sizing: border-box;
+        
+        mat-icon {
+          font-size: 1.25rem;
+          width: 1.25rem;
+          height: 1.25rem;
+          flex-shrink: 0;
+        }
+        
+        span {
+          flex: 1;
+        }
         
         &:hover {
           background-color: rgba(0, 123, 255, 0.1);

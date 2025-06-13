@@ -11,11 +11,13 @@
 
 .sidebar {
   grid-area: sidebar;
+  padding: 2rem 0 0 2rem;
 }
 
 .main-content {
   grid-area: main;
   padding: 2rem;
+  margin-left: 1rem;
   overflow-y: auto;
 }
 
@@ -43,8 +45,8 @@
     display: block; // Shown on mobile
     grid-area: bottom;
   }
-  
-  .main-content {
+    .main-content {
     padding: 1rem;
+    margin-left: 0;
   }
 }

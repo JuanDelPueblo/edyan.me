@@ -1,11 +1,17 @@
 <card>
   <nav class="bottom-nav">
     <ul>
-      <li><a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Home</a></li>
-      <li><a routerLink="/about" routerLinkActive="active">About</a></li>
-      <li><a routerLink="/projects" routerLinkActive="active">Projects</a></li>
-      <li><a routerLink="/experiences" routerLinkActive="active">Experience</a></li>
-      <li><a routerLink="/contact" routerLinkActive="active">Contact</a></li>
+      @for (item of navItems; track item.path) {
+        <li>
+          <a 
+            [routerLink]="item.path" 
+            routerLinkActive="active" 
+            [routerLinkActiveOptions]="item.exact ? {exact: true} : {exact: false}">
+            <mat-icon>{{ item.icon }}</mat-icon>
+            <span>{{ item.label }}</span>
+          </a>
+        </li>
+      }
     </ul>
   </nav>
 </card>

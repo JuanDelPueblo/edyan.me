@@ -4,7 +4,7 @@
   align-items: center;
   justify-content: center;
   width: 100%;
-  max-width: 400px;
+  max-width: min(calc(100% - 2rem), 1200px);
   margin: 1rem auto;
   padding: 1.5rem;
   border-radius: 16px;
@@ -28,4 +28,26 @@
   border: 1px solid rgba(255, 255, 255, 0.2);
   color: white;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+// Responsive adjustments for cards
+@media (max-width: 420px) {
+  .card {
+    margin: 1rem 0;
+    padding: 1rem;
+    border-radius: 12px; // Slightly reduce border radius for very small screens
+  }
+}
+
+@media (min-width: 421px) and (max-width: 768px) {
+  .card {
+    margin: 1rem 0.5rem;
+    padding: 1rem;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .card {
+    max-width: min(calc(100% - 1.5rem), 900px);
+  }
 }
