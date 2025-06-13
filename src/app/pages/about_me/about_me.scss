@@ -1,0 +1,54 @@
+.about-me {
+  text-align: center;
+  padding: 2rem 0;
+}
+
+.page-title {
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin-bottom: 2rem;
+  line-height: 1.2;
+}
+
+.about-content {
+  text-align: left;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.intro {
+  font-size: 1.2rem;
+  line-height: 1.6;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.skills-section, .background-section {
+  margin-bottom: 2rem;
+}
+
+.skills-section h2, .background-section h2 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  color: inherit;
+}
+
+.skills-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.skill-item {
+  background: rgba(0, 123, 255, 0.1);
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  text-align: center;
+  font-weight: 500;
+}
+
+.background-section p {
+  line-height: 1.6;
+  margin: 0;
+}
