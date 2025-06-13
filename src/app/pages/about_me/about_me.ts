@@ -1,10 +1,10 @@
 import { Component } from '@angular/core';
 
 @Component({
-  selector: 'app-about-me',
+  selector: 'about-me',
   imports: [],
-  templateUrl: './about-me.html',
-  styleUrl: './about-me.scss'
+  templateUrl: './about_me.html',
+  styleUrl: './about_me.scss'
 })
 export class AboutMe {
 

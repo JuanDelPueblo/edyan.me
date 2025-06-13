@@ -1,10 +1,10 @@
 import { Component } from '@angular/core';
 
 @Component({
-  selector: 'app-bottom-bar',
+  selector: 'bottom-bar',
   imports: [],
-  templateUrl: './bottom-bar.html',
-  styleUrl: './bottom-bar.scss'
+  templateUrl: './bottom_bar.html',
+  styleUrl: './bottom_bar.scss'
 })
 export class BottomBar {
 
