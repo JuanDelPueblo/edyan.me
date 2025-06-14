@@ -1,23 +1,27 @@
+@use '../scss/variables' as *;
+@use '../scss/mixins' as *;
+@use '../scss/utilities' as *;
+
 // Desktop layout - sidebar only
 .app-layout {
   display: grid;
   grid-template-areas: "sidebar main";
-  grid-template-columns: 250px 1fr;
+  grid-template-columns: $sidebar-width 1fr;
   grid-template-rows: 1fr;
   min-height: 100vh;
-  gap: 1rem;
-  padding: 1rem;
+  gap: $spacing-base;
+  padding: $spacing-base;
 }
 
 .sidebar {
   grid-area: sidebar;
-  padding: 2rem 0 0 2rem;
+  padding: $spacing-xl 0 0 $spacing-xl;
 }
 
 .main-content {
   grid-area: main;
-  padding: 2rem;
-  margin-left: 1rem;
+  padding: $spacing-xl;
+  margin-left: $spacing-base;
   overflow-y: auto;
 }
 
@@ -26,15 +30,15 @@
 }
 
 // Mobile layout - bottom navigation only
-@media (max-width: 768px) {
+@include mobile-only {
   .app-layout {
     grid-template-areas: 
       "main"
       "bottom";
     grid-template-columns: 1fr;
     grid-template-rows: 1fr auto;
-    gap: 1rem;
-    padding: 1rem;
+    gap: $spacing-base;
+    padding: $spacing-base;
   }
   
   .sidebar {
@@ -45,8 +49,9 @@
     display: block; // Shown on mobile
     grid-area: bottom;
   }
-    .main-content {
-    padding: 1rem;
+  
+  .main-content {
+    padding: $spacing-base;
     margin-left: 0;
   }
 }

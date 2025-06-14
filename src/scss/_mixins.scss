@@ -1,0 +1,184 @@
+@use 'variables' as *;
+
+// ===== MIXINS =====
+
+// ===== THEME MIXINS =====
+// Theme-aware styling using CSS custom properties
+@mixin theme-colors {
+  color: var(--text-primary);
+}
+
+@mixin theme-bg-primary {
+  background-color: var(--bg-primary);
+}
+
+@mixin theme-bg-secondary {
+  background-color: var(--bg-secondary);
+}
+
+@mixin theme-card {
+  background: var(--bg-card);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 8px 32px var(--shadow-color);
+}
+
+@mixin theme-text-primary {
+  color: var(--text-primary);
+}
+
+@mixin theme-text-secondary {
+  color: var(--text-secondary);
+}
+
+@mixin theme-text-muted {
+  color: var(--text-muted);
+}
+
+@mixin theme-border {
+  border-color: var(--border-color);
+}
+
+@mixin theme-border-subtle {
+  border-color: var(--border-subtle);
+}
+
+// ===== EXISTING MIXINS =====
+
+// Card mixin for consistent card styling
+@mixin card-base {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: min(calc(100% - #{$spacing-xl}), $max-content-width);
+  margin: $spacing-base auto;
+  padding: $spacing-lg;
+  border-radius: $border-radius-xl;
+  position: relative;
+  z-index: 1;
+}
+
+// Updated card theme mixins to use CSS custom properties
+@mixin card-theme-light {
+  @include theme-card;
+  backdrop-filter: $backdrop-filter;
+}
+
+@mixin card-theme-dark {
+  @include theme-card;
+  backdrop-filter: $backdrop-filter;
+}
+
+// Content section mixin
+@mixin content-section($max-width: $max-content-width) {
+  text-align: left;
+  max-width: $max-width;
+  margin: 0 auto;
+}
+
+// Page title mixin
+@mixin page-title {
+  font-size: $font-size-3xl;
+  font-weight: $font-weight-bold;
+  margin-bottom: $spacing-xl;
+  line-height: $line-height-normal;
+}
+
+// Section intro mixin
+@mixin section-intro {
+  font-size: $font-size-lg;
+  line-height: $line-height-relaxed;
+  margin-bottom: $spacing-xl;
+  text-align: center;
+}
+
+// Button mixin
+@mixin button-primary {
+  background: $primary-color;
+  color: $white;
+  padding: $spacing-sm $spacing-base;
+  border: none;
+  border-radius: $border-radius-base;
+  font-size: $font-size-base;
+  font-weight: $font-weight-medium;
+  cursor: pointer;
+  transition: background-color $transition-fast;
+  text-decoration: none;
+  display: inline-block;
+
+  &:hover {
+    background: $primary-color-dark;
+  }
+}
+
+// Navigation link mixin
+@mixin nav-link {
+  display: flex;
+  align-items: center;
+  padding: $spacing-sm $spacing-base;
+  text-decoration: none;
+  color: inherit;
+  border-radius: $border-radius-sm;
+  transition: all $transition-fast;
+  
+  &:hover {
+    background-color: $primary-color-light;
+  }
+  
+  &.active {
+    background-color: $primary-color;
+    color: $white;
+  }
+}
+
+// Project/Experience item mixin
+@mixin content-item {
+  background: $primary-color-lighter;
+  padding: $spacing-lg;
+  border-radius: $border-radius-lg;
+  border: 1px solid $primary-color-light;
+}
+
+// Form input mixin
+@mixin form-input {
+  padding: $spacing-sm;
+  border: 1px solid $primary-color-border;
+  border-radius: $border-radius-base;
+  font-size: $font-size-base;
+  background: $bg-form-input;
+  color: $text-primary;
+  
+  &:focus {
+    outline: none;
+    border-color: $primary-color;
+    box-shadow: 0 0 0 2px $primary-color-light;
+  }
+}
+
+// Responsive mixins
+@mixin mobile-only {
+  @media (max-width: $breakpoint-sm) {
+    @content;
+  }
+}
+
+@mixin tablet-and-up {
+  @media (min-width: #{$breakpoint-sm + 1px}) {
+    @content;
+  }
+}
+
+@mixin desktop-and-up {
+  @media (min-width: #{$breakpoint-md + 1px}) {
+    @content;
+  }
+}
+
+// Grid layout mixin
+@mixin responsive-grid($min-width: 300px, $gap: $spacing-xl) {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax($min-width, 1fr));
+  gap: $gap;
+}

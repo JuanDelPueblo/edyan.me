@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { Card } from '../../../shared/card/card';
+import { ThemeToggle } from '../../../shared/theme_toggle/theme_toggle';
 
 interface NavItem {
   path: string;
@@ -12,7 +13,7 @@ interface NavItem {
 
 @Component({
   selector: 'side-nav',
-  imports: [RouterLink, RouterLinkActive, MatIconModule, Card],
+  imports: [RouterLink, RouterLinkActive, MatIconModule, Card, ThemeToggle],
   templateUrl: './side_nav.html',
   styleUrl: './side_nav.scss'
 })

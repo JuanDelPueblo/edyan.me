@@ -1,86 +1,77 @@
+@use '../../../scss/variables' as *;
+@use '../../../scss/mixins' as *;
+@use '../../../scss/utilities' as *;
+
 .experiences {
-  text-align: center;
-  padding: 2rem 0;
+  @extend .page-container;
 }
 
 .page-title {
-  font-size: 2.5rem;
-  font-weight: bold;
-  margin-bottom: 2rem;
-  line-height: 1.2;
+  @extend .page-title;
 }
 
 .experiences-content {
-  text-align: left;
-  max-width: 700px;
-  margin: 0 auto;
+  @include content-section($max-narrow-content-width);
 }
 
 .intro {
-  font-size: 1.2rem;
-  line-height: 1.6;
-  margin-bottom: 2rem;
-  text-align: center;
+  @extend .section-intro;
 }
 
 .timeline {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: $spacing-xl;
 }
 
 .experience-item {
-  background: rgba(0, 123, 255, 0.05);
-  padding: 1.5rem;
-  border-radius: 1rem;
-  border-left: 4px solid #007bff;
+  @extend .content-item;
+  border-left: 4px solid $primary-color;
 }
 
 .experience-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 0.5rem;
+  margin-bottom: $spacing-sm;
   flex-wrap: wrap;
-  gap: 1rem;
-}
+  gap: $spacing-base;
 
-.experience-header h3 {
-  font-size: 1.3rem;
-  margin: 0;
-  color: inherit;
+  h3 {
+    font-size: $font-size-xl;
+    margin: 0;
+    color: inherit;
+  }
 }
 
 .period {
-  background: rgba(0, 123, 255, 0.2);
-  padding: 0.25rem 0.75rem;
-  border-radius: 1rem;
-  font-size: 0.875rem;
-  font-weight: 500;
+  @extend .tech-tag;
 }
 
 .company {
-  font-weight: 600;
-  color: #007bff;
-  margin-bottom: 1rem;
+  font-weight: $font-weight-semibold;
+  color: $primary-color;
+  margin-bottom: $spacing-base;
 }
 
-.description p {
-  line-height: 1.6;
-  margin-bottom: 1rem;
+.description {
+  p {
+    line-height: $line-height-relaxed;
+    margin-bottom: $spacing-base;
+  }
+
+  ul {
+    margin: 0;
+    padding-left: $spacing-lg;
+  }
+
+  li {
+    line-height: $line-height-relaxed;
+    margin-bottom: $spacing-sm;
+  }
 }
 
-.description ul {
-  margin: 0;
-  padding-left: 1.5rem;
-}
-
-.description li {
-  line-height: 1.6;
-  margin-bottom: 0.5rem;
-}
-
-@media (max-width: 768px) {
+@include mobile-only {
   .experience-header {
     flex-direction: column;
     align-items: flex-start;

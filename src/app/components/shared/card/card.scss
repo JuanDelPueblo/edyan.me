@@ -1,53 +1,40 @@
+@use '../../../../scss/variables' as *;
+@use '../../../../scss/mixins' as *;
+@use '../../../../scss/utilities' as *;
+
 .card {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  max-width: min(calc(100% - 2rem), 1200px);
-  margin: 1rem auto;
-  padding: 1.5rem;
-  border-radius: 16px;
-  position: relative;
-  z-index: 1;
+  @include card-base;
+  @include theme-card;
+  backdrop-filter: $backdrop-filter;
+  transition: all $transition-medium;
 }
 
 .card-theme-light {
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(20px) saturate(180%);
-  border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  color: #333;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  @include card-theme-light;
 }
 
 .card-theme-dark {
-  background: rgba(0, 0, 0, 0.8);
-  backdrop-filter: blur(20px) saturate(180%);
-  border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: white;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  @include card-theme-dark;
 }
 
 // Responsive adjustments for cards
-@media (max-width: 420px) {
+@media (max-width: $breakpoint-xs) {
   .card {
-    margin: 1rem 0;
-    padding: 1rem;
+    margin: $spacing-base 0;
+    padding: $spacing-base;
     border-radius: 12px; // Slightly reduce border radius for very small screens
   }
 }
 
-@media (min-width: 421px) and (max-width: 768px) {
+@media (min-width: #{$breakpoint-xs + 1px}) and (max-width: $breakpoint-sm) {
   .card {
-    margin: 1rem 0.5rem;
-    padding: 1rem;
+    margin: $spacing-base $spacing-sm;
+    padding: $spacing-base;
   }
 }
 
-@media (min-width: 769px) and (max-width: 1024px) {
+@media (min-width: #{$breakpoint-sm + 1px}) and (max-width: $breakpoint-md) {
   .card {
-    max-width: min(calc(100% - 1.5rem), 900px);
+    max-width: min(calc(100% - #{$spacing-lg}), 900px);
   }
 }

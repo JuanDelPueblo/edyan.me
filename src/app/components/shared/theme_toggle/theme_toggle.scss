@@ -1,0 +1,34 @@
+@use '../../../../scss/variables' as *;
+@use '../../../../scss/mixins' as *;
+
+.theme-toggle-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: $border-radius-base;
+  background: var(--bg-card);
+  @include theme-text-primary;
+  cursor: pointer;
+  transition: all $transition-fast;
+  
+  &:hover {
+    background: var(--bg-secondary);
+    transform: scale(1.05);
+  }
+  
+  &:active {
+    transform: scale(0.95);
+  }
+  
+  .material-icons {
+    font-size: 20px;
+    transition: transform $transition-fast;
+  }
+  
+  &:hover .material-icons {
+    transform: rotate(180deg);
+  }
+}
