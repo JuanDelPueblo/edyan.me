@@ -13,18 +13,17 @@
 .sidebar {
   position: fixed;
   top: 0;
-  left: calc(50% - 700px); // Position relative to centered layout (1400px / 2 = 700px)
+  left: calc(50% - #{$centered-layout-half-width}); // Position relative to centered layout
   width: $sidebar-width;
   height: 100vh;
   padding: $spacing-xl;
-  display: flex;
-  align-items: center;
+  display: flex;  align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: $z-index-sidebar;
   background: var(--background);
   
   // Fallback for smaller screens
-  @media (max-width: 1450px) {
+  @media (max-width: $layout-transition-breakpoint) {
     left: 0; // Stick to left edge when screen is too small
   }
 }
@@ -34,7 +33,7 @@
   padding: $spacing-base;
   overflow-y: auto;
   overflow-x: hidden; // Prevent horizontal scroll
-  max-width: 1150px; // Max width minus sidebar
+  max-width: $main-content-max-width; // Max width minus sidebar
   box-sizing: border-box; // Include padding in width calculation
   display: flex;
   align-items: center;
@@ -42,7 +41,7 @@
   min-height: 100vh;
   
   // Fallback for smaller screens
-  @media (max-width: 1450px) {
+  @media (max-width: $layout-transition-breakpoint) {
     margin-left: $sidebar-width; // Use normal sidebar margin on smaller screens
     max-width: 100%;
   }
@@ -66,24 +65,23 @@
     display: block; // Shown on mobile
     position: fixed;
     bottom: 0;
-    left: 0;
-    right: 0;
+    left: 0;    right: 0;
     width: 100%;
-    z-index: 1000;
+    z-index: $z-index-bottom-nav;
     background: var(--background);
     padding: $spacing-sm;
   }  .main-content {
     margin-left: 0;
-    margin-bottom: 120px; // Space for fixed bottom navigation
+    margin-bottom: $bottom-nav-spacing; // Space for fixed bottom navigation
     padding: $spacing-base;
     overflow-x: hidden; // Prevent horizontal scroll on mobile
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: calc(100vh - 120px); // Account for bottom nav height
+    min-height: calc(100vh - #{$bottom-nav-spacing}); // Account for bottom nav height
     
     // Extra small screens (less than 576px)
-    @media (max-width: 575px) {
+    @media (max-width: $breakpoint-xs) {
       padding: $spacing-sm;
     }
   }
@@ -92,20 +90,20 @@
 // Content container for responsive widths inside main-content
 .content-container {
   width: 100%;
-  max-width: 800px; // Default comfortable reading width
+  max-width: $max-content-width; // Default comfortable reading width
   
   // Large screens
-  @media (min-width: 1200px) {
-    max-width: 900px;
+  @media (min-width: $breakpoint-lg) {
+    max-width: $content-container-large;
   }
   
   // Medium screens
-  @media (min-width: 768px) and (max-width: 1199px) {
-    max-width: 750px;
+  @media (min-width: $breakpoint-sm) and (max-width: #{$breakpoint-lg - 1px}) {
+    max-width: $content-container-medium;
   }
   
   // Small screens and below use full width
-  @media (max-width: 767px) {
+  @media (max-width: #{$breakpoint-sm - 1px}) {
     max-width: 100%;
   }
 }

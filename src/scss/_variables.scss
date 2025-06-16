@@ -107,9 +107,23 @@ $max-content-width: 800px;
 $max-narrow-content-width: 700px;
 $max-very-narrow-content-width: 600px;
 
+// New layout variables
+$centered-layout-max-width: 1400px;
+$centered-layout-half-width: 700px; // $centered-layout-max-width / 2
+$main-content-max-width: 1150px;
+$content-container-large: 900px;
+$content-container-medium: 750px;
+$bottom-nav-height: 120px;
+$bottom-nav-spacing: 120px; // Height + padding for bottom margin
+$layout-transition-breakpoint: 1450px;
+
 // ===== TRANSITIONS =====
 $transition-fast: 0.2s ease;
 $transition-medium: 0.3s ease;
+
+// ===== Z-INDEX =====
+$z-index-sidebar: 1000;
+$z-index-bottom-nav: 1000;
 
 // ===== BACKDROP FILTER =====
 $backdrop-filter: blur(20px) saturate(180%);
