@@ -16,10 +16,8 @@ interface NavItem {
   templateUrl: './bottom_bar.html',
   styleUrl: './bottom_bar.scss'
 })
-export class BottomBar {
-  navItems: NavItem[] = [
+export class BottomBar {  navItems: NavItem[] = [
     { path: '/', label: 'Home', icon: 'home', exact: true },
-    { path: '/about', label: 'About', icon: 'person' },
     { path: '/projects', label: 'Projects', icon: 'work' },
     { path: '/experiences', label: 'Experience', icon: 'business' },
     { path: '/contact', label: 'Contact', icon: 'contact_mail' }

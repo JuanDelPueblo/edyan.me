@@ -13,11 +13,11 @@ import { StringService } from '../../services/string.service';
   styleUrl: './hero.scss'
 })
 export class Hero implements OnInit {
-  heroContent: any = {};
+  aboutContent: any = {};
 
   constructor(private stringService: StringService) {}
 
   ngOnInit(): void {
-    this.heroContent = this.stringService.getHeroContent();
+    this.aboutContent = this.stringService.getAboutContent();
   }
 }

@@ -1,7 +1,15 @@
 <card>
-	<div class="hero">
-		<h1 class="hero-title">👋 Hi, I'm Edyan Cruz</h1>
-		<p class="hero-subtitle">{{ heroContent.description }}</p>
+	<div class="about-me">
+		<div class="about-content">
+			<h1 class="hero-title">👋 Hi, I'm Edyan Cruz</h1>
+			<p class="hero-subtitle">{{ aboutContent.introduction }}</p>
+			<div class="skills-section">
+				<h2>{{ aboutContent.skillsTitle }}</h2>
+				<div class="skills-grid">
+					<div class="skill-item" *ngFor="let skill of aboutContent.skills">{{ skill }}</div>
+				</div>
+			</div>
+		</div>
 	</div>
 
 	<ng-content></ng-content>

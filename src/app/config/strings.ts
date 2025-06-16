@@ -29,36 +29,22 @@ export interface NavigationItem {
 }
 
 // Main strings configuration
-export const STRINGS = {
-  // Navigation
+export const STRINGS = {  // Navigation
   navigation: {
     items: [
       { label: 'Home', route: '/', icon: 'home' },
-      { label: 'About', route: '/about', icon: 'person' },
       { label: 'Projects', route: '/projects', icon: 'work' },
       { label: 'Experience', route: '/experiences', icon: 'timeline' },
       { label: 'Contact', route: '/contact', icon: 'mail' }
     ] as NavigationItem[]
   },
-  // Hero section
-  hero: {
-    title: 'Welcome to My Portfolio',
-    subtitle: 'Full Stack Developer & Software Engineer',
-    description: 'A passionate software engineering student at the University of Puerto Rico Mayagüez Campus. With interests in Android, game, and full stack web development, I enjoy programming and creating innovative software solutions.',
-    cta: {
-      primary: 'View My Work',
-      secondary: 'Get In Touch'
-    }
-  },
-
   // About Me section
   aboutMe: {
     title: 'About Me',
     introduction: 'I\'m a passionate software engineer with experience in full-stack development, currently pursuing my career in technology.',
     skills: [
       'Angular', 'TypeScript', 'JavaScript', 'Python', 'Java',
-      'Node.js', 'Express', 'MongoDB', 'PostgreSQL', 'Git',
-      'AWS', 'Docker', 'REST APIs', 'GraphQL'
+      'Docker'
     ],
     skillsTitle: 'Technical Skills'
   },

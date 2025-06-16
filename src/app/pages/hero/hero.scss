@@ -2,8 +2,12 @@
 @use '../../../scss/mixins' as *;
 @use '../../../scss/utilities' as *;
 
-.hero {
+.about-me {
   @extend .page-container;
+}
+
+.about-content {
+  @include content-section($max-very-narrow-content-width);
 }
 
 .hero-title {
@@ -14,5 +18,28 @@
 .hero-subtitle {
   font-size: $font-size-lg;
   opacity: 0.8;
-  margin-bottom: 0;
+  margin-bottom: $spacing-xl;
+}
+
+.skills-section {
+  margin-bottom: $spacing-xl;
+
+  h2 {
+    font-size: $font-size-2xl;
+    margin-bottom: $spacing-base;
+    color: inherit;
+  }
+}
+
+.skills-grid {
+  @include responsive-grid(200px, $spacing-base);
+  margin-bottom: $spacing-base;
+}
+
+.skill-item {
+  background: $primary-color-light;
+  padding: $spacing-sm $spacing-base;
+  border-radius: $border-radius-base;
+  text-align: center;
+  font-weight: $font-weight-medium;
 }

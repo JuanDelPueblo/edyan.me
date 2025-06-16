@@ -86,11 +86,6 @@ export class StringService {
     );
   }
 
-  // Hero section
-  getHeroContent() {
-    return this.strings.hero;
-  }
-
   // About section
   getAboutContent() {
     return this.strings.aboutMe;
