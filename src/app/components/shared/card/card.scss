@@ -3,38 +3,12 @@
 @use '../../../../scss/utilities' as *;
 
 .card {
-  @include card-base;
   @include theme-card;
+  padding: $spacing-lg;
+  border-radius: $border-radius-xl;
   backdrop-filter: $backdrop-filter;
+  box-sizing: border-box;
+  position: relative;
+  z-index: 1;
   transition: all $transition-medium;
-}
-
-.card-theme-light {
-  @include card-theme-light;
-}
-
-.card-theme-dark {
-  @include card-theme-dark;
-}
-
-// Responsive adjustments for cards
-@media (max-width: $breakpoint-xs) {
-  .card {
-    margin: $spacing-base 0;
-    padding: $spacing-base;
-    border-radius: 12px; // Slightly reduce border radius for very small screens
-  }
-}
-
-@media (min-width: #{$breakpoint-xs + 1px}) and (max-width: $breakpoint-sm) {
-  .card {
-    margin: $spacing-base $spacing-sm;
-    padding: $spacing-base;
-  }
-}
-
-@media (min-width: #{$breakpoint-sm + 1px}) and (max-width: $breakpoint-md) {
-  .card {
-    max-width: min(calc(100% - #{$spacing-lg}), 900px);
-  }
 }

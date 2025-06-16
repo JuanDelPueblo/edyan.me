@@ -1,37 +1,39 @@
 <card>
   <div class="projects">
-    <h1 class="page-title">My Projects</h1>
+    <h1 class="page-title">{{ sectionContent.title }}</h1>
     <div class="projects-content">
-      <p class="intro">Here are some of the projects I've worked on, showcasing my skills and passion for development.</p>
+      <p class="intro">{{ sectionContent.intro }}</p>
       
       <div class="projects-grid">
-        <div class="project-item">
-          <h3>Flight Tracker Pro</h3>
-          <p>A comprehensive flight tracking application with real-time updates and beautiful visualizations.</p>
-          <div class="tech-stack">
-            <span class="tech">Angular</span>
-            <span class="tech">TypeScript</span>
-            <span class="tech">API Integration</span>
+        <div class="project-item" *ngFor="let project of projects" [class.featured]="project.featured">
+          <div class="project-header">
+            <h3>{{ project.title }}</h3>
+            <div class="project-actions" *ngIf="project.liveUrl || project.githubUrl">
+              <button 
+                *ngIf="project.liveUrl" 
+                class="btn btn-primary" 
+                (click)="onProjectClick(project)"
+                type="button">
+                {{ sectionContent.buttons.viewProject }}
+              </button>
+              <button 
+                *ngIf="project.githubUrl" 
+                class="btn btn-secondary" 
+                (click)="onViewCode(project)"
+                type="button">
+                {{ sectionContent.buttons.viewCode }}
+              </button>
+            </div>
           </div>
-        </div>
-        
-        <div class="project-item">
-          <h3>Don't Let Him Cook</h3>
-          <p>A fun and interactive cooking game that challenges players with creative culinary scenarios.</p>
+          
+          <p class="project-description">{{ project.description }}</p>
+          
           <div class="tech-stack">
-            <span class="tech">JavaScript</span>
-            <span class="tech">Game Development</span>
-            <span class="tech">Web APIs</span>
+            <span class="tech" *ngFor="let tech of project.technologies">{{ tech }}</span>
           </div>
-        </div>
-        
-        <div class="project-item">
-          <h3>Portfolio Website</h3>
-          <p>A modern, responsive portfolio website built with the latest web technologies.</p>
-          <div class="tech-stack">
-            <span class="tech">Angular</span>
-            <span class="tech">SCSS</span>
-            <span class="tech">Responsive Design</span>
+          
+          <div class="project-image" *ngIf="project.image">
+            <img [src]="project.image" [alt]="project.title" />
           </div>
         </div>
       </div>

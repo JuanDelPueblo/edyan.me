@@ -27,6 +27,11 @@
 .experience-item {
   @extend .content-item;
   border-left: 4px solid $primary-color;
+  
+  &.current {
+    border-left-color: var(--accent-color);
+    background-color: var(--background-secondary);
+  }
 }
 
 .experience-header {
@@ -41,6 +46,14 @@
     font-size: $font-size-xl;
     margin: 0;
     color: inherit;
+  }
+  
+  .current-badge {
+    @extend .tech-tag;
+    background-color: var(--accent-color);
+    color: var(--text-color-on-accent);
+    font-size: $font-size-xs;
+    padding: $spacing-xs $spacing-sm;
   }
 }
 
@@ -68,6 +81,15 @@
   li {
     line-height: $line-height-relaxed;
     margin-bottom: $spacing-sm;
+  }
+}
+
+.tech-stack {
+  @extend .tech-stack;
+  margin-top: $spacing-base;
+
+  .tech {
+    @extend .tech-tag;
   }
 }
 

@@ -1,33 +1,24 @@
 <card>
   <div class="experiences">
-    <h1 class="page-title">Professional Experience</h1>
+    <h1 class="page-title">{{ sectionContent.title }}</h1>
     <div class="experiences-content">
-      <p class="intro">My professional journey and the experiences that have shaped my career in technology.</p>
+      <p class="intro">{{ sectionContent.intro }}</p>
       
       <div class="timeline">
-        <div class="experience-item">
+        <div class="experience-item" *ngFor="let experience of experiences" [class.current]="experience.current">
           <div class="experience-header">
-            <h3>Software Engineering Intern</h3>
-            <span class="period">May 2025 - August 2025</span>
+            <h3>{{ experience.position }}</h3>
+            <span class="period">{{ experience.period }}</span>
+            <span class="current-badge" *ngIf="experience.current">Current</span>
           </div>
-          <div class="company">Google</div>
+          <div class="company">{{ experience.company }}</div>
           <div class="description">
             <ul>
-              <li>Gemini Apps Team</li>
+              <li *ngFor="let item of experience.description">{{ item }}</li>
             </ul>
           </div>
-        </div>
-        
-        <div class="experience-item">
-          <div class="experience-header">
-            <h3>STEP Intern</h3>
-            <span class="period">May 2024 - August 2024</span>
-          </div>
-          <div class="company">Google</div>
-          <div class="description">
-            <ul>
-              <li>Google Messages For Web Team</li>
-            </ul>
+          <div class="tech-stack" *ngIf="experience.technologies && experience.technologies.length > 0">
+            <span class="tech" *ngFor="let tech of experience.technologies">{{ tech }}</span>
           </div>
         </div>
       </div>

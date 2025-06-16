@@ -3,44 +3,12 @@
 // ===== MIXINS =====
 
 // ===== THEME MIXINS =====
-// Theme-aware styling using CSS custom properties
-@mixin theme-colors {
-  color: var(--text-primary);
-}
-
-@mixin theme-bg-primary {
-  background-color: var(--bg-primary);
-}
-
-@mixin theme-bg-secondary {
-  background-color: var(--bg-secondary);
-}
-
+// Main theme card mixin - combines background, border, and shadow
 @mixin theme-card {
   background: var(--bg-card);
   color: var(--text-primary);
   border: 1px solid var(--border-color);
   box-shadow: 0 8px 32px var(--shadow-color);
-}
-
-@mixin theme-text-primary {
-  color: var(--text-primary);
-}
-
-@mixin theme-text-secondary {
-  color: var(--text-secondary);
-}
-
-@mixin theme-text-muted {
-  color: var(--text-muted);
-}
-
-@mixin theme-border {
-  border-color: var(--border-color);
-}
-
-@mixin theme-border-subtle {
-  border-color: var(--border-subtle);
 }
 
 // ===== EXISTING MIXINS =====
@@ -58,15 +26,13 @@
   border-radius: $border-radius-xl;
   position: relative;
   z-index: 1;
+  box-sizing: border-box; // Ensure padding is included in width
+  overflow-x: hidden; // Prevent horizontal overflow
 }
 
-// Updated card theme mixins to use CSS custom properties
-@mixin card-theme-light {
-  @include theme-card;
-  backdrop-filter: $backdrop-filter;
-}
-
-@mixin card-theme-dark {
+// Card mixin with theme support
+@mixin card {
+  @include card-base;
   @include theme-card;
   backdrop-filter: $backdrop-filter;
 }
@@ -74,8 +40,11 @@
 // Content section mixin
 @mixin content-section($max-width: $max-content-width) {
   text-align: left;
-  max-width: $max-width;
+  max-width: min($max-width, 100%);
   margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden; // Prevent horizontal overflow
 }
 
 // Page title mixin
@@ -144,11 +113,11 @@
 // Form input mixin
 @mixin form-input {
   padding: $spacing-sm;
-  border: 1px solid $primary-color-border;
+  border: 1px solid var(--border-color);
   border-radius: $border-radius-base;
   font-size: $font-size-base;
-  background: $bg-form-input;
-  color: $text-primary;
+  background: var(--bg-form-input);
+  color: var(--text-primary);
   
   &:focus {
     outline: none;
@@ -179,6 +148,8 @@
 // Grid layout mixin
 @mixin responsive-grid($min-width: 300px, $gap: $spacing-xl) {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax($min-width, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min($min-width, 100%), 1fr));
   gap: $gap;
+  width: 100%;
+  overflow-x: hidden; // Prevent horizontal overflow
 }

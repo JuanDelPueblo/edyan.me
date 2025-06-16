@@ -7,10 +7,9 @@
   justify-content: center;
   width: 40px;
   height: 40px;
-  border: none;
-  border-radius: $border-radius-base;
+  border: none;  border-radius: $border-radius-base;
   background: var(--bg-card);
-  @include theme-text-primary;
+  color: var(--text-primary);
   cursor: pointer;
   transition: all $transition-fast;
   

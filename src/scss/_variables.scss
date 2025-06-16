@@ -54,23 +54,6 @@ $border-dark: rgba(255, 255, 255, 0.2);
   --shadow-color: rgba(0, 0, 0, 0.3);
 }
 
-.light-theme {
-  // Explicitly define light theme (same as :root but for clarity)
-  --bg-primary: transparent;
-  --bg-secondary: rgba(248, 249, 250, 0.1);
-  --bg-card: #{$bg-card-light};
-  --bg-form-input: #{$bg-form-input};
-  
-  --text-primary: #{$text-primary};
-  --text-secondary: #666666;
-  --text-muted: #999999;
-  
-  --border-color: #{$border-light};
-  --border-subtle: rgba(0, 0, 0, 0.1);
-  
-  --shadow-color: rgba(0, 0, 0, 0.1);
-}
-
 // ===== TYPOGRAPHY =====
 $font-family-primary: 'Outfit', 'Roboto Flex', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
 

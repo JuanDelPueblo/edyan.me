@@ -4,12 +4,13 @@
 // Global utility classes that can be used across components
 
 // ===== THEME UTILITIES =====
-.theme-text-primary { @include theme-text-primary; }
-.theme-text-secondary { @include theme-text-secondary; }
-.theme-text-muted { @include theme-text-muted; }
+// Direct CSS custom property utilities for common theme values
+.theme-text-primary { color: var(--text-primary); }
+.theme-text-secondary { color: var(--text-secondary); }
+.theme-text-muted { color: var(--text-muted); }
 .theme-bg-primary { background-color: var(--bg-primary); }
 .theme-bg-secondary { background-color: var(--bg-secondary); }
-.theme-border { @include theme-border; }
+.theme-border { border-color: var(--border-color); }
 
 // ===== TYPOGRAPHY UTILITIES =====
 .text-center { text-align: center; }
@@ -69,19 +70,6 @@
 
 .content-item {
   @include content-item;
-}
-
-// ===== CARD COMPONENTS =====
-.card {
-  @include card-base;
-}
-
-.card-theme-light {
-  @include card-theme-light;
-}
-
-.card-theme-dark {
-  @include card-theme-dark;
 }
 
 // ===== NAVIGATION STYLES =====
