@@ -1,22 +1,18 @@
-// Import SCSS architecture first
 @use 'scss/variables' as *;
 @use 'scss/mixins' as *;
 @use 'scss/utilities' as *;
 
-// Import Google Fonts
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&family=Roboto+Flex:opsz,wght@8..144,100..1000&display=swap');
 @import url('https://fonts.googleapis.com/icon?family=Material+Icons');
 
-// Global styles
 * {
   font-family: $font-family-primary;
-  box-sizing: border-box; // Ensure consistent box-sizing
+  box-sizing: border-box;
 }
 
 html {
-  // Enable smooth theme transitions
   transition: background-color $transition-medium, color $transition-medium;
-  overflow-x: hidden; // Prevent horizontal scroll on html
+  overflow-x: hidden;
 }
 
 body {
@@ -25,9 +21,8 @@ body {
   background-position: center;
   background-repeat: no-repeat;
   background-attachment: fixed;
-  min-height: 100vh;
-  margin: 0;
+  min-height: 100vh;  margin: 0;
   padding: 0;
-  overflow-x: hidden; // Prevent horizontal scroll on body
-  max-width: 100vw; // Ensure body doesn't exceed viewport width
+  overflow-x: hidden;
+  max-width: 100vw;
 }

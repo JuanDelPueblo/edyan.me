@@ -2,107 +2,92 @@
 @use '../scss/mixins' as *;
 @use '../scss/utilities' as *;
 
-// Desktop layout - sidebar only
 .app-layout {
   display: flex;
   min-height: 100vh;
-  max-width: 100vw; // Prevent horizontal overflow
-  justify-content: center; // Center the main content
+  max-width: 100vw;
+  justify-content: center;
 }
 
 .sidebar {
   position: fixed;
-  top: 0;
-  left: calc(50% - #{$centered-layout-half-width}); // Position relative to centered layout
+  top: 0;  left: calc(50% - #{$centered-layout-half-width});
   width: $sidebar-width;
-  height: 100vh;
-  padding: $spacing-xl;
-  display: flex;  align-items: center;
+  height: 100vh;  padding: $spacing-xl;
+  display: flex;
+  align-items: center;
   justify-content: center;
-  z-index: $z-index-sidebar;
-  background: var(--background);
+  z-index: $z-index-sidebar;  background: var(--background);
   
-  // Fallback for smaller screens
   @media (max-width: $layout-transition-breakpoint) {
-    left: 0; // Stick to left edge when screen is too small
+    left: 0;
   }
 }
 
 .main-content {
-  flex: 1; // Take remaining space
+  flex: 1;
   padding: $spacing-base;
   overflow-y: auto;
-  overflow-x: hidden; // Prevent horizontal scroll
-  max-width: $main-content-max-width; // Max width minus sidebar
-  box-sizing: border-box; // Include padding in width calculation
+  overflow-x: hidden;
+  max-width: $main-content-max-width;
+  box-sizing: border-box;
   display: flex;
   align-items: center;
-  justify-content: center;
-  min-height: 100vh;
+  justify-content: center;  min-height: 100vh;
   
-  // Fallback for smaller screens
   @media (max-width: $layout-transition-breakpoint) {
-    margin-left: $sidebar-width; // Use normal sidebar margin on smaller screens
+    margin-left: $sidebar-width;
     max-width: 100%;
   }
 }
 
 .bottom-navigation {
-  display: none; // Hidden on desktop
+  display: none;
 }
 
-// Mobile layout - bottom navigation only
 @include mobile-only {
   .app-layout {
     flex-direction: column;
     min-height: 100vh;
   }
-  
-  .sidebar {
-    display: none; // Hidden on mobile
+    .sidebar {
+    display: none;
   }
   .bottom-navigation {
-    display: block; // Shown on mobile
-    position: fixed;
-    bottom: 0;
-    left: 0;    right: 0;
+    display: block;
+    position: fixed;    bottom: 0;
+    left: 0;
+    right: 0;
     width: 100%;
-    z-index: $z-index-bottom-nav;
-    background: var(--background);
+    z-index: $z-index-bottom-nav;    background: var(--background);
     padding: $spacing-sm;
   }  .main-content {
     margin-left: 0;
-    margin-bottom: $bottom-nav-spacing; // Space for fixed bottom navigation
+    margin-bottom: $bottom-nav-spacing;
     padding: $spacing-base;
-    overflow-x: hidden; // Prevent horizontal scroll on mobile
+    overflow-x: hidden;
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: calc(100vh - #{$bottom-nav-spacing}); // Account for bottom nav height
+    min-height: calc(100vh - #{$bottom-nav-spacing});
     
-    // Extra small screens (less than 576px)
     @media (max-width: $breakpoint-xs) {
       padding: $spacing-sm;
     }
   }
 }
 
-// Content container for responsive widths inside main-content
 .content-container {
-  width: 100%;
-  max-width: $max-content-width; // Default comfortable reading width
+  width: 100%;  max-width: $max-content-width;
   
-  // Large screens
   @media (min-width: $breakpoint-lg) {
     max-width: $content-container-large;
   }
   
-  // Medium screens
   @media (min-width: $breakpoint-sm) and (max-width: #{$breakpoint-lg - 1px}) {
     max-width: $content-container-medium;
   }
   
-  // Small screens and below use full width
   @media (max-width: #{$breakpoint-sm - 1px}) {
     max-width: 100%;
   }

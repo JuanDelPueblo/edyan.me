@@ -1,10 +1,6 @@
 @use 'variables' as *;
 @use 'mixins' as *;
 
-// Global utility classes that can be used across components
-
-// ===== THEME UTILITIES =====
-// Direct CSS custom property utilities for common theme values
 .theme-text-primary { color: var(--text-primary); }
 .theme-text-secondary { color: var(--text-secondary); }
 .theme-text-muted { color: var(--text-muted); }
@@ -12,7 +8,6 @@
 .theme-bg-secondary { background-color: var(--bg-secondary); }
 .theme-border { border-color: var(--border-color); }
 
-// ===== TYPOGRAPHY UTILITIES =====
 .text-center { text-align: center; }
 .text-left { text-align: left; }
 .text-right { text-align: right; }
@@ -22,7 +17,6 @@
 .font-weight-semibold { font-weight: $font-weight-semibold; }
 .font-weight-bold { font-weight: $font-weight-bold; }
 
-// ===== SPACING UTILITIES =====
 .m-0 { margin: 0; }
 .m-1 { margin: $spacing-base; }
 .m-2 { margin: $spacing-xl; }
@@ -35,7 +29,6 @@
 .p-1 { padding: $spacing-base; }
 .p-2 { padding: $spacing-xl; }
 
-// ===== LAYOUT UTILITIES =====
 .flex { display: flex; }
 .flex-col { flex-direction: column; }
 .flex-wrap { flex-wrap: wrap; }
@@ -46,7 +39,6 @@
 .w-full { width: 100%; }
 .h-full { height: 100%; }
 
-// ===== COMMON COMPONENT STYLES =====
 .page-container {
   text-align: center;
   padding: $spacing-xl 0;
@@ -72,26 +64,21 @@
   @include content-item;
 }
 
-// ===== NAVIGATION STYLES =====
 .nav-link {
   @include nav-link;
 }
 
-// ===== FORM STYLES =====
 .form-input {
   @include form-input;
 }
 
-// ===== RESPONSIVE UTILITIES =====
 @include mobile-only {
   .hide-mobile { display: none !important; }
 }
 
-@include tablet-and-up {
-  .hide-desktop { display: none !important; }
+@include tablet-and-up {  .hide-desktop { display: none !important; }
 }
 
-// ===== TECH STACK / TAG STYLES =====
 .tech-stack {
   display: flex;
   flex-wrap: wrap;
