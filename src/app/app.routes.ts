@@ -5,9 +5,9 @@ import { Experiences } from './pages/experiences/experiences';
 import { Contact } from './pages/contact/contact';
 
 export const routes: Routes = [
-  { path: '', component: Hero }, // Default route (home page with about me merged)
-  { path: 'projects', component: Projects },
-  { path: 'experiences', component: Experiences },
-  { path: 'contact', component: Contact },
+  { path: '', component: Hero, data: { animation: 'home' } }, // Default route (home page with about me merged)
+  { path: 'projects', component: Projects, data: { animation: 'projects' } },
+  { path: 'experiences', component: Experiences, data: { animation: 'experiences' } },
+  { path: 'contact', component: Contact, data: { animation: 'contact' } },
   { path: '**', redirectTo: '' } // Wildcard route - redirect to home for any unmatched routes
 ];
