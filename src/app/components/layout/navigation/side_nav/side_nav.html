@@ -1,18 +1,21 @@
 <card>
   <nav class="side-nav">
-    <ul>
-      @for (item of navItems; track item.path) {
-        <li>
-          <a 
-            [routerLink]="item.path" 
-            routerLinkActive="active" 
-            [routerLinkActiveOptions]="item.exact ? {exact: true} : {exact: false}">
-            <mat-icon>{{ item.icon }}</mat-icon>
-            <span>{{ item.label }}</span>
-          </a>
-        </li>
-      }
-    </ul>
+    <div class="nav-container">
+      <div class="active-indicator" #activeIndicator></div>
+      <ul #navList>
+        @for (item of navItems; track item.path) {
+          <li>
+            <a 
+              [routerLink]="item.path" 
+              routerLinkActive="active" 
+              [routerLinkActiveOptions]="item.exact ? {exact: true} : {exact: false}">
+              <mat-icon>{{ item.icon }}</mat-icon>
+              <span>{{ item.label }}</span>
+            </a>
+          </li>
+        }
+      </ul>
+    </div>
     
     <div class="theme-toggle-container">
       <theme-toggle></theme-toggle>
