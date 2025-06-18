@@ -11,19 +11,19 @@ export const slideAnimation = trigger('routeAnimations', [
         width: '100%',
         height: '100%',
         display: 'flex',
-        alignItems: 'center',
+        alignItems: 'center', // flex-start works sometimes
         justifyContent: 'center'
       })
     ], { optional: true }),
     
     query(':enter', [
-      style({ transform: 'translateY(100%)' })
+      style({ transform: 'translateY(150%)' })
     ], { optional: true }),
     
     group([
       query(':leave', [
         animate('400ms cubic-bezier(0.4, 0.0, 0.2, 1)', 
-                style({ transform: 'translateY(-100%)' }))
+                style({ transform: 'translateY(-150%)' }))
       ], { optional: true }),
       
       query(':enter', [
@@ -49,13 +49,13 @@ export const slideAnimation = trigger('routeAnimations', [
     ], { optional: true }),
     
     query(':enter', [
-      style({ transform: 'translateY(-100%)' })
+      style({ transform: 'translateY(-150%)' })
     ], { optional: true }),
     
     group([
       query(':leave', [
         animate('400ms cubic-bezier(0.4, 0.0, 0.2, 1)', 
-                style({ transform: 'translateY(100%)' }))
+                style({ transform: 'translateY(150%)' }))
       ], { optional: true }),
       
       query(':enter', [

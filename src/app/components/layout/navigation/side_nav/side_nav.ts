@@ -56,6 +56,10 @@ export class SideNav implements OnInit, OnDestroy, AfterViewInit {
   }
 
   private updateIndicatorPosition() {
+    // Guard for browser environment and ensure DOM API exists
+    if (typeof window === 'undefined' || !this.navList.nativeElement.getBoundingClientRect) {
+      return;
+    }
     const activeLink = this.navList.nativeElement.querySelector('a.active') as HTMLAnchorElement;
     
     if (activeLink && this.activeIndicator) {
