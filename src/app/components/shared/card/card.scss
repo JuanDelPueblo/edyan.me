@@ -4,7 +4,9 @@
 .card {
   background: var(--bg-card);
   color: var(--text-primary);
-  border: 1px solid var(--border-color);  box-shadow: 0 8px 32px var(--shadow-color);  padding: $spacing-lg;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 8px 32px var(--shadow-color);
+  padding: $spacing-lg;
   border-radius: $border-radius-xl;
   backdrop-filter: $backdrop-filter;
   box-sizing: border-box;

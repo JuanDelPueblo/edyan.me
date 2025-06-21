@@ -2,7 +2,8 @@
 
 @mixin content-section($max-width: $max-content-width) {
   text-align: left;
-  max-width: min($max-width, 100%);  margin: 0 auto;
+  max-width: min($max-width, 100%);
+  margin: 0 auto;
   width: 100%;
   box-sizing: border-box;
   overflow-x: hidden;
@@ -11,13 +12,15 @@
 @mixin page-title {
   font-size: $font-size-3xl;
   font-weight: $font-weight-bold;
-  margin-bottom: $spacing-xl;  line-height: $line-height-normal;
+  margin-bottom: $spacing-xl;
+  line-height: $line-height-normal;
 }
 
 @mixin section-intro {
   font-size: $font-size-lg;
   line-height: $line-height-relaxed;
-  margin-bottom: $spacing-xl;  text-align: center;
+  margin-bottom: $spacing-xl;
+  text-align: center;
 }
 
 @mixin button-primary {
@@ -34,7 +37,8 @@
   display: inline-block;
 
   &:hover {
-    background: $primary-color-dark;  }
+    background: $primary-color-dark;
+  }
 }
 
 @mixin nav-link {
@@ -45,20 +49,22 @@
   color: inherit;
   border-radius: $border-radius-sm;
   transition: all $transition-fast;
-  
+
   &:hover {
     background-color: $primary-color-light;
   }
-  
+
   &.active {
     background-color: $primary-color;
-    color: $white;  }
+    color: $white;
+  }
 }
 
 @mixin content-item {
   background: $primary-color-lighter;
   padding: $spacing-lg;
-  border-radius: $border-radius-lg;  border: 1px solid $primary-color-light;
+  border-radius: $border-radius-lg;
+  border: 1px solid $primary-color-light;
 }
 
 @mixin form-input {
@@ -68,11 +74,12 @@
   font-size: $font-size-base;
   background: var(--bg-form-input);
   color: var(--text-primary);
-  
+
   &:focus {
     outline: none;
     border-color: $primary-color;
-    box-shadow: 0 0 0 2px $primary-color-light;  }
+    box-shadow: 0 0 0 2px $primary-color-light;
+  }
 }
 
 @mixin mobile-only {
@@ -89,12 +96,14 @@
 
 @mixin desktop-and-up {
   @media (min-width: #{$breakpoint-md + 1px}) {
-    @content;  }
+    @content;
+  }
 }
 
 @mixin responsive-grid($min-width: 300px, $gap: $spacing-xl) {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min($min-width, 100%), 1fr));  gap: $gap;
+  grid-template-columns: repeat(auto-fit, minmax(min($min-width, 100%), 1fr));
+  gap: $gap;
   width: 100%;
   overflow-x: hidden;
 }

@@ -13,21 +13,21 @@
   color: var(--text-primary);
   cursor: pointer;
   transition: all $transition-fast;
-  
+
   &:hover {
     background: var(--bg-secondary);
     transform: scale(1.05);
   }
-  
+
   &:active {
     transform: scale(0.95);
   }
-  
+
   .material-icons {
     font-size: 20px;
     transition: transform $transition-fast;
   }
-  
+
   &:hover .material-icons {
     transform: rotate(180deg);
   }

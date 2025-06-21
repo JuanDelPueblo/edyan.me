@@ -9,11 +9,13 @@
   gap: $spacing-lg;
   align-items: center;
   justify-content: center;
-  
+
   .nav-container {
     position: relative;
     width: 100%;
-  }  .active-indicator {
+  }
+
+  .active-indicator {
     position: absolute;
     top: 0;
     left: 0;
@@ -30,7 +32,7 @@
       background-color: #6d28d9; // Darker purple for dark mode
     }
   }
-  
+
   ul {
     list-style: none;
     padding: 0;
@@ -38,14 +40,14 @@
     width: 100%;
     position: relative;
     z-index: 2;
-    
+
     li {
       margin-bottom: $spacing-sm;
-      
+
       &:last-child {
         margin-bottom: 0;
       }
-      
+
       a {
         @include nav-link;
         gap: $spacing-sm;
@@ -53,20 +55,21 @@
         box-sizing: border-box;
         position: relative;
         background-color: transparent !important; // Remove default active background
-          &.active {
+
+        &.active {
           color: var(--text-primary); // Use theme-appropriate text color instead of white
           background-color: transparent !important; // Keep transparent, indicator provides the background
-          
+
           // Only use white text in dark mode where it makes sense
           :global(.dark-theme) & {
             color: $white;
           }
         }
-        
+
         &:hover:not(.active) {
           background-color: $primary-color-light;
         }
-        
+
         mat-icon {
           font-size: 1.25rem;
           width: 1.25rem;
@@ -75,7 +78,7 @@
           position: relative;
           z-index: 3;
         }
-        
+
         span {
           flex: 1;
           position: relative;
@@ -84,7 +87,7 @@
       }
     }
   }
-  
+
   .theme-toggle-container {
     display: flex;
     justify-content: center;

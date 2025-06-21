@@ -27,7 +27,7 @@
 .experience-item {
   @extend .content-item;
   border-left: 4px solid $primary-color;
-  
+
   &.current {
     border-left-color: var(--accent-color);
     background-color: var(--background-secondary);
@@ -47,7 +47,7 @@
     margin: 0;
     color: inherit;
   }
-  
+
   .current-badge {
     @extend .tech-tag;
     background-color: var(--accent-color);
