@@ -7,7 +7,7 @@
 }
 
 .about-content {
-  @include content-section($max-very-narrow-content-width);
+  @include content-section($max-content-width);
 }
 
 .hero-title {

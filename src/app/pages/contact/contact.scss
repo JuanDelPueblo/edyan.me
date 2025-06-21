@@ -11,7 +11,7 @@
 }
 
 .contact-content {
-  @include content-section($max-narrow-content-width);
+  @include content-section($max-content-width);
 }
 
 .intro {
