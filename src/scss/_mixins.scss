@@ -2,7 +2,7 @@
 
 @mixin content-section($max-width: $max-content-width) {
   text-align: left;
-  max-width: min($max-width, 100%);
+  max-width: $max-width;
   margin: 0 auto;
   width: 100%;
   box-sizing: border-box;

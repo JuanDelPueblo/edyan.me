@@ -11,7 +11,7 @@
 }
 
 .experiences-content {
-  @include content-section($max-content-width);
+  @include content-section();
 }
 
 .intro {
