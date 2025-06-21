@@ -11,14 +11,17 @@
 
 .sidebar {
   position: fixed;
-  top: 0;  left: calc(50% - #{$centered-layout-half-width});
+  top: 0;
+  left: calc(50% - #{$centered-layout-half-width});
   width: $sidebar-width;
-  height: 100vh;  padding: $spacing-xl;
+  height: 100vh;
+  padding: $spacing-xl;
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: $z-index-sidebar;  background: var(--background);
-  
+  z-index: $z-index-sidebar;
+  background: var(--background);
+
   @media (max-width: $layout-transition-breakpoint) {
     left: 0;
   }
@@ -33,8 +36,9 @@
   box-sizing: border-box;
   display: flex;
   align-items: center;
-  justify-content: center;  min-height: 100vh;
-  
+  justify-content: center;
+  min-height: 100vh;
+
   @media (max-width: $layout-transition-breakpoint) {
     margin-left: $sidebar-width;
     max-width: 100%;
@@ -50,18 +54,24 @@
     flex-direction: column;
     min-height: 100vh;
   }
-    .sidebar {
+
+  .sidebar {
     display: none;
   }
+
   .bottom-navigation {
     display: block;
-    position: fixed;    bottom: 0;
+    position: fixed;
+    bottom: 0;
     left: 0;
     right: 0;
     width: 100%;
-    z-index: $z-index-bottom-nav;    background: var(--background);
+    z-index: $z-index-bottom-nav;
+    background: var(--background);
     padding: $spacing-sm;
-  }  .main-content {
+  }
+
+  .main-content {
     margin-left: 0;
     margin-bottom: $bottom-nav-spacing;
     padding: $spacing-base;
@@ -70,7 +80,7 @@
     align-items: center;
     justify-content: center;
     min-height: calc(100vh - #{$bottom-nav-spacing});
-    
+
     @media (max-width: $breakpoint-xs) {
       padding: $spacing-sm;
     }
@@ -86,15 +96,15 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  
+
   @media (min-width: $breakpoint-lg) {
     max-width: $content-container-large;
   }
-  
+
   @media (min-width: $breakpoint-sm) and (max-width: #{$breakpoint-lg - 1px}) {
     max-width: $content-container-medium;
   }
-  
+
   @media (max-width: #{$breakpoint-sm - 1px}) {
     max-width: 100%;
   }
@@ -109,15 +119,15 @@ router-outlet {
   height: 100%;
 }
 
-router-outlet + * {
+router-outlet+* {
   width: 100%;
   height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  
+
   // Ensure content within pages maintains its layout during animation
-  > * {
+  >* {
     width: 100%;
     max-width: inherit;
   }
