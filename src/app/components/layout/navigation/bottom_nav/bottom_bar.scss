@@ -12,9 +12,12 @@
     display: flex;
     justify-content: space-around;
     width: 100%;
+    position: relative;
+    z-index: 2;
 
     li {
       flex: 1;
+      position: relative;
 
       a {
         @include nav-link;
@@ -23,6 +26,8 @@
         font-size: $font-size-xs;
         gap: $spacing-xs;
         padding: $spacing-sm $spacing-xs;
+        position: relative;
+        z-index: 3;
 
         mat-icon {
           font-size: 1.25rem;
@@ -34,7 +39,40 @@
           font-size: $font-size-xs;
           line-height: $line-height-tight;
         }
+
+        &.active {
+          color: var(--text-primary);
+          background-color: transparent !important;
+
+          :global(.dark-theme) & {
+            color: $white;
+          }
+        }
       }
+    }
+  }
+
+  .nav-container {
+    position: relative;
+    width: 100%;
+  }
+
+  .active-indicator {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 0;
+    height: 0;
+    background-color: $primary-color;
+    border-radius: $border-radius-sm;
+    opacity: 0;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1;
+    pointer-events: none;
+
+    // Dark mode
+    :global(.dark-theme) & {
+      background-color: #6d28d9;
     }
   }
 }
