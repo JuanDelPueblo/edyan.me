@@ -124,6 +124,12 @@
 .page-container {
   text-align: center;
   padding: $spacing-xl 0;
+
+  // fix stupid experiences page not matching width
+  @media (min-width: #{$breakpoint-lg}) {
+    width: $max-content-width;
+    margin: 0 auto;
+  }
 }
 
 .page-title {
