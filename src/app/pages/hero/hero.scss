@@ -32,14 +32,22 @@
 }
 
 .skills-grid {
-  @include responsive-grid(200px, $spacing-base);
+  @include responsive-grid(100px, $spacing-base);
   margin-bottom: $spacing-base;
 }
 
 .skill-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   background: $primary-color-light;
   padding: $spacing-sm $spacing-base;
   border-radius: $border-radius-base;
   text-align: center;
   font-weight: $font-weight-medium;
+}
+
+.skill-item mat-icon {
+  transform: scale(2);
+  margin: $spacing-base 0;
 }

@@ -6,7 +6,10 @@
 			<div class="skills-section">
 				<h2>{{ aboutContent.skillsTitle }}</h2>
 				<div class="skills-grid">
-					<div class="skill-item" *ngFor="let skill of aboutContent.skills">{{ skill }}</div>
+					<div class="skill-item" *ngFor="let skill of aboutContent.skills">
+						<mat-icon *ngIf="skill.icon">{{ skill.icon }}</mat-icon>
+						<span>{{ skill.name }}</span>
+					</div>
 				</div>
 			</div>
 		</div>

@@ -29,6 +29,7 @@ export class BottomBar implements AfterViewInit, OnDestroy {
   ];
 
   ngAfterViewInit(): void {
+    if (typeof window === 'undefined') return; // Only run in browser
     setTimeout(() => this.updateActiveIndicator(), 100);
     this.setupSectionObserver();
   }
@@ -76,6 +77,7 @@ export class BottomBar implements AfterViewInit, OnDestroy {
   }
 
   private updateActiveIndicator(): void {
+    if (typeof window === 'undefined') return; // Only run in browser
     if (!this.navList?.nativeElement || !this.activeIndicator?.nativeElement) {
       return;
     }

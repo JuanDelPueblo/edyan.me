@@ -28,6 +28,11 @@ export interface NavigationItem {
   icon?: string;
 }
 
+export interface Skill {
+  name: string;
+  icon: string;
+}
+
 // Main strings configuration
 export const STRINGS = {  // Navigation
   navigation: {
@@ -43,9 +48,13 @@ export const STRINGS = {  // Navigation
     title: 'About Me',
     introduction: 'I\'m a passionate software engineer with experience in full-stack development, currently pursuing my career in technology.',
     skills: [
-      'Angular', 'TypeScript', 'JavaScript', 'Python', 'Java',
-      'Docker'
-    ],
+      { name: 'Angular', icon: 'web' },
+      { name: 'TypeScript', icon: 'code' },
+      { name: 'JavaScript', icon: 'javascript' },
+      { name: 'Python', icon: 'smart_toy' },
+      { name: 'HTML', icon: 'html' },
+      { name: 'CSS', icon: 'css' },
+    ] as Skill[],
     skillsTitle: 'Technical Skills'
   },
 
