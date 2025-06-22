@@ -1,12 +1,10 @@
 <card>
-  <nav class="bottom-nav">
-    <ul>
-      @for (item of navItems; track item.path) {
+  <nav class="bottom-nav">    <ul>
+      @for (item of navItems; track item.sectionId) {
         <li>
           <a 
-            [routerLink]="item.path" 
-            routerLinkActive="active" 
-            [routerLinkActiveOptions]="item.exact ? {exact: true} : {exact: false}">
+            (click)="scrollToSection(item.sectionId)"
+            [attr.data-section]="item.sectionId">
             <mat-icon>{{ item.icon }}</mat-icon>
             <span>{{ item.label }}</span>
           </a>

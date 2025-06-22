@@ -52,7 +52,6 @@
         @include nav-link;
         gap: $spacing-sm;
         width: 100%;
-        box-sizing: border-box;
         position: relative;
         background-color: transparent !important; // Remove default active background
 

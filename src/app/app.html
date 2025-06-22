@@ -2,11 +2,13 @@
   <aside class="sidebar">
     <side-nav></side-nav>
   </aside>
-
   <main class="main-content">
-    <div class="content-container" [@routeAnimations]="prepareRoute(outlet)">
-      <router-outlet #outlet="outlet" />
+    <div class="hero-container">
+      <hero id="hero"></hero>
     </div>
+    <projects id="projects"></projects>
+    <experiences id="experiences"></experiences>
+    <contact id="contact"></contact>
   </main>
 
   <footer class="bottom-navigation">
