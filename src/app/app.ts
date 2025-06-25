@@ -16,7 +16,7 @@ export class App {
   protected title = 'edyan.me';
 
   protected navItems: NavItem[] = [
-    { sectionId: 'hero', label: 'H  ome', icon: 'home' },
+    { sectionId: 'hero', label: 'Home', icon: 'home' },
     { sectionId: 'projects', label: 'Projects', icon: 'code' },
     { sectionId: 'experiences', label: 'Experiences', icon: 'work' },
   ];
