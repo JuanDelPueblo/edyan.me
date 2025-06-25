@@ -146,18 +146,6 @@
   @include content-item;
 }
 
-@include mobile-only {
-  .hide-mobile {
-    display: none !important;
-  }
-}
-
-@include tablet-and-up {
-  .hide-desktop {
-    display: none !important;
-  }
-}
-
 .tag {
   background: $primary-color-border;
   padding: $spacing-xs $spacing-sm;

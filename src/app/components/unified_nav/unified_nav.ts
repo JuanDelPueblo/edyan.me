@@ -1,7 +1,7 @@
 import { Component, input } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
-import { Card } from '../shared/card/card';
-import { ThemeToggle } from '../shared/theme_toggle/theme_toggle';
+import { Card } from '../card/card';
+import { ThemeToggle } from './theme_toggle/theme_toggle';
 import { NavItem } from '../../types/datatypes';
 
 @Component({

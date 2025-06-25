@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Card } from '../../components/shared/card/card';
+import { Card } from '../../components/card/card';
 import { TechStack } from '../../components/tech_stack/tech_stack';
 import { StringService } from '../../services/string.service';
 import { Project } from '../../config/strings';
