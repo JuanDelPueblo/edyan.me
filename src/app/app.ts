@@ -1,18 +1,24 @@
 import { Component } from '@angular/core';
-import { SideNav } from './components/layout/navigation/side_nav/side_nav';
-import { BottomBar } from './components/layout/navigation/bottom_nav/bottom_bar';
+import { UnifiedNav } from './components/unified_nav/unified_nav';
 import { Hero } from './pages/hero/hero';
 import { Projects } from './pages/projects/projects';
 import { Experiences } from './pages/experiences/experiences';
 import { Contact } from './pages/contact/contact';
+import { NavItem } from './types/datatypes';
 
 @Component({
   selector: 'root',
-  imports: [SideNav, BottomBar, Hero, Projects, Experiences, Contact],
+  imports: [UnifiedNav, Hero, Projects, Experiences, Contact],
   templateUrl: './app.html',
   styleUrl: './app.scss',
 })
 export class App {
   protected title = 'edyan.me';
 
+  protected navItems: NavItem[] = [
+    { sectionId: 'hero', label: 'Home', icon: 'home' },
+    { sectionId: 'projects', label: 'Projects', icon: 'code' },
+    { sectionId: 'experiences', label: 'Experiences', icon: 'work' },
+    { sectionId: 'contact', label: 'Contact', icon: 'mail' },
+  ];
 }

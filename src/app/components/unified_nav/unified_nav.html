@@ -1,0 +1,22 @@
+<card>
+	<nav class="unified-nav">
+		<div class="nav-container">
+			<div class="active-indicator" #activeIndicator></div>
+			<ul #navList>
+				@for (item of navItems(); track item.sectionId) {
+				<li>
+					<a href="#{{ item.sectionId }}">
+						<mat-icon>{{ item.icon }}</mat-icon>
+						<span>{{ item.label }}</span>
+					</a>
+				</li>
+				}
+			</ul>
+		</div>
+
+		<!-- Theme toggle only shown on desktop/sidebar -->
+		<div class="theme-toggle-container">
+			<theme-toggle></theme-toggle>
+		</div>
+	</nav>
+</card>
