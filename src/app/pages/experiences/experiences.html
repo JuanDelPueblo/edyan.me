@@ -3,7 +3,7 @@
     <h1 class="page-title">{{ sectionContent.title }}</h1>
     <div class="experiences-content">
       <p class="intro">{{ sectionContent.intro }}</p>
-      
+
       <div class="timeline">
         <div class="experience-item" *ngFor="let experience of experiences" [class.current]="experience.current">
           <div class="experience-header">
@@ -17,9 +17,7 @@
               <li *ngFor="let item of experience.description">{{ item }}</li>
             </ul>
           </div>
-          <div class="tech-stack" *ngIf="experience.technologies && experience.technologies.length > 0">
-            <span class="tech" *ngFor="let tech of experience.technologies">{{ tech }}</span>
-          </div>
+          <tech-stack [technologies]="experience.technologies" />
         </div>
       </div>
     </div>

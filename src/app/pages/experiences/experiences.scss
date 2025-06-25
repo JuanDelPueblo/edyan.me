@@ -49,7 +49,7 @@
   }
 
   .current-badge {
-    @extend .tech-tag;
+    @extend .tag;
     background-color: var(--accent-color);
     color: var(--text-color-on-accent);
     font-size: $font-size-xs;
@@ -58,7 +58,7 @@
 }
 
 .period {
-  @extend .tech-tag;
+  @extend .tag;
 }
 
 .company {
@@ -89,7 +89,7 @@
   margin-top: $spacing-base;
 
   .tech {
-    @extend .tech-tag;
+    @extend .tag;
   }
 }
 

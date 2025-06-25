@@ -40,45 +40,11 @@
   }
 }
 
-@mixin nav-link {
-  display: flex;
-  align-items: center;
-  padding: $spacing-sm $spacing-base;
-  text-decoration: none;
-  color: inherit;
-  border-radius: $border-radius-sm;
-  transition: all $transition-fast;
-
-  &:hover {
-    background-color: $primary-color-light;
-  }
-
-  &.active {
-    background-color: $primary-color;
-    color: $white;
-  }
-}
-
 @mixin content-item {
   background: $primary-color-lighter;
   padding: $spacing-lg;
   border-radius: $border-radius-lg;
   border: 1px solid $primary-color-light;
-}
-
-@mixin form-input {
-  padding: $spacing-sm;
-  border: 1px solid var(--border-color);
-  border-radius: $border-radius-base;
-  font-size: $font-size-base;
-  background: var(--bg-form-input);
-  color: var(--text-primary);
-
-  &:focus {
-    outline: none;
-    border-color: $primary-color;
-    box-shadow: 0 0 0 2px $primary-color-light;
-  }
 }
 
 @mixin mobile-only {

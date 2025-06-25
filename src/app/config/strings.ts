@@ -17,7 +17,7 @@ export interface Experience {
   company: string;
   period: string;
   description: string[];
-  technologies?: string[];
+  technologies: string[];
   current: boolean;
   order: number;
 }
