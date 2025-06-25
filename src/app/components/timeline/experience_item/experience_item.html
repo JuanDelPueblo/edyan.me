@@ -1,0 +1,19 @@
+<div class="experience-item">
+	<div class="experience-header">
+		<h3>{{ experience().position }}</h3>
+		<span class="period">{{ experience().period }}</span>
+		@if (experience().current) {
+		<span class="current-badge">Current</span>
+		}
+	</div>
+	<div class="company">{{ experience().company }}</div>
+
+	<div class="description">
+		<ul>
+			@for (item of experience().description; track item) {
+			<li>{{ item }}</li>
+			}
+		</ul>
+	</div>
+	<tech-stack [technologies]="experience().technologies" />
+</div>

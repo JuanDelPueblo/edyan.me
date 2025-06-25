@@ -22,4 +22,5 @@ export class App {
   ];
 
   protected projects = STRINGS.projects;
+  protected experiences = STRINGS.experiences;
 }

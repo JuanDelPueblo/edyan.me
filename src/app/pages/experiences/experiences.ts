@@ -1,24 +1,17 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, input, OnInit } from '@angular/core';
 import { Card } from '../../components/card/card';
-import { TechStack } from '../../components/tech_stack/tech_stack';
-import { StringService } from '../../services/string.service';
-import { Experience } from '../../config/strings';
+import { Experience } from '../../types/datatypes';
+import { Timeline } from '../../components/timeline/timeline';
 
 @Component({
   selector: 'experiences',
-  imports: [Card, CommonModule, TechStack],
+  imports: [Card, Timeline],
   templateUrl: './experiences.html',
   styleUrl: './experiences.scss'
 })
-export class Experiences implements OnInit {
-  experiences: Experience[] = [];
-  sectionContent: any = {};
+export class Experiences {
+  readonly title = input.required<string>();
+  readonly description = input.required<string>();
+  readonly experiences = input.required<Experience[]>();
 
-  constructor(private stringService: StringService) { }
-
-  ngOnInit(): void {
-    this.experiences = this.stringService.getAllExperiences();
-    this.sectionContent = this.stringService.getExperiencesSectionContent();
-  }
 }

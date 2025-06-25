@@ -1,4 +1,4 @@
-import { Project } from './types/datatypes';
+import { Experience, Project } from './types/datatypes';
 
 export const STRINGS = {
 	projects: {
@@ -33,5 +33,31 @@ export const STRINGS = {
 				githubUrl: '',
 			}
 		] as Project[],
-	}
+	},
+	experiences: {
+		title: 'Professional Experience',
+		description: 'My professional journey and the experiences that have shaped my career in technology.',
+		experiencesList: [
+			{
+				position: 'Software Engineering Intern',
+				company: 'Google',
+				period: 'May 2025 - August 2025',
+				description: [
+					'Gemini Apps Team',
+					'Working on cutting-edge AI applications and user experiences'
+				],
+				technologies: ['TypeScript', 'Angular', 'Python', 'Machine Learning'],
+			},
+			{
+				position: 'STEP Intern',
+				company: 'Google',
+				period: 'May 2024 - August 2024',
+				description: [
+					'Google Messages For Web Team',
+					'Contributed to web-based messaging platform development'
+				],
+				technologies: ['JavaScript', 'Web APIs', 'Frontend Development'],
+			}
+		] as Experience[],
+	},
 }
