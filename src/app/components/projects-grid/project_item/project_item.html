@@ -1,0 +1,27 @@
+<div class="project-item">
+	<div class="project-header">
+		<h3>{{ project().title }}</h3>
+		@if (project().liveUrl || project().githubUrl) {
+		<div class="project-actions">
+			@if (project().liveUrl) {
+			<button class="btn btn-primary" (click)="onBtnClick(project().liveUrl)" type="button">
+				View Project
+			</button>
+			} @else if (project().githubUrl) {
+			<button class="btn btn-secondary" (click)="onBtnClick(project().githubUrl)" type="button">
+				View Code
+			</button>
+			}
+		</div>
+		}
+	</div>
+	<p class="project-description">{{ project().description }}</p>
+
+	<tech-stack [technologies]="project().technologies" />
+
+	@if (project().image) {
+	<div class="project-image">
+		<img [src]="project().image" [alt]="project().title" />
+	</div>
+	}
+</div>

@@ -1,31 +1,10 @@
 <card>
   <div class="projects">
-    <h1 class="page-title">{{ sectionContent.title }}</h1>
+    <h1 class="page-title">{{ title() }}</h1>
     <div class="projects-content">
-      <p class="intro">{{ sectionContent.intro }}</p>
+      <p class="intro">{{ description() }}</p>
 
-      <div class="projects-grid">
-        <div class="project-item" *ngFor="let project of projects" [class.featured]="project.featured">
-          <div class="project-header">
-            <h3>{{ project.title }}</h3>
-            <div class="project-actions" *ngIf="project.liveUrl || project.githubUrl">
-              <button *ngIf="project.liveUrl" class="btn btn-primary" (click)="onProjectClick(project)" type="button">
-                {{ sectionContent.buttons.viewProject }}
-              </button>
-              <button *ngIf="project.githubUrl" class="btn btn-secondary" (click)="onViewCode(project)" type="button">
-                {{ sectionContent.buttons.viewCode }}
-              </button>
-            </div>
-          </div>
-          <p class="project-description">{{ project.description }}</p>
-
-          <tech-stack [technologies]="project.technologies" />
-
-          <div class="project-image" *ngIf="project.image">
-            <img [src]="project.image" [alt]="project.title" />
-          </div>
-        </div>
-      </div>
+      <projects-grid [projects]="projects()" />
     </div>
   </div>
 </card>

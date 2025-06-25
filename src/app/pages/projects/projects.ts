@@ -1,36 +1,16 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, input, } from '@angular/core';
 import { Card } from '../../components/card/card';
-import { TechStack } from '../../components/tech_stack/tech_stack';
-import { StringService } from '../../services/string.service';
-import { Project } from '../../config/strings';
+import { Project } from '../../types/datatypes';
+import { ProjectsGrid } from '../../components/projects-grid/projects_grid';
 
 @Component({
   selector: 'projects',
-  imports: [Card, CommonModule, TechStack],
+  imports: [Card, ProjectsGrid],
   templateUrl: './projects.html',
   styleUrl: './projects.scss'
 })
-export class Projects implements OnInit {
-  projects: Project[] = [];
-  sectionContent: any = {};
-
-  constructor(private stringService: StringService) { }
-
-  ngOnInit(): void {
-    this.projects = this.stringService.getAllProjects();
-    this.sectionContent = this.stringService.getProjectsSectionContent();
-  }
-
-  onProjectClick(project: Project): void {
-    if (project.liveUrl) {
-      window.open(project.liveUrl, '_blank');
-    }
-  }
-
-  onViewCode(project: Project): void {
-    if (project.githubUrl) {
-      window.open(project.githubUrl, '_blank');
-    }
-  }
+export class Projects {
+  readonly projects = input.required<Project[]>();
+  readonly title = input.required<string>();
+  readonly description = input.required<string>();
 }

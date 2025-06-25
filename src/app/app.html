@@ -6,7 +6,8 @@
     <div class="hero-container" id="hero">
       <hero></hero>
     </div>
-    <projects id="projects"></projects>
+    <projects id="projects" [title]="projects.title" [description]="projects.description"
+      [projects]="projects.projectsList"></projects>
     <experiences id="experiences"></experiences>
   </main>
 
