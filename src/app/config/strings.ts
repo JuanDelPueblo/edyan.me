@@ -48,14 +48,14 @@ export const STRINGS = {  // Navigation
     title: 'About Me',
     introduction: 'I\'m a passionate software engineer with experience in full-stack development, currently pursuing my career in technology.',
     skills: [
-      { name: 'Angular', icon: 'web' },
-      { name: 'TypeScript', icon: 'code' },
-      { name: 'JavaScript', icon: 'javascript' },
+      { name: 'Web', icon: 'web' },
+      { name: 'Android', icon: 'android' },
+      { name: 'Blender', icon: 'blender' },
       { name: 'Python', icon: 'smart_toy' },
       { name: 'HTML', icon: 'html' },
       { name: 'CSS', icon: 'css' },
     ] as Skill[],
-    skillsTitle: 'Technical Skills'
+    skillsTitle: 'Experienced Developing In',
   },
 
   // Projects section
