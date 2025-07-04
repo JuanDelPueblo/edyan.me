@@ -10,6 +10,8 @@
 	text-align: center;
 	font-weight: $font-weight-medium;
 	padding: $spacing-base;
+	transition: background-color $transition-fast;
+
 
 	&:hover {
 		background: $primary-color-light;

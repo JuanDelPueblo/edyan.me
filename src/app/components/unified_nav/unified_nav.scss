@@ -34,27 +34,17 @@
 				padding: $spacing-sm $spacing-base;
 				text-decoration: none;
 				color: inherit;
-				border-radius: $border-radius-sm;
+				border-radius: $border-radius-base;
 				gap: $spacing-sm;
 				width: 100%;
 				position: relative;
-				background-color: transparent;
-				border: 1px solid transparent;
+				background-color: $primary-color-lighter;
+				border: 1px solid $primary-color-light;
 				box-sizing: border-box;
 				transition: all $transition-fast;
 
 				&:hover {
-					background: rgba(167, 139, 250, 0.08);
-					backdrop-filter: blur(8px);
-					border-color: rgba(167, 139, 250, 0.2);
-					transform: translateY(-1px);
-					box-shadow: 0 4px 16px rgba(167, 139, 250, 0.1);
-
-					:global(.dark-theme) & {
-						background: rgba(109, 40, 217, 0.12);
-						border-color: rgba(109, 40, 217, 0.3);
-						box-shadow: 0 4px 16px rgba(109, 40, 217, 0.15);
-					}
+					background: $primary-color-light;
 				}
 
 				mat-icon {

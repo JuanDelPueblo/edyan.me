@@ -7,28 +7,18 @@
   justify-content: center;
   width: 40px;
   height: 40px;
-  border: none;
+  border: 1px solid $primary-color-light;
   border-radius: $border-radius-base;
-  background: var(--bg-card);
+  background: $primary-color-lighter;
   color: var(--text-primary);
   cursor: pointer;
   transition: all $transition-fast;
 
   &:hover {
-    background: var(--bg-secondary);
-    transform: scale(1.05);
-  }
-
-  &:active {
-    transform: scale(0.95);
+    background: $primary-color-light;
   }
 
   .material-icons {
     font-size: 20px;
-    transition: transform $transition-fast;
-  }
-
-  &:hover .material-icons {
-    transform: rotate(180deg);
   }
 }
