@@ -1,6 +1,6 @@
 import { Component, input } from '@angular/core';
 import { ProjectItem } from './project_item/project_item';
-import { Project } from '../../types/datatypes';
+import { Project } from '../../datatypes';
 
 @Component({
   selector: 'projects-grid',

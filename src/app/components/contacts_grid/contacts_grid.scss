@@ -1,0 +1,7 @@
+@use '../../../scss/variables' as *;
+@use '../../../scss/mixins' as *;
+
+.contacts-grid {
+	@include responsive-grid(100px, $spacing-base);
+	margin-bottom: $spacing-base;
+}

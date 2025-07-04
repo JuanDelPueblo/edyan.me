@@ -3,7 +3,7 @@ import { UnifiedNav } from './components/unified_nav/unified_nav';
 import { Hero } from './pages/hero/hero';
 import { Projects } from './pages/projects/projects';
 import { Experiences } from './pages/experiences/experiences';
-import { NavItem } from './types/datatypes';
+import { NavItem } from './datatypes';
 import { STRINGS } from './strings';
 
 @Component({

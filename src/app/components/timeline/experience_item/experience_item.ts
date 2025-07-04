@@ -1,6 +1,6 @@
 import { Component, input } from '@angular/core';
 import { TechStack } from '../../tech_stack/tech_stack';
-import { Experience } from '../../../types/datatypes';
+import { Experience } from '../../../datatypes';
 
 @Component({
   selector: 'experience-item',

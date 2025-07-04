@@ -1,6 +1,6 @@
 import { Component, input, OnInit } from '@angular/core';
 import { Card } from '../../components/card/card';
-import { Experience } from '../../types/datatypes';
+import { Experience } from '../../datatypes';
 import { Timeline } from '../../components/timeline/timeline';
 
 @Component({

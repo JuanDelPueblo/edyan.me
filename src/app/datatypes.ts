@@ -4,6 +4,12 @@ export interface NavItem {
 	icon: string;
 }
 
+export interface Contact {
+	name: string;
+	url?: string;
+	icon: string;
+}
+
 export interface Project {
 	id: string;
 	title: string;

@@ -1,16 +1,13 @@
 <card>
 	<div class="about-me">
 		<div class="about-content">
-			<h1 class="hero-title">👋 Hi, I'm Edyan Antonio Cruz</h1>
-			<p class="hero-subtitle">{{ aboutContent.introduction }}</p>
+			<div class="introduction">
+				<h1 class="hero-title">{{ aboutMeStrings.title }}</h1>
+				<p class="hero-subtitle">{{ aboutMeStrings.introduction }}</p>
+			</div>
 			<div class="skills-section">
-				<h2>{{ aboutContent.skillsTitle }}</h2>
-				<div class="skills-grid">
-					<div class="skill-item" *ngFor="let skill of aboutContent.skills">
-						<mat-icon *ngIf="skill.icon">{{ skill.icon }}</mat-icon>
-						<span>{{ skill.name }}</span>
-					</div>
-				</div>
+				<h2>{{ aboutMeStrings.contactsTitle }}</h2>
+				<contacts-grid [contacts]="aboutMeStrings.contacts"></contacts-grid>
 			</div>
 		</div>
 	</div>

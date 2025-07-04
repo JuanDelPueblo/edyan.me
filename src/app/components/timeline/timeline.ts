@@ -1,5 +1,5 @@
 import { Component, input } from '@angular/core';
-import { Experience, Project } from '../../types/datatypes';
+import { Experience, Project } from '../../datatypes';
 import { ExperienceItem } from './experience_item/experience_item';
 
 @Component({

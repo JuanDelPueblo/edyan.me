@@ -1,6 +1,6 @@
 import { Component, input } from '@angular/core';
 import { TechStack } from '../../tech_stack/tech_stack';
-import { Project } from '../../../types/datatypes';
+import { Project } from '../../../datatypes';
 
 @Component({
   selector: 'project-item',

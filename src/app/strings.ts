@@ -1,6 +1,43 @@
-import { Experience, Project } from './types/datatypes';
+import { Contact, Experience, Project } from './datatypes';
 
 export const STRINGS = {
+	aboutMe: {
+		title: '👋 Hi, I\'m Edyan Antonio Cruz',
+		introduction: 'I\'m a passionate software engineer with experience in full-stack development, currently pursuing my career in technology.',
+		contactsTitle: 'Get in Touch',
+		contacts: [
+			{
+				name: 'Email',
+				url: 'mailto:edyancruz@outlook.com',
+				icon: 'email',
+			},
+			{
+				name: 'GitHub',
+				url: 'github.com/juandelpueblo',
+				icon: 'code',
+			},
+			{
+				name: 'LinkedIn',
+				url: 'linkedin.com/in/edyancruz',
+				icon: 'linkedin',
+			},
+			{
+				name: 'X (Twitter)',
+				url: 'x.com/edyancruz',
+				icon: 'document_scanner',
+			},
+			{
+				name: 'YouTube',
+				url: 'youtube.com/@edyancruz',
+				icon: 'video_library',
+			},
+			{
+				name: 'Instagram',
+				url: 'instagram.com/edyancruz',
+				icon: 'photo',
+			}
+		] as Contact[],
+	},
 	projects: {
 		title: 'My Projects',
 		description: 'Here are some of the projects I\'ve worked on, showcasing my skills and passion for development.',

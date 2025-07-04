@@ -1,7 +1,7 @@
 import { Component, input, } from '@angular/core';
 import { Card } from '../../components/card/card';
-import { Project } from '../../types/datatypes';
-import { ProjectsGrid } from '../../components/projects-grid/projects_grid';
+import { Project } from '../../datatypes';
+import { ProjectsGrid } from '../../components/projects_grid/projects_grid';
 
 @Component({
   selector: 'projects',

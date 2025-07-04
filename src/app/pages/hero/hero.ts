@@ -1,24 +1,17 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { Card } from '../../components/card/card';
-import { StringService } from '../../services/string.service';
-import { MatIcon } from '@angular/material/icon';
+import { ContactsGrid } from "../../components/contacts_grid/contacts_grid";
+import { STRINGS } from '../../strings';
+
 @Component({
   selector: 'hero',
   imports: [
     Card,
-    CommonModule,
-    MatIcon
+    ContactsGrid
   ],
   templateUrl: './hero.html',
   styleUrl: './hero.scss'
 })
-export class Hero implements OnInit {
-  aboutContent: any = {};
-
-  constructor(private stringService: StringService) { }
-
-  ngOnInit(): void {
-    this.aboutContent = this.stringService.getAboutContent();
-  }
+export class Hero {
+  readonly aboutMeStrings = STRINGS.aboutMe;
 }
