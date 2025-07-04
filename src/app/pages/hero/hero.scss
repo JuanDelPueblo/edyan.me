@@ -19,24 +19,11 @@
   flex: 2;
 }
 
-.hero-title {
-  @extend .page-title;
-  margin-bottom: $spacing-base;
-}
-
 .hero-subtitle {
   font-size: $font-size-lg;
   opacity: 0.8;
-  margin-bottom: $spacing-xl;
 }
 
 .skills-section {
   flex: 1;
-  margin-bottom: $spacing-xl;
-
-  h2 {
-    font-size: $font-size-2xl;
-    margin-bottom: $spacing-base;
-    color: inherit;
-  }
 }

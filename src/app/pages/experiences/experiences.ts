@@ -7,7 +7,6 @@ import { Timeline } from '../../components/timeline/timeline';
   selector: 'experiences',
   imports: [Card, Timeline],
   templateUrl: './experiences.html',
-  styleUrl: './experiences.scss'
 })
 export class Experiences {
   readonly title = input.required<string>();

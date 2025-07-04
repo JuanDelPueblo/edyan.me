@@ -7,7 +7,6 @@ import { ProjectsGrid } from '../../components/projects_grid/projects_grid';
   selector: 'projects',
   imports: [Card, ProjectsGrid],
   templateUrl: './projects.html',
-  styleUrl: './projects.scss'
 })
 export class Projects {
   readonly projects = input.required<Project[]>();

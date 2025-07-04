@@ -1,15 +1,19 @@
 @use '../../../../scss/variables' as *;
-@use '../../../../scss/mixins' as *;
+@use '../../../../scss/utilities' as *;
 
 .contact-item {
+	@extend .content-item;
+
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	background: $primary-color-light;
-	padding: $spacing-sm $spacing-base;
-	border-radius: $border-radius-base;
 	text-align: center;
 	font-weight: $font-weight-medium;
+	padding: $spacing-base;
+
+	&:hover {
+		background: var(--bg-secondary);
+	}
 }
 
 .contact-item a {
@@ -19,15 +23,6 @@
 	flex-direction: column;
 	align-items: center;
 	transition: all $transition-fast;
-
-	&:hover {
-		background: var(--bg-secondary);
-		transform: scale(1.05);
-	}
-
-	&:active {
-		transform: scale(0.95);
-	}
 }
 
 .contact-item mat-icon {
