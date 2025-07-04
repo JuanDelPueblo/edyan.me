@@ -6,15 +6,6 @@
   @extend .page-container;
 }
 
-.page-title {
-  @extend .page-title;
-}
-
-.projects-content {
-  @include content-section();
-}
-
 .intro {
   @extend .section-intro;
 }
-

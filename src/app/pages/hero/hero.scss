@@ -2,12 +2,9 @@
 @use '../../../scss/mixins' as *;
 @use '../../../scss/utilities' as *;
 
-.about-me {
-  @extend .page-container;
-}
-
 .about-content {
-  @include content-section();
+  @extend .page-content;
+
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -23,7 +20,7 @@
 }
 
 .hero-title {
-  @include page-title;
+  @extend .page-title;
   margin-bottom: $spacing-base;
 }
 
@@ -41,36 +38,5 @@
     font-size: $font-size-2xl;
     margin-bottom: $spacing-base;
     color: inherit;
-  }
-}
-
-.btn {
-  padding: $spacing-xs $spacing-sm;
-  border: none;
-  border-radius: 4px;
-  font-size: $font-size-sm;
-  cursor: pointer;
-  text-decoration: none;
-  transition: all 0.2s ease;
-
-  &.btn-primary {
-    background-color: var(--accent-color);
-    color: var(--text-color-on-accent);
-
-    &:hover {
-      background-color: var(--accent-color-hover, var(--accent-color));
-      transform: translateY(-1px);
-    }
-  }
-
-  &.btn-secondary {
-    background-color: transparent;
-    color: var(--accent-color);
-    border: 1px solid var(--accent-color);
-
-    &:hover {
-      background-color: var(--accent-color);
-      color: var(--text-color-on-accent);
-    }
   }
 }

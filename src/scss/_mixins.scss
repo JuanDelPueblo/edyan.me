@@ -1,52 +1,5 @@
 @use 'variables' as *;
 
-@mixin content-section($max-width: $max-content-width) {
-  text-align: left;
-  max-width: $max-width;
-  margin: 0 auto;
-  width: 100%;
-  overflow-x: hidden;
-}
-
-@mixin page-title {
-  font-size: $font-size-3xl;
-  font-weight: $font-weight-bold;
-  margin-bottom: $spacing-xl;
-  line-height: $line-height-normal;
-}
-
-@mixin section-intro {
-  font-size: $font-size-lg;
-  line-height: $line-height-relaxed;
-  margin-bottom: $spacing-xl;
-  text-align: center;
-}
-
-@mixin button-primary {
-  background: $primary-color;
-  color: $white;
-  padding: $spacing-sm $spacing-base;
-  border: none;
-  border-radius: $border-radius-base;
-  font-size: $font-size-base;
-  font-weight: $font-weight-medium;
-  cursor: pointer;
-  transition: background-color $transition-fast;
-  text-decoration: none;
-  display: inline-block;
-
-  &:hover {
-    background: $primary-color-dark;
-  }
-}
-
-@mixin content-item {
-  background: $primary-color-lighter;
-  padding: $spacing-lg;
-  border-radius: $border-radius-lg;
-  border: 1px solid $primary-color-light;
-}
-
 @mixin mobile-only {
   @media (max-width: $breakpoint-sm) {
     @content;
