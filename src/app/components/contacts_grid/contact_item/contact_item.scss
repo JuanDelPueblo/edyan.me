@@ -12,7 +12,7 @@
 	padding: $spacing-base;
 
 	&:hover {
-		background: var(--bg-secondary);
+		background: $primary-color-light;
 	}
 }
 
@@ -25,7 +25,18 @@
 	transition: all $transition-fast;
 }
 
-.contact-item mat-icon {
+.contact-item ng-icon {
 	transform: scale(2);
 	margin: $spacing-base 0;
+}
+
+.contact-item img.contact-icon {
+	width: 32px;
+	height: 32px;
+	margin-bottom: $spacing-base;
+	transition: transform $transition-fast;
+
+	&:hover {
+		transform: scale(1.1);
+	}
 }

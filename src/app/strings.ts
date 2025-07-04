@@ -9,32 +9,22 @@ export const STRINGS = {
 			{
 				name: 'Email',
 				url: 'mailto:edyancruz@outlook.com',
-				icon: 'email',
+				icon: 'matEmailRound',
 			},
 			{
 				name: 'GitHub',
 				url: 'github.com/juandelpueblo',
-				icon: 'code',
+				icon: 'faBrandGithub',
 			},
 			{
 				name: 'LinkedIn',
 				url: 'linkedin.com/in/edyancruz',
-				icon: 'linkedin',
+				icon: 'faBrandLinkedin',
 			},
 			{
-				name: 'X (Twitter)',
-				url: 'x.com/edyancruz',
-				icon: 'document_scanner',
-			},
-			{
-				name: 'YouTube',
-				url: 'youtube.com/@edyancruz',
-				icon: 'video_library',
-			},
-			{
-				name: 'Instagram',
-				url: 'instagram.com/edyancruz',
-				icon: 'photo',
+				name: 'Discord',
+				url: 'https://discord.com/users/271392262510870528',
+				icon: 'faBrandDiscord',
 			}
 		] as Contact[],
 	},

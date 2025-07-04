@@ -44,10 +44,10 @@
 }
 
 .btn {
-  background: $primary-color;
-  color: $white;
+  background: $primary-color-lighter;
   padding: $spacing-sm $spacing-base;
-  border: none;
+  color: inherit;
+  border: 1px solid $primary-color-light;
   border-radius: $border-radius-base;
   font-size: $font-size-base;
   font-weight: $font-weight-medium;
@@ -57,6 +57,6 @@
   display: inline-block;
 
   &:hover {
-    background: $primary-color-dark;
+    background: $primary-color-light;
   }
 }

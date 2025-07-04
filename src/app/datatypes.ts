@@ -6,8 +6,9 @@ export interface NavItem {
 
 export interface Contact {
 	name: string;
-	url?: string;
-	icon: string;
+	url: string;
+	icon?: string;
+	iconUrl?: string; // Optional URL for the icon image
 }
 
 export interface Project {
