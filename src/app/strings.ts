@@ -13,12 +13,12 @@ export const STRINGS = {
 			},
 			{
 				name: 'GitHub',
-				url: 'github.com/juandelpueblo',
+				url: 'https://github.com/juandelpueblo',
 				icon: 'faBrandGithub',
 			},
 			{
 				name: 'LinkedIn',
-				url: 'linkedin.com/in/edyancruz',
+				url: 'https://linkedin.com/in/edyancruz',
 				icon: 'faBrandLinkedin',
 			},
 			{
