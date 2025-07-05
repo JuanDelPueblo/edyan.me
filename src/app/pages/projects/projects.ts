@@ -11,5 +11,4 @@ import { ProjectsGrid } from '../../components/projects_grid/projects_grid';
 export class Projects {
   readonly projects = input.required<Project[]>();
   readonly title = input.required<string>();
-  readonly description = input.required<string>();
 }

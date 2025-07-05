@@ -10,7 +10,6 @@ import { Timeline } from '../../components/timeline/timeline';
 })
 export class Experiences {
   readonly title = input.required<string>();
-  readonly description = input.required<string>();
   readonly experiences = input.required<Experience[]>();
 
 }
