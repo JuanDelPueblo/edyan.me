@@ -1,0 +1,48 @@
+@use '../../../../scss/variables' as *;
+@use '../../../../scss/utilities' as *;
+
+.contact-item {
+	@extend .content-item;
+
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	text-align: center;
+	font-weight: $font-weight-medium;
+	padding: $spacing-base;
+	transition: background-color $transition-fast;
+
+
+	&:hover {
+		background: var(--bg-btn-hover);
+	}
+
+	&:active {
+		background: var(--bg-btn-active);
+	}
+}
+
+.contact-item a {
+	color: inherit;
+	text-decoration: none;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	transition: all $transition-fast;
+}
+
+.contact-item ng-icon {
+	transform: scale(2);
+	margin: $spacing-base 0;
+}
+
+.contact-item img.contact-icon {
+	width: 32px;
+	height: 32px;
+	margin-bottom: $spacing-base;
+	transition: transform $transition-fast;
+
+	&:hover {
+		transform: scale(1.1);
+	}
+}

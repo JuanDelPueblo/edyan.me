@@ -1,0 +1,12 @@
+@use '../../../scss/variables' as *;
+@use '../../../scss/utilities' as *;
+
+.tech-stack {
+	display: flex;
+	flex-wrap: wrap;
+	gap: $spacing-sm;
+}
+
+.tech-tag {
+	@extend .tag;
+}

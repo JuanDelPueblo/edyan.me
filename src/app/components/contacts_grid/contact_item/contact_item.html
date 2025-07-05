@@ -1,0 +1,10 @@
+<div class="contact-item">
+	<a [href]="contact().url" target="_blank">
+		@if (contact().iconUrl) {
+		<img [src]="contact().iconUrl" alt="{{ contact().name }} icon" class="contact-icon" />
+		} @else {
+		<ng-icon [name]="contact().icon" />
+		}
+		<span>{{ contact().name }}</span>
+	</a>
+</div>

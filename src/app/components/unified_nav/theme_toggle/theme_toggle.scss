@@ -1,0 +1,28 @@
+@use '../../../../scss/variables' as *;
+@use '../../../../scss/mixins' as *;
+
+.theme-toggle-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid $primary-color-light;
+  border-radius: $border-radius-base;
+  background: var(--bg-btn);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all $transition-fast;
+
+  &:hover {
+    background: var(--bg-btn-hover);
+  }
+
+  &:active {
+    background: var(--bg-btn-active);
+  }
+
+  .material-icons {
+    font-size: 20px;
+  }
+}

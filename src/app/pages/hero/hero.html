@@ -1,0 +1,15 @@
+<card>
+	<div class="page-container">
+		<div class="about-content">
+			<div class="introduction">
+				<h1 class="page-title">Hi 👋 <br> {{ aboutMeStrings.title }}</h1>
+				<p class="hero-subtitle">{{ aboutMeStrings.introduction }}</p>
+				<button onclick="window.open('/edyan_resume.pdf', '_blank')" class="btn">Download Résumé</button>
+			</div>
+			<div class="skills-section">
+				<h2>{{ aboutMeStrings.contactsTitle }}</h2>
+				<contacts-grid [contacts]="aboutMeStrings.contacts"></contacts-grid>
+			</div>
+		</div>
+	</div>
+</card>

@@ -1,0 +1,29 @@
+@use 'scss/variables' as *;
+@use 'scss/mixins' as *;
+@use 'scss/utilities' as *;
+
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&family=Roboto+Flex:opsz,wght@8..144,100..1000&display=swap');
+@import url('https://fonts.googleapis.com/icon?family=Material+Icons');
+
+* {
+  font-family: $font-family-primary;
+  box-sizing: border-box;
+}
+
+html {
+  transition: background-color $transition-medium, color $transition-medium;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+}
+
+body {
+  background-image: url(https://bing.biturl.top/?resolution=1920&format=image&index=0&mkt=zh-CN);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  min-height: 100vh;  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  max-width: 100vw;
+}

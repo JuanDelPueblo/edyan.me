@@ -1,0 +1,27 @@
+@use 'variables' as *;
+
+@mixin mobile-only {
+  @media (max-width: $breakpoint-sm) {
+    @content;
+  }
+}
+
+@mixin tablet-and-up {
+  @media (min-width: #{$breakpoint-sm + 1px}) {
+    @content;
+  }
+}
+
+@mixin desktop-and-up {
+  @media (min-width: #{$breakpoint-md + 1px}) {
+    @content;
+  }
+}
+
+@mixin responsive-grid($min-width: 300px, $gap: $spacing-xl) {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min($min-width, 100%), 1fr));
+  gap: $gap;
+  width: 100%;
+  overflow-x: hidden;
+}

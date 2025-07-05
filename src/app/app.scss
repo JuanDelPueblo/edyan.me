@@ -1,0 +1,95 @@
+@use '../scss/variables' as *;
+@use '../scss/mixins' as *;
+@use '../scss/utilities' as *;
+
+.app-layout {
+  display: flex;
+  justify-content: center;
+}
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-100%);
+  margin-left: -320px;
+  width: $sidebar-width;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: $z-index-sidebar;
+
+  @media (max-width: $layout-transition-breakpoint) {
+    left: 0;
+    transform: none;
+    margin-left: 0;
+  }
+}
+
+.main-content {
+  margin-left: $sidebar-width;
+  padding: 0 $spacing-base $spacing-2xl;
+  max-width: 1080px;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-2xl;
+}
+
+.hero-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bottom-navigation {
+  display: none;
+}
+
+@include mobile-only {
+  .app-layout {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    display: none;
+  }
+
+  .bottom-navigation {
+    display: block;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    z-index: $z-index-bottom-nav;
+    background: var(--background);
+    padding: $spacing-base;
+
+    @media (max-width: $breakpoint-xs) {
+      padding: $spacing-sm;
+    }
+  }
+
+  .main-content {
+    margin-left: 0;
+    margin-bottom: $bottom-nav-spacing;
+    padding: $spacing-base;
+    overflow-x: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: calc(100vh - #{$bottom-nav-spacing});
+    gap: $spacing-base;
+
+    @media (max-width: $breakpoint-xs) {
+      padding: $spacing-sm;
+      gap: $spacing-sm;
+    }
+  }
+
+  .hero-container {
+    all: unset;
+  }
+}

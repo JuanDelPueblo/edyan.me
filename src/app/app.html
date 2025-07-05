@@ -1,0 +1,18 @@
+<div class="app-layout">
+  <aside class="sidebar">
+    <unified-nav [navItems]="navItems"></unified-nav>
+  </aside>
+  <main class="main-content">
+    <div class="hero-container" id="hero">
+      <hero></hero>
+    </div>
+    <projects id="projects" [title]="projects.title"
+      [projects]="projects.projectsList"></projects>
+    <experiences id="experiences" [title]="experiences.title"
+      [experiences]="experiences.experiencesList"></experiences>
+  </main>
+
+  <footer class="bottom-navigation">
+    <unified-nav [navItems]="navItems"></unified-nav>
+  </footer>
+</div>
