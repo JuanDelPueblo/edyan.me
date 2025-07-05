@@ -29,7 +29,7 @@
 }
 
 .content-item {
-  background: $primary-color-lighter;
+  background: var(--bg-btn);
   padding: $spacing-lg;
   border-radius: $border-radius-lg;
   border: 1px solid $primary-color-light;
@@ -44,7 +44,7 @@
 }
 
 .btn {
-  background: $primary-color-lighter;
+  background: var(--bg-btn);
   padding: $spacing-sm $spacing-base;
   color: inherit;
   border: 1px solid $primary-color-light;
@@ -57,6 +57,10 @@
   display: inline-block;
 
   &:hover {
-    background: $primary-color-light;
+    background: var(--bg-btn-hover);
+  }
+
+  &:active {
+    background: var(--bg-btn-active);
   }
 }

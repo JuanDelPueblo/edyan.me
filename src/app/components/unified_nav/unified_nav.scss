@@ -38,13 +38,17 @@
 				gap: $spacing-sm;
 				width: 100%;
 				position: relative;
-				background-color: $primary-color-lighter;
+				background-color: var(--bg-btn);
 				border: 1px solid $primary-color-light;
 				box-sizing: border-box;
 				transition: all $transition-fast;
 
 				&:hover {
-					background: $primary-color-light;
+					background: var(--bg-btn-hover);
+				}
+
+				&:active {
+					background: var(--bg-btn-active);
 				}
 
 				mat-icon {

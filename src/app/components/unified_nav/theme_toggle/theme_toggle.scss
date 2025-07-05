@@ -9,13 +9,17 @@
   height: 40px;
   border: 1px solid $primary-color-light;
   border-radius: $border-radius-base;
-  background: $primary-color-lighter;
+  background: var(--bg-btn);
   color: var(--text-primary);
   cursor: pointer;
   transition: all $transition-fast;
 
   &:hover {
-    background: $primary-color-light;
+    background: var(--bg-btn-hover);
+  }
+
+  &:active {
+    background: var(--bg-btn-active);
   }
 
   .material-icons {

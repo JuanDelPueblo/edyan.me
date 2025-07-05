@@ -11,20 +11,25 @@ $text-secondary: rgba(255, 255, 255, 0.8);
 
 $bg-card-light: rgba(255, 255, 255, 0.9);
 $bg-card-dark: rgba(0, 0, 0, 0.8);
-$bg-form-input: rgba(255, 255, 255, 0.8);
+
+$bg-btn-light: rgba(167, 139, 250, 0.15);
+$bg-btn-dark: rgba(109, 40, 217, 0.15);
+$bg-btn-hover-light: rgba(167, 139, 250, 0.5);
+$bg-btn-hover-dark: rgba(109, 40, 217, 0.5);
+$bg-btn-active-light: rgba(167, 139, 250, 0.8);
+$bg-btn-active-dark: rgba(109, 40, 217, 0.8);
 
 $border-light: rgba(255, 255, 255, 0.3);
 $border-dark: rgba(255, 255, 255, 0.2);
 
 :root {
-  --bg-primary: transparent;
-  --bg-secondary: rgba(248, 249, 250, 0.1);
   --bg-card: #{$bg-card-light};
-  --bg-form-input: #{$bg-form-input};
+  --bg-btn: #{$bg-btn-light};
+  --bg-btn-hover: #{$bg-btn-hover-light};
+  --bg-btn-active: #{$bg-btn-active-light};
 
   --text-primary: #{$text-primary};
   --text-secondary: #666666;
-  --text-muted: #999999;
 
   --border-color: #{$border-light};
   --border-subtle: rgba(0, 0, 0, 0.1);
@@ -33,10 +38,10 @@ $border-dark: rgba(255, 255, 255, 0.2);
 }
 
 .dark-theme {
-  --bg-primary: transparent;
-  --bg-secondary: rgba(30, 30, 30, 0.1);
   --bg-card: #{$bg-card-dark};
-  --bg-form-input: rgba(255, 255, 255, 0.1);
+  --bg-btn: #{$bg-btn-dark};
+  --bg-btn-hover: #{$bg-btn-hover-dark};
+  --bg-btn-active: #{$bg-btn-active-dark};
 
   --text-primary: #ffffff;
   --text-secondary: rgba(255, 255, 255, 0.8);
@@ -88,15 +93,7 @@ $breakpoint-lg: 1200px;
 
 $sidebar-width: 250px;
 $max-content-width: 800px;
-$max-narrow-content-width: 700px;
-$max-very-narrow-content-width: 600px;
 
-$centered-layout-max-width: 1400px;
-$centered-layout-half-width: 700px;
-$main-content-max-width: 1150px;
-$content-container-large: 900px;
-$content-container-medium: 750px;
-$bottom-nav-height: 120px;
 $bottom-nav-spacing: 120px;
 $layout-transition-breakpoint: 1140px;
 
