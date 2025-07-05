@@ -30,7 +30,6 @@ export const STRINGS = {
 	},
 	projects: {
 		title: 'My Projects',
-		description: 'Here are some of the projects I\'ve worked on, showcasing my skills and passion for development.',
 		projectsList: [
 			{
 				id: 'rumarino-auv',
@@ -80,8 +79,7 @@ export const STRINGS = {
 		] as Project[],
 	},
 	experiences: {
-		title: 'Professional Experience',
-		description: 'My professional journey and the experiences that have shaped my career in technology.',
+		title: 'My Experiences',
 		experiencesList: [
 			{
 				position: 'SWE Intern',
