@@ -91,7 +91,7 @@ export const STRINGS = {
 					'Built an UI component gallery using an internal storybook library for the Gemini web page using Angular and Typescript to preview and test UI elements in isolation, shortening the development process of UI components.',
 					'Prototyped and assessed the feasibility of features such as temporary chat and conversation grouping, gaining hands-on experience in product ideation and user flow optimization.'
 				],
-				technologies: ['TypeScript', 'Angular'],
+				technologies: ['TypeScript', 'Angular', 'Java'],
 			},
 			{
 				position: 'STEP Intern',
