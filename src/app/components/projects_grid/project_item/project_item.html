@@ -4,11 +4,12 @@
 		@if (project().liveUrl || project().githubUrl) {
 		<div class="project-actions">
 			@if (project().liveUrl) {
-			<button class="btn btn-primary" (click)="onBtnClick(project().liveUrl)" type="button">
+			<button class="btn" (click)="onBtnClick(project().liveUrl)" type="button">
 				View Project
 			</button>
-			} @else if (project().githubUrl) {
-			<button class="btn btn-secondary" (click)="onBtnClick(project().githubUrl)" type="button">
+			}
+			@if (project().githubUrl) {
+			<button class="btn" (click)="onBtnClick(project().githubUrl)" type="button">
 				View Code
 			</button>
 			}

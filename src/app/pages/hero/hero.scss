@@ -26,4 +26,10 @@
 
 .skills-section {
   flex: 1;
+  margin-left: $spacing-xl;
+
+  @media (max-width: $layout-transition-breakpoint) {
+    margin-left: 0;
+    margin-top: $spacing-xl;
+  }
 }
