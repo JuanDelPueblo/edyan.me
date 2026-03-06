@@ -32,6 +32,15 @@ export const STRINGS = {
 		title: 'My Projects',
 		projectsList: [
 			{
+				id: 'nvsleepify',
+				title: 'nvsleepify',
+				description: 'An utility for Linux that dynamically enables and disables the Nvidia GPU based on battery status, significantly improving battery life on laptops.',
+				technologies: ['Rust', 'Linux'],
+				image: '/images/nvsleepify.png',
+				liveUrl: '',
+				githubUrl: 'https://github.com/JuandelPueblo/nvsleepify',
+			},
+			{
 				id: 'rumarino-auv',
 				title: 'RUMarino Autonomous Underwater Vehicle (AUV)',
 				description: 'Led a team of three software engineers to develop RUMarino\'s AUV software framework utilizing ROS and Docker to participate in RoboSub 2025.',
