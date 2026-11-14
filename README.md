@@ -1,3 +1,7 @@
+# edyan.me
+
+(WIP) Portfolio site for Edyan Antonio Cruz, rebuilt in Astro with a Frutiger Aero theme.
+
 # Astro Starter Kit: Basics
 
 ```sh
