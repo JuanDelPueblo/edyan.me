@@ -262,7 +262,7 @@ function hue(name: string) {
     const hits = [
       ...document.querySelectorAll<HTMLElement>(".aero-entry"),
     ].filter((el) => el.dataset.tech!.split("|").includes(chip.dataset.tech!));
-    const panelOf = (el: Element) => el.closest<HTMLElement>(".aero-box")!;
+    const panelOf = (el: Element) => el.closest<HTMLElement>(".aero-panel")!;
     const current = "p-" + document.documentElement.dataset.tab;
     const target = hits.find((el) => panelOf(el).id === current) ?? hits[0];
     selectTab(panelOf(target).id.slice(2));

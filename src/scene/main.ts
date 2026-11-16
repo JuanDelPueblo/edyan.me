@@ -164,11 +164,11 @@ export function startScene(canvas: HTMLCanvasElement, site: HTMLElement) {
   seaScene.add(kelp.kelp, kelp.grass, ...fish.meshes);
   seaScene.add(jellies.mesh, bubbles.motes, bubbles.streams, bubbles.burst);
 
-  // The content panel is opaque, so the canvas behind it is never seen. An
-  // invisible quad drawn first, at the near plane, makes the depth test
-  // reject everything behind the panel; the final pass skips the same
-  // pixels.
-  const panels = [...site.querySelectorAll<HTMLElement>(".aero-box")];
+  // The window frame behind the content panel is opaque, so the canvas
+  // behind the panel is never seen. An invisible quad drawn first, at the
+  // near plane, makes the depth test reject everything behind the panel; the
+  // final pass skips the same pixels.
+  const panels = [...site.querySelectorAll<HTMLElement>(".aero-panel")];
   const cover = new THREE.Mesh(
     new THREE.PlaneGeometry(2, 2),
     new THREE.ShaderMaterial({

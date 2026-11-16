@@ -9,10 +9,12 @@ ${underwater}
 attribute vec3 aJ; // distance from the crown or along the tentacle, kind, phase
 attribute vec4 iPos; // position, size
 attribute vec2 iLook; // pulse phase, colour
+attribute float iFade;
 varying vec3 vW;
 varying vec3 vN;
 varying vec3 vJ;
 varying float vLook;
+varying float vFade;
 void main() {
   vec3 p = position;
   float beat = uTime * 1.5 + iLook.x;
@@ -34,6 +36,7 @@ void main() {
   vN = normal;
   vJ = aJ;
   vLook = iLook.y;
+  vFade = iFade;
   gl_Position = projectionMatrix * viewMatrix * vec4(vW, 1.0);
 }
 `;
@@ -46,6 +49,7 @@ varying vec3 vW;
 varying vec3 vN;
 varying vec3 vJ;
 varying float vLook;
+varying float vFade;
 void main() {
   vec3 ray = vW - cameraPosition;
   float dist = length(ray);
@@ -72,7 +76,7 @@ void main() {
   col *= 0.6 + 0.6 * exp(vW.y * 0.04);
   float fog = exp(-dist * 0.048);
   col = mix(waterColor(-view), col, fog);
-  a *= 0.35 + 0.65 * fog;
+  a *= (0.35 + 0.65 * fog) * vFade;
   gl_FragColor = vec4(col * a, a);
 }
 `;
@@ -194,9 +198,12 @@ export function createJellies() {
     new Float32Array(COUNT * 2),
     2,
   );
+  const iFade = new THREE.InstancedBufferAttribute(new Float32Array(COUNT), 1);
   iPos.setUsage(THREE.DynamicDrawUsage);
+  iFade.setUsage(THREE.DynamicDrawUsage);
   geo.setAttribute("iPos", iPos);
   geo.setAttribute("iLook", iLook);
+  geo.setAttribute("iFade", iFade);
   geo.instanceCount = COUNT;
   const mesh = new THREE.Mesh(
     geo,
@@ -215,10 +222,10 @@ export function createJellies() {
   mesh.frustumCulled = false;
   mesh.renderOrder = 15;
 
-  // Per jellyfish: x, y, z, size, drift along x, rise speed.
+  // Per jellyfish: x, y, z, size, drift along x, rise speed, opacity.
   const state: number[][] = [];
   for (let i = 0; i < COUNT; i++) {
-    state.push([0, 0, -(4.5 + rand() * 11), 0.16 + rand() * 0.2, 0, 0]);
+    state.push([0, 0, -(4.5 + rand() * 11), 0.16 + rand() * 0.2, 0, 0, 1]);
     iLook.setXY(i, rand() * 6.28, rand());
   }
   let placed = false;
@@ -241,17 +248,28 @@ export function createJellies() {
       const beat = Math.sin((view.time + 20) * 1.5 + iLook.getX(i) - 2.2);
       jelly[0] += jelly[4] * dt;
       jelly[1] += jelly[5] * (1 + 0.9 * beat) * dt;
-      // Stay in the band of water around the camera as the page scrolls.
-      if (jelly[1] > hi || jelly[1] < lo - 0.5) {
-        const below = jelly[1] < lo;
-        jelly[1] = hi <= lo ? (lo + hi) / 2 : below ? hi - rand() : lo;
-        jelly[0] = (rand() * 2 - 1) * half;
+      // Stay in the band of water around the camera. The band moves when
+      // the page scrolls or changes length, and its ends can be in view, so
+      // a jellyfish outside it fades out, moves into the lower part of the
+      // band and fades back in. A still scene (dt 0) moves it at once.
+      const out = jelly[1] > hi || jelly[1] < lo - 0.5;
+      if (out || hi <= lo) {
+        jelly[6] = dt ? Math.max(0, jelly[6] - dt * 2.5) : 0;
+        if (jelly[6] === 0 && hi > lo) {
+          jelly[1] = lo + rand() * (hi - lo) * 0.5;
+          jelly[0] = (rand() * 2 - 1) * half;
+          if (!dt) jelly[6] = 1;
+        }
+      } else {
+        jelly[6] = Math.min(1, jelly[6] + dt * 0.8);
       }
       if (Math.abs(jelly[0]) > half) jelly[0] = -Math.sign(jelly[0]) * half;
       iPos.setXYZW(i, jelly[0], jelly[1], jelly[2], jelly[3]);
+      iFade.setX(i, jelly[6]);
     }
     placed = true;
     iPos.needsUpdate = true;
+    iFade.needsUpdate = true;
   }
 
   return { mesh, update };

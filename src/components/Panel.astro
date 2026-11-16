@@ -1,27 +1,22 @@
 ---
-// Tab panel with a glossy title bar. CSS shows only the selected panel; see
-// the data-tab rules in global.css. The tab strip script adds the tabpanel
-// role, so without JavaScript the panels are plain sections.
+// Tab panel: a page section under the tab bar, headed like a Vista dialog's
+// main instruction. CSS shows only the selected panel; see the data-tab rules
+// in global.css. The tab strip script adds the tabpanel role, so without
+// JavaScript the panels are plain sections, separated by a rule.
 interface Props {
   tabKey: string;
   title: string;
-  icon: string;
 }
 
-const { tabKey, title, icon } = Astro.props;
+const { tabKey, title } = Astro.props;
 ---
 
 <section
-  class="aero-box relative overflow-hidden rounded-lg"
+  class="aero-panel relative no-js:not-first:border-t no-js:not-first:border-dotted no-js:not-first:border-rule no-js:not-first:pt-4"
   id={`p-${tabKey}`}
 >
-  <h2 class="aero-titlebar relative flex min-h-9 items-center gap-2 overflow-hidden px-2.5 py-1.5 font-head text-sm leading-[1.3] font-bold">
-    <svg class="size-5 flex-none drop-shadow-icon" aria-hidden="true">
-      <use href={`#i-${icon}`}></use>
-    </svg>
+  <h2 class="mb-2 px-0.5 font-head text-lg leading-tight text-heading text-shadow-[0_1px_0_#fff]">
     {title}
   </h2>
-  <div class="aero-box-body relative p-3.5">
-    <slot />
-  </div>
+  <slot />
 </section>
