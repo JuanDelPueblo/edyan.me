@@ -98,9 +98,9 @@ float caustic(vec2 uv, float t) {
 
 vec3 waterColor(vec3 dir) {
   float dk = exp(-uCamDepth * 0.05);
-  vec3 top = mix(S(0.10, 0.50, 0.88), S(0.36, 0.86, 0.98), dk);
-  vec3 mid = mix(S(0.05, 0.40, 0.80), S(0.12, 0.66, 0.94), dk);
-  vec3 bot = mix(S(0.03, 0.27, 0.66), S(0.05, 0.45, 0.82), dk);
+  vec3 top = mix(S(0.04, 0.38, 0.88), S(0.20, 0.74, 0.99), dk);
+  vec3 mid = mix(S(0.02, 0.25, 0.76), S(0.05, 0.50, 0.94), dk);
+  vec3 bot = mix(S(0.01, 0.14, 0.58), S(0.02, 0.30, 0.80), dk);
   vec3 c = mix(mid, top, smoothstep(0.0, 0.42, dir.y));
   c = mix(c, bot, smoothstep(0.0, -0.42, dir.y));
   float s = max(dot(dir, uSunU), 0.0);

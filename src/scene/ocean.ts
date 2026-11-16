@@ -37,7 +37,7 @@ void main() {
   refl = min(refl, vec3(0.94));
 
   float fres = 0.02 + 0.98 * pow(1.0 - max(dot(n, view), 0.0), 5.0);
-  vec3 body = mix(S(0.16, 0.80, 0.90), S(0.03, 0.45, 0.80),
+  vec3 body = mix(S(0.08, 0.74, 0.94), S(0.01, 0.30, 0.80),
     smoothstep(3.0, 70.0, dist));
   vec3 col = mix(body, refl, clamp(fres, 0.0, 1.0));
 
@@ -48,7 +48,7 @@ void main() {
   col += S(1.0, 0.97, 0.86)
     * (pow(glint, 1200.0) * 6.0 * smoothstep(0.5, 0.85, sparkle)
       + pow(glint, 60.0) * 0.04);
-  col = mix(col, S(0.76, 0.92, 1.0), smoothstep(250.0, 3500.0, dist) * 0.7);
+  col = mix(col, S(0.62, 0.88, 1.0), smoothstep(250.0, 3500.0, dist) * 0.6);
   gl_FragColor = vec4(col, 1.0);
 }
 `;

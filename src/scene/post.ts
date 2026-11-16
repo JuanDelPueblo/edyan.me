@@ -78,6 +78,7 @@ uniform float uFlare;
 uniform float uSunSize;
 uniform float uDeep; // 0 near the surface, 1 far below
 uniform float uBloom; // 0 while bloom is off
+uniform vec4 uHole; // page rectangle hidden by the content panel
 
 float lineWave(float x, float t) {
   return sin(x * 0.011 + t * 0.9) * 3.2
@@ -94,6 +95,10 @@ vec3 ghost(vec2 page, float along, float size, vec3 tint, float rim) {
 
 void main() {
   vec2 page = vec2(gl_FragCoord.x * uPx, uTop + uSize.y - gl_FragCoord.y * uPx);
+  if (page.x > uHole.x && page.x < uHole.z && page.y > uHole.y && page.y < uHole.w) {
+    gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+    return;
+  }
   float wave = lineWave(page.x, uTime);
   float off = page.y - uWl;
   float row = page.y - wave * exp(-abs(off) / 36.0);
@@ -112,26 +117,32 @@ void main() {
   if (below > 0.0) {
     vec2 q = vec2(page.x - uSun.x - 60.0, row - uWl + 560.0);
     float ang = atan(q.x, q.y);
-    float rays = smoothstep(0.38, 0.92, vnoise(vec2(ang * 34.0 + uTime * 0.10, uTime * 0.06))) * 0.6;
-    rays += smoothstep(0.45, 0.95, vnoise(vec2(ang * 81.0 - uTime * 0.15, 3.0 + uTime * 0.05))) * 0.4;
     float shaft = smoothstep(0.0, 70.0, below) * exp(-below / 1300.0);
     shaft *= exp(-abs(ang) * 1.1);
-    col += S(0.72, 0.96, 1.0) * rays * shaft * 0.34;
+    // The noise is skipped where the shafts have faded out.
+    if (shaft > 0.01) {
+      float rays = smoothstep(0.38, 0.92, vnoise(vec2(ang * 34.0 + uTime * 0.10, uTime * 0.06))) * 0.6;
+      rays += smoothstep(0.45, 0.95, vnoise(vec2(ang * 81.0 - uTime * 0.15, 3.0 + uTime * 0.05))) * 0.4;
+      col += S(0.72, 0.96, 1.0) * rays * shaft * 0.34;
+    }
   }
 
   // The waterline: a bright core, mist above, a cyan glow and a blue lip
   // below.
   float m = page.y - uWl - wave;
-  float core = exp(-m * m / 9.0);
-  float under = step(0.0, m);
-  col += vec3(0.85, 0.95, 1.0) * exp(min(m, 0.0) / 15.0) * (1.0 - under) * 0.32;
-  col = mix(col, S(0.82, 0.97, 1.0) * 1.05, under * exp(-m / 7.0) * 0.8);
-  float lip = under * smoothstep(5.0, 15.0, m) * exp(-max(m - 15.0, 0.0) / 12.0);
-  col = mix(col, S(0.04, 0.36, 0.68), lip * 0.4);
-  col = mix(col, vec3(1.3), core * 0.92);
-  if (abs(m) < 40.0) {
-    float glint = pow(vnoise(vec2(page.x * 0.09 + uTime * 0.9, uTime * 0.6)), 7.0);
-    col += vec3(2.5) * glint * exp(-m * m / 30.0);
+  // All of it has faded out a little way from the line.
+  if (abs(m) < 120.0) {
+    float core = exp(-m * m / 9.0);
+    float under = step(0.0, m);
+    col += vec3(0.85, 0.95, 1.0) * exp(min(m, 0.0) / 15.0) * (1.0 - under) * 0.32;
+    col = mix(col, S(0.82, 0.97, 1.0) * 1.05, under * exp(-m / 7.0) * 0.8);
+    float lip = under * smoothstep(5.0, 15.0, m) * exp(-max(m - 15.0, 0.0) / 12.0);
+    col = mix(col, S(0.04, 0.36, 0.68), lip * 0.4);
+    col = mix(col, vec3(1.3), core * 0.92);
+    if (abs(m) < 40.0) {
+      float glint = pow(vnoise(vec2(page.x * 0.09 + uTime * 0.9, uTime * 0.6)), 7.0);
+      col += vec3(2.5) * glint * exp(-m * m / 30.0);
+    }
   }
 
   // Lens flare along the line from the sun through the viewport centre.
@@ -212,6 +223,7 @@ export function createPost(renderer: THREE.WebGLRenderer, hdr: boolean) {
     uSunSize: U.uSunSize,
     uDeep: { value: 0 },
     uBloom: { value: 1 },
+    uHole: { value: new THREE.Vector4() },
   });
 
   const levels = 5;

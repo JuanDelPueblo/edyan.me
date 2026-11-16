@@ -2,8 +2,8 @@ import * as THREE from "three";
 import { common } from "./glsl";
 import { U, makeMaterial, type View } from "./view";
 
-// A pod of dolphins porpoising across the sea above the waterline. Each one
-// follows a track along uHeading: it rides a sine in height, so it leaps
+// Dolphins porpoising across the sea above the waterline. Each one follows
+// its pod's track along uHeading: it rides a sine in height, so it leaps
 // clear of the water for part of every cycle and runs under it for the rest.
 // The sea surface hides the underwater part.
 const track = /* glsl */ `
@@ -74,8 +74,8 @@ void main() {
   if (vD.z > 0.5 && dot(n, view) < 0.0) n = -n;
 
   // Dark back, paler flanks, white belly.
-  vec3 back = S(0.27, 0.39, 0.56);
-  vec3 alb = mix(S(0.56, 0.68, 0.80), back, smoothstep(0.05, 0.7, vD.y));
+  vec3 back = S(0.15, 0.31, 0.62);
+  vec3 alb = mix(S(0.42, 0.62, 0.90), back, smoothstep(0.05, 0.7, vD.y));
   alb = mix(alb, S(0.96, 0.97, 0.99), smoothstep(-0.1, -0.6, vD.y));
   if (vD.z > 0.5) alb = back * 0.92;
   float eye = distance(vO.xy, vec2(0.352, 0.014));
@@ -289,10 +289,11 @@ function dolphinGeometry() {
   return geo;
 }
 
-const POD = 4;
 const SPRAY = 12;
 
-export function createDolphins() {
+// One group of dolphins on a shared track, with its spray.
+function createPod(rolls: number[]) {
+  const size = rolls.length;
   const uniforms = {
     uTime: U.uTime,
     uLight: U.uLight,
@@ -303,14 +304,11 @@ export function createDolphins() {
   };
 
   const geo = dolphinGeometry();
-  const iD = new THREE.InstancedBufferAttribute(new Float32Array(POD * 4), 4);
-  const iRoll = new THREE.InstancedBufferAttribute(
-    new Float32Array([0.3, -0.25, 0.42, 0.18]),
-    1,
-  );
+  const iD = new THREE.InstancedBufferAttribute(new Float32Array(size * 4), 4);
+  const iRoll = new THREE.InstancedBufferAttribute(new Float32Array(rolls), 1);
   geo.setAttribute("iD", iD);
   geo.setAttribute("iRoll", iRoll);
-  geo.instanceCount = POD;
+  geo.instanceCount = size;
   const dolphins = new THREE.Mesh(
     geo,
     makeMaterial({
@@ -324,7 +322,7 @@ export function createDolphins() {
 
   // Per dolphin and per crossing: a burst of spray and one foam ring.
   const each = SPRAY + 1;
-  const count = POD * 2 * each;
+  const count = size * 2 * each;
   const splashGeo = new THREE.InstancedBufferGeometry();
   splashGeo.setAttribute(
     "position",
@@ -367,48 +365,96 @@ export function createDolphins() {
   splashes.frustumCulled = false;
   splashes.renderOrder = 8;
 
-  function layout(view: View) {
-    const { w, k } = view;
-    // Narrow pages get a closer, slower pod so it stays in view for longer.
-    const wide = Math.min(1, Math.max(0, (w - 400) / 700));
-    const speed = 4.4 + 1.1 * wide;
-    const dist = 24 + 3 * wide;
-    const rate = (Math.PI * 2) / (2.3 + 0.3 * wide);
-    const half = (w / 2) * k * dist;
-    const reach = Math.max(half * 1.9, 22);
-    // The pod crosses left to right, angled a little towards the camera.
-    uniforms.uPod.value.set(speed, reach, rate, 1.8);
-    uniforms.uHeading.value.set(Math.cos(0.2), 0, Math.sin(0.2));
-    uniforms.uOrigin.value.set(0, 0, -dist);
-
-    // uTime starts at 20. The leader is then at the top of a leap near the
-    // left edge, with the others following a little behind and out of step.
-    const start = 20;
-    const lag = [0, 1.9, 3.6, 5.6];
-    const sideways = [0, 2.6, -3, 5];
-    const late = [0, 0.9, 1.8, 2.9];
-    const length = [2.5, 2.2, 2.7, 1.9];
-    for (let i = 0; i < POD; i++) {
-      iD.setXYZW(
-        i,
-        -0.8 * half - lag[i] - speed * start,
-        sideways[i],
-        Math.PI / 2 - rate * start - late[i],
-        length[i],
-      );
-      for (let j = 0; j < 2 * each; j++) {
-        sD.setXYZW(
-          i * 2 * each + j,
-          iD.getX(i),
-          iD.getY(i),
-          iD.getZ(i),
-          iD.getW(i),
-        );
-      }
+  // Places dolphin i: start along the track, sideways offset, leap phase
+  // and body length.
+  function place(
+    i: number,
+    start: number,
+    side: number,
+    phase: number,
+    length: number,
+  ) {
+    iD.setXYZW(i, start, side, phase, length);
+    for (let j = 0; j < 2 * each; j++) {
+      sD.setXYZW(i * 2 * each + j, start, side, phase, length);
     }
     iD.needsUpdate = true;
     sD.needsUpdate = true;
   }
 
-  return { dolphins, splashes, layout };
+  return { dolphins, splashes, uniforms, place };
+}
+
+export function createDolphins() {
+  const far = createPod([0.3, -0.25, 0.42, 0.18]);
+  const near = createPod([0.35, -0.2]);
+
+  function layout(view: View) {
+    const { w, k } = view;
+    // uTime starts at 20; the offsets below set where each dolphin is then.
+    const start = 20;
+    const wide = Math.min(1, Math.max(0, (w - 400) / 700));
+
+    // The far pod crosses left to right, angled a little towards the
+    // camera. Narrow pages get a closer, slower pod so it stays in view for
+    // longer.
+    {
+      const speed = 4.4 + 1.1 * wide;
+      const dist = 24 + 3 * wide;
+      const rate = (Math.PI * 2) / (2.3 + 0.3 * wide);
+      const half = (w / 2) * k * dist;
+      const reach = Math.max(half * 1.9, 22);
+      far.uniforms.uPod.value.set(speed, reach, rate, 1.8);
+      far.uniforms.uHeading.value.set(Math.cos(0.2), 0, Math.sin(0.2));
+      far.uniforms.uOrigin.value.set(0, 0, -dist);
+      // The leader is at the top of a leap near the left edge, with the
+      // others following a little behind and out of step.
+      const lag = [0, 1.9, 3.6, 5.6];
+      const sideways = [0, 2.6, -3, 5];
+      const late = [0, 0.9, 1.8, 2.9];
+      const length = [2.5, 2.2, 2.7, 1.9];
+      for (let i = 0; i < lag.length; i++) {
+        far.place(
+          i,
+          -0.8 * half - lag[i] - speed * start,
+          sideways[i],
+          Math.PI / 2 - rate * start - late[i],
+          length[i],
+        );
+      }
+    }
+
+    // A pair close to the camera crosses right to left, large in the view.
+    // The track runs well past both edges, so the pair is out of sight for
+    // most of each lap.
+    {
+      const speed = 4;
+      const dist = 16 - 5 * wide;
+      const rate = (Math.PI * 2) / 3;
+      const half = (w / 2) * k * dist;
+      const reach = Math.max(half * 3.5, 16);
+      near.uniforms.uPod.value.set(speed, reach, rate, 1.4);
+      near.uniforms.uHeading.value.set(-Math.cos(0.12), 0, Math.sin(0.12));
+      near.uniforms.uOrigin.value.set(0, 0, -dist);
+      // The first is at the top of a leap right of the centre.
+      const lag = [0, 3.4];
+      const sideways = [0, -2.4];
+      const late = [0, 1.5];
+      const length = [2.1 + 0.5 * wide, 1.8 + 0.4 * wide];
+      for (let i = 0; i < lag.length; i++) {
+        near.place(
+          i,
+          -0.62 * half - lag[i] - speed * start,
+          sideways[i],
+          Math.PI / 2 - rate * start - late[i],
+          length[i],
+        );
+      }
+    }
+  }
+
+  return {
+    meshes: [far.dolphins, far.splashes, near.dolphins, near.splashes],
+    layout,
+  };
 }

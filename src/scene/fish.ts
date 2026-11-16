@@ -45,7 +45,7 @@ const species: Species[] = [
       dorsal: [0.22, 0.76, 0.1, 0.5, 3],
       anal: [0.56, 0.76, 0.09, 0.6, 0],
     },
-    count: 6,
+    count: 10,
     school: 0,
     size: 0.3,
     speed: 0.34,
@@ -66,7 +66,7 @@ const species: Species[] = [
       dorsal: [0.2, 0.77, 0.075, 0.6, 0],
       anal: [0.42, 0.77, 0.07, 0.6, 0],
     },
-    count: 5,
+    count: 8,
     school: 0,
     size: 0.5,
     speed: 0.52,
@@ -87,8 +87,8 @@ const species: Species[] = [
       dorsal: [0.2, 0.78, 0.17, 0.7, 1],
       anal: [0.4, 0.78, 0.15, 0.7, 1],
     },
-    count: 6,
-    school: 0,
+    count: 12,
+    school: 4,
     size: 0.4,
     speed: 0.44,
   },
@@ -108,7 +108,7 @@ const species: Species[] = [
       dorsal: [0.24, 0.8, 0.5, 1.5, 2],
       anal: [0.45, 0.8, 0.16, 0.9, 1],
     },
-    count: 4,
+    count: 6,
     school: 0,
     size: 0.46,
     speed: 0.38,
@@ -129,7 +129,7 @@ const species: Species[] = [
       dorsal: [0.26, 0.78, 0.13, 0.5, 1],
       anal: [0.46, 0.78, 0.12, 0.5, 1],
     },
-    count: 4,
+    count: 6,
     school: 0,
     size: 0.38,
     speed: 0.34,
@@ -150,7 +150,7 @@ const species: Species[] = [
       dorsal: [0.2, 0.8, 0.13, 0.9, 1],
       anal: [0.4, 0.8, 0.12, 0.9, 1],
     },
-    count: 3,
+    count: 5,
     school: 0,
     size: 0.62,
     speed: 0.3,
@@ -171,7 +171,7 @@ const species: Species[] = [
       dorsal: [0.24, 0.72, 0.07, 0.6, 0],
       anal: [0.5, 0.72, 0.06, 0.6, 0],
     },
-    count: 48,
+    count: 72,
     school: 24,
     size: 0.17,
     speed: 0.5,
@@ -192,10 +192,31 @@ const species: Species[] = [
       dorsal: [0.24, 0.73, 0.07, 0.6, 0],
       anal: [0.5, 0.73, 0.06, 0.6, 0],
     },
-    count: 22,
+    count: 44,
     school: 22,
     size: 0.15,
     speed: 0.56,
+  },
+  // 8 anthias
+  {
+    shape: {
+      bodyEnd: 0.76,
+      height: 0.33,
+      peak: 0.72,
+      round: 0.75,
+      above: 0.5,
+      stalk: 0.07,
+      snout: 0,
+      width: 0.07,
+      tail: 0.4,
+      fork: 0.6,
+      dorsal: [0.22, 0.74, 0.09, 0.7, 0],
+      anal: [0.5, 0.72, 0.07, 0.6, 0],
+    },
+    count: 40,
+    school: 20,
+    size: 0.16,
+    speed: 0.5,
   },
 ];
 
@@ -230,7 +251,8 @@ function finProfile(style: number, s: number) {
   return Math.sqrt(Math.sin(Math.PI * s));
 }
 
-function fishGeometry(shape: Shape) {
+// Small schooling fish cover few pixels each, so they get a coarser mesh.
+function fishGeometry(shape: Shape, coarse: boolean) {
   const position: number[] = [];
   const uv: number[] = [];
   const fin: number[] = []; // part, flex, side
@@ -250,8 +272,8 @@ function fishGeometry(shape: Shape) {
   }
 
   // Body: rings of points around the outline.
-  const stations = 22;
-  const around = 12;
+  const stations = coarse ? 10 : 22;
+  const around = coarse ? 8 : 12;
   for (let i = 0; i <= stations; i++) {
     const t = i / stations;
     const u = shape.bodyEnd * t;
@@ -289,8 +311,8 @@ function fishGeometry(shape: Shape) {
   const [stalkTop, stalkBottom] = outline(shape, start);
   const stalkMid = (stalkTop + stalkBottom) / 2;
   const stalkHalf = (stalkTop - stalkBottom) / 2;
-  const rows = 7;
-  const cols = 7;
+  const rows = coarse ? 4 : 7;
+  const cols = coarse ? 4 : 7;
   const tailStart = position.length / 3;
   for (let i = 0; i < rows; i++) {
     const t = i / (rows - 1);
@@ -322,7 +344,7 @@ function fishGeometry(shape: Shape) {
   // Dorsal and anal fins: a strip from the body outline out to the fin edge.
   function strip(spec: number[], part: number, sign: number) {
     const [u0, u1, height, sweep, style] = spec;
-    const steps = 14;
+    const steps = coarse ? 7 : 14;
     const first = position.length / 3;
     for (let i = 0; i <= steps; i++) {
       const s = i / steps;
@@ -533,10 +555,15 @@ vec3 pattern(float u, float v, float part, float flex) {
     // Green chromis.
     c = mix(S(0.62, 0.96, 0.80), S(0.28, 0.74, 0.86), smoothstep(-0.6, 0.9, v));
     if (part > 0.5) c = mix(c, S(0.80, 1.0, 0.92), 0.4);
-  } else {
+  } else if (uKind < 7.5) {
     // Yellowtail blue damsel.
     c = mix(S(0.02, 0.20, 1.0), S(0.10, 0.42, 1.0), smoothstep(0.3, -0.8, v));
     c = mix(c, S(1.0, 0.84, 0.0), smoothstep(0.63, 0.72, u));
+  } else {
+    // Anthias: orange, paler below, with pink fins and tail.
+    c = mix(S(1.0, 0.42, 0.10), S(1.0, 0.66, 0.30), smoothstep(0.2, -0.9, v));
+    c = mix(c, S(1.0, 0.36, 0.62), smoothstep(0.6, 0.8, u));
+    if (part > 0.5) c = S(1.0, 0.40, 0.66);
   }
   return c;
 }
@@ -647,7 +674,7 @@ export function createFish() {
 
   for (let kind = 0; kind < species.length; kind++) {
     const spec = species[kind];
-    const { geo: base, eye } = fishGeometry(spec.shape);
+    const { geo: base, eye } = fishGeometry(spec.shape, spec.size < 0.2);
     const geo = new THREE.InstancedBufferGeometry();
     geo.setIndex(base.getIndex());
     for (const name of ["position", "normal", "aUv", "aFin"]) {
@@ -855,11 +882,34 @@ export function createFish() {
       }
     }
 
+    // Only fish that can be seen are drawn: those on the canvas and not
+    // wholly behind the content panel.
+    const [coverLeft, coverTop, coverRight, coverBottom] = view.cover;
     for (let kind = 0; kind < species.length; kind++) {
       const [iPos, iDir, iAnim] = buffers[kind];
-      const list = byKind[kind];
-      for (let i = 0; i < list.length; i++) {
-        const fish = list[i];
+      let i = 0;
+      for (const fish of byKind[kind]) {
+        // Page position and a generous radius, in CSS px.
+        const scale = 1 / (-fish.z * k);
+        const px = view.w / 2 + (fish.x - view.camX) * scale;
+        const py = view.seaTop + view.lvh / 2 - (fish.y - camY) * scale;
+        const r = (fish.size * 0.9 + 0.1) * scale + 8;
+        if (
+          px + r < 0 ||
+          px - r > view.w ||
+          py + r < view.top ||
+          py - r > view.top + h
+        ) {
+          continue;
+        }
+        if (
+          px - r > coverLeft &&
+          px + r < coverRight &&
+          py - r > coverTop &&
+          py + r < coverBottom
+        ) {
+          continue;
+        }
         const cp = Math.cos(fish.pitch);
         iPos.setXYZW(i, fish.x, fish.y, fish.z, fish.size);
         iDir.setXYZW(
@@ -870,10 +920,16 @@ export function createFish() {
           fish.roll,
         );
         iAnim.setXY(i, fish.phase, 0.75 + Math.min(1.2, fish.boost * 0.5));
+        i++;
       }
-      iPos.needsUpdate = true;
-      iDir.needsUpdate = true;
-      iAnim.needsUpdate = true;
+      const mesh = meshes[kind];
+      (mesh.geometry as THREE.InstancedBufferGeometry).instanceCount = i;
+      mesh.visible = i > 0;
+      if (i > 0) {
+        iPos.needsUpdate = true;
+        iDir.needsUpdate = true;
+        iAnim.needsUpdate = true;
+      }
     }
   }
 

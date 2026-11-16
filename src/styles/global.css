@@ -20,7 +20,7 @@
   --color-rim-deep: #06507d;
   --color-rule: #8fc0dc;
   --color-focus: #082f55;
-  --color-water-deep: #0c63b8;
+  --color-water-deep: #084ea8;
   --color-strip: #a6daf6;
   --font-text:
     Verdana, "DejaVu Sans", "Bitstream Vera Sans", Tahoma, sans-serif;
@@ -128,11 +128,11 @@
       ),
       linear-gradient(
         180deg,
-        #0f6fd8 0,
-        #3d9cf0 calc(var(--wl) * 0.5),
-        #b3e2ff var(--wl),
-        #43b8f2 var(--wl),
-        #1f93de calc(var(--wl) + 380px),
+        #0a4fc4 0,
+        #2b85ea calc(var(--wl) * 0.5),
+        #9dd8ff var(--wl),
+        #2ea6f0 var(--wl),
+        #1378d6 calc(var(--wl) + 380px),
         var(--color-water-deep) 100%
       );
   }

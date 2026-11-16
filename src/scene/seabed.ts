@@ -42,11 +42,12 @@ varying vec4 vLook;
 varying float vTip;
 
 vec3 palette(float h) {
-  if (h < 0.2) return S(1.0, 0.40, 0.60);
-  if (h < 0.4) return S(1.0, 0.62, 0.18);
-  if (h < 0.6) return S(0.68, 0.46, 1.0);
-  if (h < 0.8) return S(1.0, 0.90, 0.30);
-  return S(0.20, 0.88, 0.76);
+  if (h < 0.24) return S(1.0, 0.26, 0.34);
+  if (h < 0.46) return S(1.0, 0.52, 0.12);
+  if (h < 0.66) return S(1.0, 0.42, 0.72);
+  if (h < 0.84) return S(1.0, 0.86, 0.24);
+  if (h < 0.93) return S(0.74, 0.42, 1.0);
+  return S(0.16, 0.86, 0.80);
 }
 
 void main() {
@@ -55,15 +56,15 @@ void main() {
   vec3 tint = palette(vLook.y);
   vec3 alb;
   if (kind < 0.5) {
-    // Rock: mottled stone, darker in the hollows, with small patches of
+    // Rock: mottled stone, darker in the hollows, with patches of
     // coralline colour and a dusting of sand on top.
     float nz = fbm(vO.xy * 5.0 + vO.z * 4.0 + vLook.y * 10.0);
-    float fine = fbm(vO.zx * 17.0 + vO.y * 13.0);
-    alb = mix(S(0.50, 0.52, 0.54), S(0.80, 0.78, 0.72), nz) * (0.8 + 0.4 * fine);
-    float crust = smoothstep(0.58, 0.68, fbm(vO.zy * 3.6 + vLook.y * 30.0));
-    alb = mix(alb, tint * (0.6 + 0.4 * fine), crust * 0.6);
-    float crust2 = smoothstep(0.62, 0.7, fbm(vO.xz * 4.4 + vLook.y * 71.0));
-    alb = mix(alb, palette(fract(vLook.y + 0.37)) * 0.8, crust2 * 0.5);
+    float fine = fbm2(vO.zx * 17.0 + vO.y * 13.0);
+    alb = mix(S(0.58, 0.46, 0.52), S(0.88, 0.76, 0.72), nz) * (0.8 + 0.4 * fine);
+    float crust = smoothstep(0.46, 0.6, fbm2(vO.zy * 3.6 + vLook.y * 30.0));
+    alb = mix(alb, tint * (0.6 + 0.4 * fine), crust * 0.8);
+    float crust2 = smoothstep(0.54, 0.64, fbm2(vO.xz * 4.4 + vLook.y * 71.0));
+    alb = mix(alb, palette(fract(vLook.y + 0.37)) * 0.85, crust2 * 0.7);
     alb = mix(alb, S(0.88, 0.82, 0.66), smoothstep(0.78, 0.98, n.y) * 0.4);
   } else if (kind < 1.5) {
     // Dome coral with winding grooves.
@@ -75,7 +76,10 @@ void main() {
     float dots = step(0.78, hash21(floor(vO.xz * 13.0)));
     alb = mix(S(1.0, 0.36, 0.12), S(1.0, 0.80, 0.42), dots);
   }
-  vec3 col = alb * underLight(vW, n, 0.9);
+  // Whiter light than the sand gets, so the warm colours stay warm.
+  vec3 light = underLight(vW, n, 0.9);
+  light = mix(light, vec3(dot(light, vec3(0.34))), 0.55) * 1.1;
+  vec3 col = alb * light;
   gl_FragColor = vec4(applyFog(col, vW), 1.0);
 }
 `;
@@ -264,7 +268,7 @@ export function createSeabed() {
     const branchRows: number[][] = [];
     const starRows: number[][] = [];
     // Reef patches: a few rocks with corals growing around them.
-    for (let patch = 0; patch < 26; patch++) {
+    for (let patch = 0; patch < 30; patch++) {
       const [x, z] = spot(3.4, 30);
       const rocks = 1 + Math.floor(rand() * 3);
       for (let i = 0; i < rocks; i++) {
@@ -282,12 +286,12 @@ export function createSeabed() {
           0.12,
         ]);
       }
-      const domes = Math.floor(rand() * 3);
+      const domes = 1 + Math.floor(rand() * 3);
       for (let i = 0; i < domes; i++) {
         blobRows.push([
           x + (rand() - 0.5) * 2.8,
           z + (rand() - 0.5) * 2,
-          0.22 + rand() * 0.42,
+          0.26 + rand() * 0.5,
           rand() * 6.28,
           1,
           rand(),
@@ -295,12 +299,12 @@ export function createSeabed() {
           0.25,
         ]);
       }
-      const corals = Math.floor(rand() * 3);
+      const corals = 1 + Math.floor(rand() * 4);
       for (let i = 0; i < corals; i++) {
         branchRows.push([
           x + (rand() - 0.5) * 2.6,
           z + (rand() - 0.5) * 2,
-          0.6 + rand() * 0.9,
+          0.7 + rand() * 1.1,
           rand() * 6.28,
           2,
           rand(),
@@ -309,7 +313,7 @@ export function createSeabed() {
         ]);
       }
     }
-    for (let i = 0; i < 14; i++) {
+    for (let i = 0; i < 20; i++) {
       const [x, z] = spot(2.6, 11);
       starRows.push([x, z, 0.1 + rand() * 0.07, rand() * 6.28, 3, 0, 1, -0.05]);
     }

@@ -13,7 +13,7 @@ import {
 const haze = /* glsl */ `
 vec3 airHaze(vec3 col, vec3 wpos) {
   float d = length(wpos - cameraPosition);
-  return mix(col, S(0.76, 0.92, 1.0), 1.0 - exp(-d * 0.0009));
+  return mix(col, S(0.62, 0.88, 1.0), 1.0 - exp(-d * 0.0009));
 }
 `;
 
@@ -184,7 +184,7 @@ function broadleafGeometry() {
   const a = new THREE.Vector3();
   const b = new THREE.Vector3();
   for (const [x, y, z, radius] of balls) {
-    const ball = new THREE.IcosahedronGeometry(radius, 2);
+    const ball = new THREE.IcosahedronGeometry(radius, 1);
     ball.translate(x, y, z);
     const pos = ball.getAttribute("position");
     const nrm = ball.getAttribute("normal");

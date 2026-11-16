@@ -29,6 +29,10 @@ export interface View {
   camY: number;
   floorY: number;
   layout: number; // increments when sizes change
+  seaTop: number; // page row of the top of the underwater camera's frame
+  // Page rectangle hidden behind the content panel: left, top, right,
+  // bottom. All zero when nothing is hidden.
+  cover: number[];
 }
 
 // Uniforms shared by several materials. Materials reference these objects

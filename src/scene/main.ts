@@ -1,5 +1,5 @@
 // WebGL background: sky, sun, rainbow, clouds and islands above the
-// waterline, and a sea that deepens down the page to a kelp bed at the bottom.
+// waterline, and a sea that deepens down the page to a coral reef at the bottom.
 import * as THREE from "three";
 import { createBubbles } from "./bubbles";
 import { createDolphins } from "./dolphin";
@@ -21,8 +21,13 @@ import { D_REF, EYE, FOV, TAN, U, type View } from "./view";
 const OVERSCAN = matchMedia("(pointer: coarse)").matches ? 140 : 96;
 
 // Quality steps when frames run slow, best first: 0 full, 1 without MSAA,
-// 2 without bloom, then lower resolutions.
+// 2 without bloom, then lower resolutions. One step past the last, the
+// scene stops animating and only redraws when the page scrolls or resizes.
 const SCALES = [1, 1, 1, 0.8, 0.64, 0.5];
+const STILL = SCALES.length;
+// The level reached is kept for the next visit, so a slow device does not
+// start at full quality every time.
+const LEVEL_KEY = "scene-level";
 // Frame intervals in ms: the normal cap, and the rate after a while
 // without input.
 const FRAME = 1000 / 60;
@@ -39,11 +44,29 @@ export function startScene(canvas: HTMLCanvasElement, site: HTMLElement) {
       depth: false,
       stencil: false,
       powerPreference: "default",
+      // Software rendering is too slow for the scene; the CSS background
+      // stays instead.
+      failIfMajorPerformanceCaveat: true,
     });
   } catch {
     return false;
   }
   if (!renderer.capabilities.isWebGL2) return false;
+  // Reading shader logs back costs a round trip per program at start-up.
+  renderer.debug.checkShaderErrors = import.meta.env.DEV;
+  // Some browsers hand out a software context all the same; its name
+  // gives it away.
+  const gl = renderer.getContext();
+  // Firefox names the GPU in RENDERER; Chrome needs the extension.
+  let gpu = String(gl.getParameter(gl.RENDERER));
+  if (/^webkit/i.test(gpu)) {
+    const info = gl.getExtension("WEBGL_debug_renderer_info");
+    if (info) gpu = String(gl.getParameter(info.UNMASKED_RENDERER_WEBGL));
+  }
+  if (/swiftshader|llvmpipe|softpipe|software/i.test(gpu)) {
+    renderer.dispose();
+    return false;
+  }
   renderer.autoClear = false;
   renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
   const hdr = renderer.extensions.has("EXT_color_buffer_float");
@@ -75,9 +98,19 @@ export function startScene(canvas: HTMLCanvasElement, site: HTMLElement) {
     camY: -1,
     floorY: -10,
     layout: 0,
+    seaTop: 0,
+    cover: [0, 0, 0, 0],
   };
   let docHeight = 0;
   let level = 0;
+  try {
+    // A saved still level starts one step better, in case it was set by a
+    // passing slowdown.
+    const saved = Number(localStorage.getItem(LEVEL_KEY)) || 0;
+    level = Math.max(0, Math.min(STILL - 1, Math.round(saved)));
+  } catch {
+    // Storage is blocked; start at full quality.
+  }
   // Best level still allowed; rises when a step back up does not hold.
   let ceiling = 0;
   let raisedAt = -Infinity;
@@ -115,7 +148,7 @@ export function startScene(canvas: HTMLCanvasElement, site: HTMLElement) {
   skyScene.add(sky.backdrop, sky.clouds, sky.bow, sky.gulls);
   skyScene.add(islands.hill, islands.cay, islands.broadleaf, islands.palms);
   const pod = createDolphins();
-  skyScene.add(ocean, pod.dolphins, pod.splashes);
+  skyScene.add(ocean, ...pod.meshes);
 
   // Below the water.
   const seaScene = new THREE.Scene();
@@ -130,6 +163,57 @@ export function startScene(canvas: HTMLCanvasElement, site: HTMLElement) {
   seaScene.add(seabed.blobs, seabed.branches, seabed.stars);
   seaScene.add(kelp.kelp, kelp.grass, ...fish.meshes);
   seaScene.add(jellies.mesh, bubbles.motes, bubbles.streams, bubbles.burst);
+
+  // The content panel is opaque, so the canvas behind it is never seen. An
+  // invisible quad drawn first, at the near plane, makes the depth test
+  // reject everything behind the panel; the final pass skips the same
+  // pixels.
+  const panels = [...site.querySelectorAll<HTMLElement>(".aero-box")];
+  const cover = new THREE.Mesh(
+    new THREE.PlaneGeometry(2, 2),
+    new THREE.ShaderMaterial({
+      uniforms: { uRect: { value: new THREE.Vector4() } },
+      vertexShader: /* glsl */ `
+        uniform vec4 uRect; // left, bottom, right, top in clip space
+        void main() {
+          gl_Position = vec4(mix(uRect.xy, uRect.zw, position.xy * 0.5 + 0.5), -1.0, 1.0);
+        }
+      `,
+      fragmentShader: /* glsl */ `
+        void main() {
+          gl_FragColor = vec4(0.0);
+        }
+      `,
+      colorWrite: false,
+      depthFunc: THREE.AlwaysDepth,
+    }),
+  );
+  cover.frustumCulled = false;
+  cover.renderOrder = -20;
+  seaScene.add(cover);
+  // Page rectangle of the panel on show: left, top, right, bottom. Empty
+  // while the panel or an ancestor animates, and while the content is
+  // hidden.
+  const hidden = new THREE.Vector4();
+  function findHidden() {
+    hidden.set(0, 0, 0, 0);
+    if (site.classList.contains("scene-only")) return;
+    const panel = panels.find((el) => el.offsetParent);
+    if (!panel) return;
+    for (let el = panel; el !== site; el = el.parentElement!) {
+      for (const animation of el.getAnimations()) {
+        if (animation.playState === "running") return;
+      }
+    }
+    const box = panel.getBoundingClientRect();
+    const siteBox = site.getBoundingClientRect();
+    hidden.set(
+      box.left - siteBox.left,
+      box.top - siteBox.top,
+      box.right - siteBox.left,
+      box.bottom - siteBox.top,
+    );
+  }
 
   let dirty = true;
   const banner = site.querySelector(".aero-banner");
@@ -173,7 +257,7 @@ export function startScene(canvas: HTMLCanvasElement, site: HTMLElement) {
       w < 700 ? 1.5 : 2,
       Math.sqrt(budget / (w * h)),
     );
-    const pr = base * SCALES[level];
+    const pr = base * SCALES[Math.min(level, STILL - 1)];
     // Aliasing is hard to see at 1.5 device px per CSS px and above.
     msaa = base < 1.5;
     const samples = msaa && level === 0 ? 4 : 0;
@@ -336,13 +420,20 @@ export function startScene(canvas: HTMLCanvasElement, site: HTMLElement) {
   // back and forth.
   function setLevel(next: number, now: number) {
     if (next === 1 && !msaa) next = next > level ? 2 : 0;
-    if (next > level && now - raisedAt < 10000) ceiling = next;
+    if (next > level && now - raisedAt < 10000) {
+      ceiling = Math.max(ceiling, level + 1);
+    }
     if (next < level) raisedAt = now;
     level = next;
     dirty = true;
     pace = expected;
-    slow = 0;
-    good = 0;
+    slowFor = 0;
+    goodFor = 0;
+    try {
+      localStorage.setItem(LEVEL_KEY, String(level));
+    } catch {
+      // Storage is blocked; the level lasts for this visit only.
+    }
   }
 
   let last = 0;
@@ -355,8 +446,11 @@ export function startScene(canvas: HTMLCanvasElement, site: HTMLElement) {
   // alone does not lower quality.
   let expected = FRAME;
   let pace = FRAME;
-  let slow = 0;
-  let good = 0;
+  // How long, in ms, frames have been running late or on time.
+  let slowFor = 0;
+  let goodFor = 0;
+  let startedAt = 0;
+  let drewAt = 0;
   let drawn = "";
 
   function frame(now: number) {
@@ -374,24 +468,41 @@ export function startScene(canvas: HTMLCanvasElement, site: HTMLElement) {
     if (now < due - 2) return;
     due = Math.max(due + interval, now);
 
-    const still = reduced.matches;
+    const still = reduced.matches || level === STILL;
+    // At the still level a frame is slow to draw, so scrolling redraws at
+    // most ten times a second; the last one comes once scrolling stops.
+    if (level === STILL && scrolling && now - drewAt < 100) return;
     const dt = Math.min(0.05, last ? (now - last) / 1000 : 0.016);
     // Step quality down when frames keep arriving late, and back up after
-    // a long run of frames on time.
-    if (last && !idle && !still) {
-      pace += (now - last - pace) * 0.05;
-      if (pace > expected * 1.3) {
-        slow++;
-        good = 0;
-      } else if (pace < expected * 1.1) {
-        good++;
-        slow = 0;
+    // a long run of frames on time. The first moments are left out, while
+    // the page is still loading.
+    startedAt ||= now;
+    if (last && !still && now - startedAt > 1500) {
+      const gap = now - last;
+      const target = idle ? Math.max(expected, IDLE_FRAME) : expected;
+      // Running average over about 400 ms. Each frame counts for at most
+      // four intervals, so one long stall does not read as a slow device.
+      pace += (Math.min(gap, target * 4) - pace) * Math.min(1, gap / 400);
+      if (pace > target * 1.3) {
+        slowFor += Math.min(gap, 200);
+        goodFor = 0;
+      } else if (pace < target * 1.1) {
+        // The idle rate is easy to hold, so it never raises the level.
+        if (!idle) goodFor += gap;
+        slowFor = 0;
       } else {
-        slow = 0;
-        good = 0;
+        slowFor = 0;
+        goodFor = 0;
       }
-      if (slow > 90 && level < SCALES.length - 1) setLevel(level + 1, now);
-      if (good > 900 && level > ceiling) setLevel(level - 1, now);
+      const over = pace / target;
+      if (slowFor > 1500 && level < STILL - 1) {
+        // Far over budget, skip levels instead of taking them one by one.
+        const steps = over > 3 ? 3 : over > 1.8 ? 2 : 1;
+        setLevel(Math.min(level + steps, STILL - 1), now);
+      } else if (slowFor > 3000 && over > 2.5 && level === STILL - 1) {
+        setLevel(STILL, now);
+      }
+      if (goodFor > 8000 && level > ceiling) setLevel(level - 1, now);
     }
     last = now;
     if (dirty) measure();
@@ -440,9 +551,19 @@ export function startScene(canvas: HTMLCanvasElement, site: HTMLElement) {
 
     // With reduced motion the scene is a still picture that only follows
     // scrolling and resizing.
-    const key = `${scroll}|${top}|${view.layout}|${view.floorY.toFixed(3)}`;
+    findHidden();
+    // The part of the panel that hides the scene: its inside, less a margin
+    // for the rounded corners and for the few pixels the final pass reads
+    // to the side of each one it draws.
+    const open = hidden.z - hidden.x > 60 && hidden.w - hidden.y > 60;
+    view.cover = open
+      ? [hidden.x + 14, hidden.y + 14, hidden.z - 14, hidden.w - 14]
+      : [0, 0, 0, 0];
+    view.seaTop = frameTop + seaShift;
+    const key = `${scroll}|${top}|${view.layout}|${view.floorY.toFixed(3)}|${hidden.x}|${hidden.y}|${hidden.z}|${hidden.w}`;
     if (still && key === drawn) return;
     drawn = key;
+    drewAt = now;
 
     if (!still && hoverX >= 0) {
       fish.startle(view, hoverX, frameY(hoverY), 80, 1.1);
@@ -470,6 +591,21 @@ export function startScene(canvas: HTMLCanvasElement, site: HTMLElement) {
     const lowest = (offY + h - lvh / 2) * view.k;
     const drop = view.camY + 0.07 - (view.floorY + 0.62);
     sea.sand.visible = drop <= 0 || (lowest > 0 && drop / lowest < 80);
+    // The final pass skips the panel's inside, less its rounded corners.
+    const hole = post.uniforms.uHole.value;
+    cover.visible = open;
+    if (open) {
+      hole.set(hidden.x + 5, hidden.y + 5, hidden.z - 5, hidden.w - 5);
+      const [x0, y0, x1, y1] = view.cover;
+      cover.material.uniforms.uRect.value.set(
+        (x0 / w) * 2 - 1,
+        1 - ((y1 - top) / h) * 2,
+        (x1 / w) * 2 - 1,
+        1 - ((y0 - top) / h) * 2,
+      );
+    } else {
+      hole.set(0, 0, 0, 0);
+    }
 
     const dw = main.width;
     const dh = main.height;
@@ -544,6 +680,19 @@ export function startScene(canvas: HTMLCanvasElement, site: HTMLElement) {
       ]);
     } catch {
       // Anything not compiled yet compiles on its first draw.
+    }
+    // Without KHR_parallel_shader_compile (Firefox), compileAsync returns
+    // before the programs have linked, and the first draw would then wait
+    // for all of them at once. Reading a program's uniforms waits for that
+    // program alone, so the waits are spread over several frames here.
+    let since = performance.now();
+    for (const program of renderer.info.programs ?? []) {
+      program.getUniforms();
+      program.getAttributes();
+      if (performance.now() - since > 4) {
+        await new Promise(requestAnimationFrame);
+        since = performance.now();
+      }
     }
     ready = true;
   }

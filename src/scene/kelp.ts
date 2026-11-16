@@ -97,7 +97,7 @@ function strandGeometry() {
   }
 
   // Stalk: two crossed ribbons.
-  const segments = 22;
+  const segments = 14;
   for (let cross = 0; cross < 2; cross++) {
     const side = new THREE.Vector3(cross ? 0 : 0.006, 0, cross ? 0.006 : 0);
     const face = new THREE.Vector3(cross ? 1 : 0, 0, cross ? 0 : 1);
@@ -121,7 +121,7 @@ function strandGeometry() {
   // Long narrow blades spiral up the stalk and trail off with the current.
   // Their normals curl across the width so each blade shades as a ribbon.
   const blades = 44;
-  const steps = 9;
+  const steps = 8;
   const up = new THREE.Vector3(0, 1, 0);
   const drift = new THREE.Vector3(1, 0, 0.2).normalize();
   for (let b = 0; b < blades; b++) {
@@ -261,7 +261,7 @@ export function createKelp() {
     const strands: number[][] = [];
     const column = Math.min(800, w - 2 * left);
     let tries = 0;
-    while (strands.length < 54 && tries++ < 4000) {
+    while (strands.length < 24 && tries++ < 4000) {
       const z = -(3.6 + Math.pow(rand(), 1.3) * 24);
       const px = rand() * (w + 500) - 250;
       // Keep most of the tall kelp out from behind the content column, unless
@@ -272,20 +272,18 @@ export function createKelp() {
       const height = 2.2 + rand() * rand() * 5.5;
       strands.push([x, z, height, rand() * 6.28, rand(), 0.4 + rand() * 0.8]);
     }
-    // Clumps round out each plant.
-    const clumps = strands.length;
-    for (let i = 0; i < clumps; i++) {
+    // A second, shorter strand rounds out each plant.
+    const plants = strands.length;
+    for (let i = 0; i < plants; i++) {
       const [x, z, height] = strands[i];
-      for (let j = 0; j < 2; j++) {
-        strands.push([
-          x + rand() * 0.7 - 0.35,
-          z + rand() * 0.7 - 0.35,
-          height * (0.45 + rand() * 0.5),
-          rand() * 6.28,
-          rand(),
-          0.4 + rand() * 0.8,
-        ]);
-      }
+      strands.push([
+        x + rand() * 0.7 - 0.35,
+        z + rand() * 0.7 - 0.35,
+        height * (0.45 + rand() * 0.5),
+        rand() * 6.28,
+        rand(),
+        0.4 + rand() * 0.8,
+      ]);
     }
     // A row of short plants close to the camera, in view under the content
     // at the end of the page on any width.
@@ -306,7 +304,7 @@ export function createKelp() {
     setInstances(kelp, strands);
 
     const blades: number[][] = [];
-    for (let patch = 0; patch < 90; patch++) {
+    for (let patch = 0; patch < 60; patch++) {
       const z = -(2.2 + Math.pow(rand(), 1.5) * 22);
       const half = ((w / 2 + 200) * mpp * -z) / D_REF;
       const x = (rand() * 2 - 1) * half;

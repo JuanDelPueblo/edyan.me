@@ -25,11 +25,11 @@ void main() {
   vec3 dir = normalize(vec3(vTan, -1.0));
   // 0 at the horizon, 1 at the top of the page.
   float e = max(vTan.y, 0.0) / uTanTop;
-  vec3 col = S(0.76, 0.92, 1.0);
-  col = mix(col, S(0.46, 0.76, 0.98), smoothstep(0.0, 0.2, e));
-  col = mix(col, S(0.22, 0.60, 0.95), smoothstep(0.2, 0.55, e));
-  col = mix(col, S(0.06, 0.43, 0.86), smoothstep(0.55, 1.05, e));
-  col = mix(col, S(0.03, 0.30, 0.76), smoothstep(1.05, 2.4, e));
+  vec3 col = S(0.62, 0.88, 1.0);
+  col = mix(col, S(0.30, 0.70, 1.0), smoothstep(0.0, 0.2, e));
+  col = mix(col, S(0.10, 0.50, 0.97), smoothstep(0.2, 0.55, e));
+  col = mix(col, S(0.02, 0.32, 0.88), smoothstep(0.55, 1.05, e));
+  col = mix(col, S(0.01, 0.19, 0.70), smoothstep(1.05, 2.4, e));
 
   float clear = clearOfText();
 
@@ -45,6 +45,22 @@ void main() {
   col += warm * 7.0 * smoothstep(0.024, 0.017, d);
 
   gl_FragColor = vec4(col, 1.0);
+}
+`;
+
+// The rainbow's quad covers only the square around both bows. vTan is the
+// view ray, as in backdropVertex.
+const bowVertex = /* glsl */ `
+uniform vec4 uBow;
+varying vec2 vTan;
+void main() {
+  vTan = uBow.xy + position.xy * (uBow.z * 1.34 + uBow.w * 0.6);
+  gl_Position = vec4(
+    vTan.x * projectionMatrix[0][0] - projectionMatrix[2][0],
+    vTan.y * projectionMatrix[1][1] - projectionMatrix[2][1],
+    1.0,
+    1.0
+  );
 }
 `;
 
@@ -155,7 +171,7 @@ void main() {
   float lit = smoothstep(0.2, 0.9, dot(nrm, uLight) * 0.5 + 0.5);
   vec3 col = mix(S(0.56, 0.72, 0.93), vec3(1.06), lit);
   col *= mix(0.88, 1.0, smoothstep(-0.3, 0.5, vInfo.z + vUv.y * 0.3));
-  col = mix(col, S(0.80, 0.93, 1.0), vInfo.w);
+  col = mix(col, S(0.72, 0.90, 1.0), vInfo.w);
   a *= mix(1.0, 0.75, vInfo.w) * mix(0.12, 1.0, clearOfText());
   gl_FragColor = vec4(col * a, a);
 }
@@ -202,11 +218,12 @@ export function createSky() {
     blendDst: THREE.OneMinusSrcAlphaFactor,
   };
   const bow = new THREE.Mesh(
-    screenTriangle(),
+    new THREE.PlaneGeometry(2, 2),
     makeMaterial({
-      vertexShader: backdropVertex,
+      vertexShader: bowVertex,
       fragmentShader: bowFragment,
       uniforms: { uPage: U.uPage, uExcl: U.uExcl, uTanTop, uBow },
+      side: THREE.DoubleSide,
       ...premultiplied,
     }),
   );

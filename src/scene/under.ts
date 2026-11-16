@@ -77,10 +77,10 @@ void main() {
     -(dune(p + vec2(0.0, 0.05)) - h) / 0.05);
   // Wind-ripple ridges across the sand.
   vec2 across = vec2(0.34, 0.94);
-  float phase = dot(p, across) * 15.0 + fbm(p * 0.7) * 6.0;
+  float phase = dot(p, across) * 15.0 + fbm2(p * 0.7) * 6.0;
   n.xz += across * cos(phase) * 0.2;
   n = normalize(n);
-  vec3 alb = mix(S(1.0, 0.95, 0.80), S(0.88, 0.82, 0.64), fbm(p * 0.55));
+  vec3 alb = mix(S(1.0, 0.95, 0.80), S(0.88, 0.82, 0.64), fbm2(p * 0.55));
   alb *= 0.96 + 0.08 * hash21(floor(p * 80.0));
   vec3 light = underLight(vW, n, 1.0);
   vec3 col = alb * light;
@@ -97,7 +97,6 @@ export function createUnderwater() {
       vertexShader: backdropVertex,
       fragmentShader: backdropFragment,
       uniforms: underUniforms(),
-      depthTest: false,
       depthWrite: false,
     }),
   );
@@ -117,7 +116,7 @@ export function createUnderwater() {
   );
   ceiling.frustumCulled = false;
 
-  const sandGeo = new THREE.PlaneGeometry(200, 80, 200, 80);
+  const sandGeo = new THREE.PlaneGeometry(200, 80, 100, 40);
   sandGeo.rotateX(-Math.PI / 2);
   sandGeo.translate(0, 0, -38);
   const sand = new THREE.Mesh(
