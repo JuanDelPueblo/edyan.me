@@ -224,6 +224,9 @@ export function createBubbles() {
       iB.set(rows[i].slice(0, 4), i * 4);
       iC.set(rows[i].slice(4, 7), i * 3);
     }
+    // Frees the GPU buffers of the previous layout; three.js uploads the
+    // shared ones again on the next draw.
+    streamGeo.dispose();
     streamGeo.setAttribute("iB", new THREE.InstancedBufferAttribute(iB, 4));
     streamGeo.setAttribute("iC", new THREE.InstancedBufferAttribute(iC, 3));
     streamGeo.instanceCount = rows.length;

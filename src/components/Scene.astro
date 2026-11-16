@@ -17,5 +17,8 @@
   // three.js loads in its own chunk after the page has rendered.
   const canvas = document.querySelector<HTMLCanvasElement>(".aero-scene")!;
   const site = document.querySelector<HTMLElement>(".aero-site")!;
-  import("../scene/main").then(({ startScene }) => startScene(canvas, site));
+  // A failed chunk load leaves the CSS background in place.
+  import("../scene/main")
+    .then(({ startScene }) => startScene(canvas, site))
+    .catch(() => {});
 </script>

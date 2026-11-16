@@ -59,7 +59,7 @@ void main() {
   vec3 col;
   float a;
   if (vJ.y < 0.5) {
-    float rim = pow(1.0 - abs(dot(n, view)), 1.6);
+    float rim = pow(1.0 - min(abs(dot(n, view)), 1.0), 1.6);
     a = 0.16 + 0.62 * rim + 0.3 * smoothstep(0.86, 1.0, vJ.x);
     col = mix(tint, vec3(1.0), 0.35 + 0.4 * rim) * (0.8 + 0.5 * rim);
     // Bright veins fanning out from the crown.

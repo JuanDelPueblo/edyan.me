@@ -49,9 +49,9 @@ export function startScene(canvas: HTMLCanvasElement, site: HTMLElement) {
       failIfMajorPerformanceCaveat: true,
     });
   } catch {
+    // No WebGL 2 context, which three.js requires.
     return false;
   }
-  if (!renderer.capabilities.isWebGL2) return false;
   // Reading shader logs back costs a round trip per program at start-up.
   renderer.debug.checkShaderErrors = import.meta.env.DEV;
   // Some browsers hand out a software context all the same; its name
@@ -64,6 +64,8 @@ export function startScene(canvas: HTMLCanvasElement, site: HTMLElement) {
     if (info) gpu = String(gl.getParameter(info.UNMASKED_RENDERER_WEBGL));
   }
   if (/swiftshader|llvmpipe|softpipe|software/i.test(gpu)) {
+    // dispose() alone leaves the context open.
+    renderer.forceContextLoss();
     renderer.dispose();
     return false;
   }
@@ -258,8 +260,10 @@ export function startScene(canvas: HTMLCanvasElement, site: HTMLElement) {
       Math.sqrt(budget / (w * h)),
     );
     const pr = base * SCALES[Math.min(level, STILL - 1)];
-    // Aliasing is hard to see at 1.5 device px per CSS px and above.
-    msaa = base < 1.5;
+    // Aliasing is hard to see at 1.5 device px per CSS px and above. Large
+    // screens skip MSAA too: four samples of a half-float target cost about
+    // 60 bytes per pixel, too much GPU memory for a background.
+    msaa = base < 1.5 && w * h * base * base < 3e6;
     const samples = msaa && level === 0 ? 4 : 0;
     if (samples !== main.samples) {
       // The target reallocates with the new sample count on its next use.
@@ -369,7 +373,8 @@ export function startScene(canvas: HTMLCanvasElement, site: HTMLElement) {
       sfx("coqui");
       return;
     }
-    if (reduced.matches || pageY < view.wl + 8) return;
+    // A still scene would leave the bubbles frozen in place.
+    if (reduced.matches || level === STILL || pageY < view.wl + 8) return;
     const dist = 3.2;
     const y = frameY(event.clientY);
     bubbles.pop(
@@ -457,7 +462,17 @@ export function startScene(canvas: HTMLCanvasElement, site: HTMLElement) {
   let goodFor = 0;
   let startedAt = 0;
   let drewAt = 0;
+  let checkedAt = 0;
   let drawn = "";
+
+  // Animation frames stop in a hidden tab, so the loop cannot see the gap.
+  // Restart the timing on return, with the same grace period as at load,
+  // so the gap and the stutter after it do not read as slow frames.
+  document.addEventListener("visibilitychange", () => {
+    last = 0;
+    due = 0;
+    startedAt = 0;
+  });
 
   function frame(now: number) {
     requestAnimationFrame(frame);
@@ -475,6 +490,14 @@ export function startScene(canvas: HTMLCanvasElement, site: HTMLElement) {
     due = Math.max(due + interval, now);
 
     const still = reduced.matches || level === STILL;
+    // A still picture changes only with scrolling, resizing or a panel
+    // switch, so between scrolls the page is checked ten times a second
+    // instead of on every frame.
+    if (still && !scrolling && !dirty && now - checkedAt < 100) {
+      last = 0;
+      return;
+    }
+    checkedAt = now;
     // At the still level a frame is slow to draw, so scrolling redraws at
     // most ten times a second; the last one comes once scrolling stops.
     if (level === STILL && scrolling && now - drewAt < 100) return;
@@ -678,14 +701,27 @@ export function startScene(canvas: HTMLCanvasElement, site: HTMLElement) {
       requestAnimationFrame(frame);
     }
     requestAnimationFrame(tick);
+    // compileAsync never settles once the context is lost, so a loss ends
+    // the wait. The frame loop then idles until the context is restored,
+    // and three.js compiles the shaders again on the first draw.
+    const lostDuringStart = new Promise((resolve) =>
+      canvas.addEventListener("webglcontextlost", resolve, { once: true }),
+    );
     try {
-      await Promise.all([
-        renderer.compileAsync(skyScene, skyCam),
-        renderer.compileAsync(seaScene, seaCam),
-        post.compile(),
+      await Promise.race([
+        Promise.all([
+          renderer.compileAsync(skyScene, skyCam),
+          renderer.compileAsync(seaScene, seaCam),
+          post.compile(),
+        ]),
+        lostDuringStart,
       ]);
     } catch {
       // Anything not compiled yet compiles on its first draw.
+    }
+    if (lost) {
+      ready = true;
+      return;
     }
     // Without KHR_parallel_shader_compile (Firefox), compileAsync returns
     // before the programs have linked, and the first draw would then wait

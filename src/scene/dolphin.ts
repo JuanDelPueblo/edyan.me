@@ -90,7 +90,7 @@ void main() {
   // Wet skin: a sharp highlight and a rim of sky.
   vec3 h = normalize(uLight + view);
   col += vec3(0.95) * pow(max(dot(n, h), 0.0), 50.0);
-  col += S(0.62, 0.82, 1.0) * pow(1.0 - max(dot(n, view), 0.0), 3.0) * 0.4;
+  col += S(0.62, 0.82, 1.0) * pow(1.0 - clamp(dot(n, view), 0.0, 1.0), 3.0) * 0.4;
   gl_FragColor = vec4(col, 1.0);
 }
 `;

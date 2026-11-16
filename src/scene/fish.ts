@@ -591,7 +591,7 @@ void main() {
   col += alb * 0.3 * (1.0 - onBody);
   vec3 h = normalize(uSunU + view);
   col += vec3(0.5) * pow(max(dot(n, h), 0.0), 36.0) * onBody;
-  col += S(0.55, 0.88, 1.0) * pow(1.0 - max(dot(n, view), 0.0), 3.0) * 0.2 * onBody;
+  col += S(0.55, 0.88, 1.0) * pow(1.0 - clamp(dot(n, view), 0.0, 1.0), 3.0) * 0.2 * onBody;
   col += vec3(0.8) * glint;
   // Pectoral fins, and the pale tails of some species, are see-through.
   // With multisampling, alpha becomes partial coverage.

@@ -602,6 +602,9 @@ function setTrees(mesh: THREE.Mesh, trees: number[][]) {
     iPos.set(trees[i].slice(0, 4), i * 4);
     iVar.set(trees[i].slice(4, 7), i * 3);
   }
+  // Frees the GPU buffers of the previous layout; three.js uploads the
+  // shared ones again on the next draw.
+  geo.dispose();
   geo.setAttribute("iPos", new THREE.InstancedBufferAttribute(iPos, 4));
   geo.setAttribute("iVar", new THREE.InstancedBufferAttribute(iVar, 3));
   geo.instanceCount = trees.length;

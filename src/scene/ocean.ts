@@ -36,7 +36,7 @@ void main() {
   vec3 refl = texture2D(tRefl, clamp(uv, 0.003, 0.997)).rgb;
   refl = min(refl, vec3(0.94));
 
-  float fres = 0.02 + 0.98 * pow(1.0 - max(dot(n, view), 0.0), 5.0);
+  float fres = 0.02 + 0.98 * pow(1.0 - clamp(dot(n, view), 0.0, 1.0), 5.0);
   vec3 body = mix(S(0.08, 0.74, 0.94), S(0.01, 0.30, 0.80),
     smoothstep(3.0, 70.0, dist));
   vec3 col = mix(body, refl, clamp(fres, 0.0, 1.0));

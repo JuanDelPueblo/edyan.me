@@ -239,6 +239,9 @@ function setInstances(mesh: THREE.Mesh, rows: number[][]) {
     iBase.set(rows[i].slice(0, 4), i * 4);
     iLook.set(rows[i].slice(4, 6), i * 2);
   }
+  // Frees the GPU buffers of the previous layout; three.js uploads the
+  // shared ones again on the next draw.
+  geo.dispose();
   geo.setAttribute("iBase", new THREE.InstancedBufferAttribute(iBase, 4));
   geo.setAttribute("iLook", new THREE.InstancedBufferAttribute(iLook, 2));
   geo.instanceCount = rows.length;

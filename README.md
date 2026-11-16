@@ -28,9 +28,23 @@ To build the site into `dist/`, run:
 npm run build
 ```
 
+## Checks
+
+To type-check the Astro components and scripts, run:
+
+```sh
+npm run check
+```
+
 ## Formatting
 
 ```sh
 npm run format
 npm run format:check
 ```
+
+## Deployment
+
+Pushes to `master` run `.github/workflows/deploy.yml`, which builds the site and
+publishes it to GitHub Pages. The Pages source must be set to GitHub Actions in
+the repository settings.

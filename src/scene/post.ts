@@ -76,7 +76,6 @@ uniform vec2 uSun; // page position of the sun
 uniform vec2 uCenter; // page position of the viewport centre
 uniform float uFlare;
 uniform float uSunSize;
-uniform float uDeep; // 0 near the surface, 1 far below
 uniform float uBloom; // 0 while bloom is off
 uniform vec4 uHole; // page rectangle hidden by the content panel
 
@@ -221,7 +220,6 @@ export function createPost(renderer: THREE.WebGLRenderer, hdr: boolean) {
     uCenter: { value: new THREE.Vector2() },
     uFlare: { value: 1 },
     uSunSize: U.uSunSize,
-    uDeep: { value: 0 },
     uBloom: { value: 1 },
     uHole: { value: new THREE.Vector4() },
   });

@@ -59,8 +59,9 @@ Manage the background server with `astro dev stop`, `astro dev status`, and
   across supported file types.
 - Run `npm run format` to format supported files and `npm run format:check` to
   verify formatting.
-- Run `npm run build` for code or configuration changes. Check responsive layout
-  and keyboard navigation when changing markup or styling.
+- Run `npm run check` and `npm run build` for code or configuration changes.
+  Check responsive layout and keyboard navigation when changing markup or
+  styling.
 
 ## Documentation
 

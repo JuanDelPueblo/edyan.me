@@ -1,0 +1,39 @@
+---
+// Astro builds this file as 404.html, which GitHub Pages serves for any
+// missing address. The CSS sky and water gradients on .aero-site stand in for
+// the WebGL scene.
+import { portfolio as info } from "../content";
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout
+  title={`Page not found · ${info.pageTitle}`}
+  description={info.description}
+  notFound
+>
+  <div class="aero-site relative min-h-screen pt-[max(18vh,calc(env(safe-area-inset-top,0px)+40px))] pr-[max(16px,env(safe-area-inset-right,0px))] pb-10 pl-[max(16px,env(safe-area-inset-left,0px))] text-[13px] leading-[1.55]">
+    <main
+      id="main-content"
+      class="mx-auto grid max-w-[34rem] justify-items-center gap-4 text-center"
+    >
+      <h1 class="aero-title relative font-head text-[42px] leading-[1.1] font-bold text-balance max-sm:text-[30px]">
+        <span class="block">404</span>
+        Page not found
+      </h1>
+      <p class="flex flex-wrap justify-center gap-2">
+        <a
+          class="aero-leaf aero-jelly relative inline-flex items-center justify-center rounded-[20px] px-[22px] py-[9px] font-head text-sm font-bold no-underline"
+          href="/"
+        >
+          Go to the home page
+        </a>
+        <a
+          class="aero-pill aero-jelly relative inline-flex items-center rounded-[20px] px-[22px] py-[9px] font-head text-sm font-bold no-underline"
+          href={info.resume}
+        >
+          View Resume
+        </a>
+      </p>
+    </main>
+  </div>
+</Layout>
