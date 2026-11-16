@@ -91,7 +91,7 @@ function hue(name: string) {
     <div class="tk-track flex gap-2 px-5 will-change-transform motion-reduce:flex-wrap motion-reduce:px-0 no-js:flex-wrap no-js:px-0">
       {toolbox.map((tech) => (
         <button
-          class="aero-chip flex flex-none cursor-pointer items-center gap-1.5 rounded-[14px] py-1 pr-[5px] pl-[5px] font-head text-xs font-bold whitespace-nowrap no-js:pointer-events-none"
+          class="aero-chip flex flex-none cursor-pointer items-center gap-1.5 rounded-[14px] py-1 pr-2.5 pl-[5px] font-head text-xs font-bold whitespace-nowrap no-js:pointer-events-none"
           type="button"
           tabindex="-1"
           data-tech={tech}
@@ -119,9 +119,6 @@ function hue(name: string) {
             />
           )}
           {tech}
-          <b class="aero-count min-w-[18px] rounded-[9px] px-[5px] py-px text-center text-[10px]">
-            {used[tech].length}
-          </b>
         </button>
       ))}
     </div>

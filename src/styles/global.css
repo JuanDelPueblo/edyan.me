@@ -571,11 +571,6 @@
       rgba(255, 255, 255, 0.1)
     );
   }
-  .aero-count {
-    background: linear-gradient(180deg, #3aa2dc, #0b5d9e);
-    color: #fff;
-    text-shadow: 0 1px 0 rgba(0, 30, 70, 0.8);
-  }
 
   /* ===== Tab window ===== */
 
