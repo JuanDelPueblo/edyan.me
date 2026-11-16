@@ -1,0 +1,58 @@
+---
+// Fixed corner button that hides the page content to show the background on
+// its own. The content keeps its height, so the page still scrolls through
+// the whole scene. Escape also brings the content back.
+---
+
+<button
+  class="aero-peek fixed right-[max(16px,env(safe-area-inset-right,0px))] bottom-[max(16px,env(safe-area-inset-bottom,0px))] z-50 grid size-11 place-items-center rounded-full no-js:hidden"
+  id="scene-toggle"
+  type="button"
+  aria-pressed="false"
+  aria-label="Hide page content"
+  data-tip-title="Hide page content"
+>
+  <!-- Eye: open while the content shows, struck through while it is hidden. -->
+  <svg
+    class="relative z-2 size-6 drop-shadow-[0_1px_1px_rgba(0,40,90,0.6)]"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="#fff"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    aria-hidden="true"
+  >
+    <path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z"></path>
+    <circle cx="12" cy="12" r="3"></circle>
+    <path class="eye-off" d="M4 4l16 16"></path>
+  </svg>
+</button>
+
+<script>
+  import { sfx } from "../scripts/sound";
+
+  const toggle = document.getElementById("scene-toggle")!;
+  const site = document.querySelector<HTMLElement>(".aero-site")!;
+
+  function setHidden(hidden: boolean) {
+    site.classList.toggle("scene-only", hidden);
+    toggle.setAttribute("aria-pressed", String(hidden));
+    // aria-pressed reports the state, so the label stays the same.
+    toggle.dataset.tipTitle = hidden
+      ? "Show page content"
+      : "Hide page content";
+  }
+
+  // Add ?scene to the address to start with the content hidden.
+  if (new URLSearchParams(location.search).has("scene")) setHidden(true);
+
+  toggle.addEventListener("click", () => {
+    setHidden(!site.classList.contains("scene-only"));
+    sfx("click");
+  });
+  addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && site.classList.contains("scene-only"))
+      setHidden(false);
+  });
+</script>

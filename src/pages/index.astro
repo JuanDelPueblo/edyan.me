@@ -5,6 +5,7 @@ import Balloon from "../components/Balloon.astro";
 import Hero from "../components/Hero.astro";
 import Lightbox from "../components/Lightbox.astro";
 import Scene from "../components/Scene.astro";
+import SceneToggle from "../components/SceneToggle.astro";
 import TabWindow from "../components/TabWindow.astro";
 import Toolbox from "../components/Toolbox.astro";
 import Layout from "../layouts/Layout.astro";
@@ -17,6 +18,7 @@ import Layout from "../layouts/Layout.astro";
   -->
   <div class="aero-site relative min-h-screen overflow-clip pt-5 pr-[max(16px,env(safe-area-inset-right,0px))] pb-[clamp(150px,26vh,280px)] pl-[max(16px,env(safe-area-inset-left,0px))] text-[13px] leading-[1.55]">
     <Scene />
+    <SceneToggle />
     <div class="relative z-2 mx-auto max-w-[800px]">
       <Hero />
       <Toolbox />

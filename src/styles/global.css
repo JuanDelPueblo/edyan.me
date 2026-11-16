@@ -152,9 +152,53 @@
   .scene-live .aero-waterline {
     opacity: 0;
   }
-  /* ?scene hides the page content but keeps its height. */
-  .scene-only > :not(.aero-scene) {
+  /* SceneToggle.astro and ?scene hide the page content but keep its height. */
+  .scene-only > :not(.aero-scene, .aero-waterline, .aero-peek) {
     visibility: hidden;
+  }
+  /* Round blue glass button in the corner for SceneToggle.astro. */
+  .aero-peek {
+    border: 1px solid rgba(255, 255, 255, 0.85);
+    background: radial-gradient(
+      circle at 50% 100%,
+      rgba(190, 250, 255, 0.95) 0%,
+      rgba(60, 180, 240, 0.85) 45%,
+      rgba(10, 90, 190, 0.95) 100%
+    );
+    box-shadow:
+      0 4px 10px rgba(0, 40, 90, 0.45),
+      inset 0 -5px 9px rgba(200, 255, 255, 0.7),
+      inset 0 2px 5px rgba(0, 40, 120, 0.4);
+    transition:
+      filter 0.15s,
+      transform 0.15s;
+  }
+  .aero-peek::before {
+    content: "";
+    position: absolute;
+    top: 5%;
+    left: 16%;
+    right: 16%;
+    height: 45%;
+    border-radius: 50%;
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.9),
+      rgba(255, 255, 255, 0.05)
+    );
+  }
+  .aero-peek:hover {
+    filter: brightness(1.1);
+  }
+  .aero-peek:active {
+    transform: scale(0.94);
+  }
+  .aero-peek:focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 2px;
+  }
+  .aero-peek[aria-pressed="false"] .eye-off {
+    display: none;
   }
   /* ===== Header ===== */
 

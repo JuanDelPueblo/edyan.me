@@ -18,8 +18,4 @@
   const canvas = document.querySelector<HTMLCanvasElement>(".aero-scene")!;
   const site = document.querySelector<HTMLElement>(".aero-site")!;
   import("../scene/main").then(({ startScene }) => startScene(canvas, site));
-  // Add ?scene to the address to look at the background on its own.
-  if (new URLSearchParams(location.search).has("scene")) {
-    site.classList.add("scene-only");
-  }
 </script>
