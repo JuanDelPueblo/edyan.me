@@ -1,0 +1,36 @@
+# Profile information and display lists. Entries use filenames without .yaml.
+# List order controls display order. Omit an entry to hide it.
+
+pageTitle: Edyan Cruz
+description: >-
+  I'm Edyan Antonio Cruz, a Computer Science student focused on user-facing
+  software development and robotics.
+greeting: Hi 👋
+title: I'm Edyan Antonio Cruz
+resume: https://drive.google.com/file/d/1zN4vLOaH-EQquWTEVSJRbRAEb7-VgGHk/view?usp=sharing
+contactsTitle: Get in Touch
+projectsTitle: My Projects
+experiencesTitle: My Experiences
+contacts:
+  - name: Email
+    url: mailto:edyancruz@outlook.com
+  - name: GitHub
+    url: https://github.com/juandelpueblo
+  - name: LinkedIn
+    url: https://linkedin.com/in/edyancruz
+  - name: Discord
+    url: https://discord.com/users/271392262510870528
+introduction: >-
+  I'm a 4th-year Computer Science student at the University of Puerto Rico
+  Mayagüez, with a passion for user-facing software development and robotics.
+projects:
+  - nvsleepify
+  - rumarino-auv
+  - dont-let-him-cook
+  - discord-application-bot
+  - flight-tracker-pro
+  - classcorder
+experiences:
+  - google-swe-2026
+  - google-swe-2025
+  - google-step-2024

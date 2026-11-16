@@ -1,23 +1,38 @@
-<!doctype html>
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro Basics</title>
-	</head>
-	<body>
-		<slot />
-	</body>
-</html>
+---
+import "../styles/global.css";
 
-<style>
-	html,
-	body {
-		margin: 0;
-		width: 100%;
-		height: 100%;
-	}
-</style>
+// Shared document layout with page-specific metadata.
+interface Props {
+  title: string;
+  description: string;
+}
+
+const { title, description } = Astro.props;
+---
+
+<!doctype html>
+<html
+  lang="en"
+  class="bg-white font-sans leading-[1.6] wrap-anywhere text-[#222]"
+>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <!-- Files in public/ are served at fixed URLs. -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="description" content={description} />
+    <title>{title}</title>
+  </head>
+  <body class="mx-auto max-w-[52rem] p-6">
+    <a
+      class="absolute -top-20 left-4 z-10 bg-white p-2 text-blue-800 underline focus:top-2 focus-visible:outline-2 focus-visible:outline-offset-4"
+      href="#main-content"
+    >
+      Skip to content
+    </a>
+    <!-- The page content goes in this slot. -->
+    <slot />
+  </body>
+</html>

@@ -1,0 +1,12 @@
+title: Discord Application Bot
+technologies:
+  - TypeScript
+  - Discord.JS
+  - Node.js
+  - SQLite
+image: /images/discordapplicationbot.png
+githubUrl: https://github.com/juandelpueblo/discord-application-bot
+description: >-
+  Discord Bot for managing application forms within a Discord server. Each form
+  is managed in a single channel where the applications are answered inside
+  threads.

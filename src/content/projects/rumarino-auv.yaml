@@ -1,0 +1,11 @@
+title: RUMarino Autonomous Underwater Vehicle (AUV)
+technologies:
+  - Python
+  - ROS
+  - Docker
+  - CUDA
+image: /images/hydrus.jpeg
+githubUrl: https://github.com/Rumarino-Team
+description: >-
+  Led a team of three software engineers to develop RUMarino's AUV software
+  framework utilizing ROS and Docker to participate in RoboSub 2025.

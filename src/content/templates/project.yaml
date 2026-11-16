@@ -1,0 +1,12 @@
+# Copy to projects/example-project.yaml, then add example-project to index.yaml.
+title: Example project
+description: >-
+  Project description.
+technologies:
+  - TypeScript
+
+# Uncomment optional links and image fields as needed.
+# image: /images/example-project.png
+# imageAlt: Screenshot of the project
+# githubUrl: https://github.com/juandelpueblo/example-project
+# liveUrl: https://example.com

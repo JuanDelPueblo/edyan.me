@@ -1,0 +1,11 @@
+position: STEP Intern
+company: Google
+period: May 2024 - Aug 2024
+technologies:
+  - TypeScript
+  - Angular
+accomplishments:
+  - Integrated Google Photos media picker into Google Messages for Web using
+    Angular and TypeScript, reducing time spent attaching media by 50%.
+  - Added a progress bar and enhanced attachments error handling, improving the
+    existing user end-to-end attachment flow.

@@ -1,0 +1,63 @@
+---
+import type { Project } from "../content";
+
+interface Props {
+  project: Project;
+}
+
+// Read the project data passed by the page.
+const {
+  title,
+  description,
+  technologies,
+  image,
+  imageAlt,
+  githubUrl,
+  liveUrl,
+} = Astro.props.project;
+---
+
+<article class="my-10">
+  <h3 class="my-4 text-xl font-bold leading-tight">{title}</h3>
+  <p class="my-4">{description}</p>
+  {technologies.length > 0 && (
+    <p class="my-4">Technologies: {technologies.join(", ")}</p>
+  )}
+  <!-- Projects can have a demo, a repository, both, or neither. -->
+  {(liveUrl || githubUrl) && (
+    <ul
+      class="my-4 flex flex-wrap gap-x-5 gap-y-2"
+      aria-label={`${title} links`}
+    >
+      {liveUrl && (
+        <li>
+          <a
+            class="text-blue-800 underline underline-offset-2 focus-visible:outline-2 focus-visible:outline-offset-4"
+            href={liveUrl}
+          >
+            View Project
+          </a>
+        </li>
+      )}
+      {githubUrl && (
+        <li>
+          <a
+            class="text-blue-800 underline underline-offset-2 focus-visible:outline-2 focus-visible:outline-offset-4"
+            href={githubUrl}
+          >
+            View Code
+          </a>
+        </li>
+      )}
+    </ul>
+  )}
+  {image && (
+    <img
+      class="block h-auto max-w-full"
+      src={image}
+      alt={imageAlt ?? title}
+      loading="lazy"
+      decoding="async"
+    />
+  )}
+</article>

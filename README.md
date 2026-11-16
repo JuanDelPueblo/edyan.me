@@ -1,50 +1,40 @@
 # edyan.me
 
-(WIP) Portfolio site for Edyan Antonio Cruz, rebuilt in Astro with a Frutiger Aero theme.
+Portfolio website for Edyan Antonio Cruz, built with Astro.
 
-# Astro Starter Kit: Basics
+Profile information and ordered project/experience lists are stored in
+`src/content/index.yaml`. Omit an entry from its list to hide it. Templates for
+new entries are in `src/content/templates/`.
+
+## Development server
+
+Requires Node.js 22.23.4 or newer. To install dependencies and start the
+development server, run:
 
 ```sh
-npm create astro@latest -- --template basics
+npm ci
+npm run dev -- --background
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+To check the server status, view logs, or stop the server, run:
 
-## 🚀 Project Structure
-
-Inside of your Astro project, you'll see the following folders and files:
-
-```text
-/
-├── public/
-│   └── favicon.svg
-├── src
-│   ├── assets
-│   │   └── astro.svg
-│   ├── components
-│   │   └── Welcome.astro
-│   ├── layouts
-│   │   └── Layout.astro
-│   └── pages
-│       └── index.astro
-└── package.json
+```sh
+npm run astro -- dev status
+npm run astro -- dev logs
+npm run astro -- dev stop
 ```
 
-To learn more about the folder structure of an Astro project, refer to [our guide on project structure](https://docs.astro.build/en/basics/project-structure/).
+## Building
 
-## 🧞 Commands
+To build the site into `dist/`, run:
 
-All commands are run from the root of the project, from a terminal:
+```sh
+npm run build
+```
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
+## Formatting
 
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+```sh
+npm run format
+npm run format:check
+```

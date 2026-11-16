@@ -1,0 +1,14 @@
+position: SWE Intern
+company: Google
+period: May 2026 - Aug 2026
+technologies:
+  - Kotlin
+  - Jetpack Compose
+  - Java
+accomplishments:
+  - Developed enhanced note-editing capabilities for Google Keep on Android
+    using Kotlin and Java, enabling seamless content conversion and formatting
+    across complex notes.
+  - Refactored note preview layout components and rendering logic, improving
+    visual rendering accuracy in the main feed and streamlining user interaction
+    flows.

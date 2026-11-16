@@ -1,0 +1,9 @@
+# Copy to experiences/example-role.yaml, then add example-role to index.yaml.
+position: Example role
+company: Company name
+period: May 2026 - Present
+technologies:
+  - TypeScript
+accomplishments:
+  - Built ...
+  - Improved ...
