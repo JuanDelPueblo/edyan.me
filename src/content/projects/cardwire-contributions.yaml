@@ -1,0 +1,15 @@
+title: Cardwire (as contributor)
+technologies:
+  - Rust
+  - Iced
+  - D-Bus
+  - Linux
+image: cardwire.png
+imageAlt: Cardwire's main window listing an AMD and an NVIDIA GPU
+liveUrl: https://opengamingcollective.github.io/cardwire/
+githubUrl: https://github.com/OpenGamingCollective/cardwire
+description: >-
+  Contributed several merged pull requests to Cardwire, an open-source GPU
+  manager for Linux that blocks GPUs using eBPF to save power. Built the GUI's
+  system tray applet and global settings, and added automatic switching to
+  Hybrid mode when an external display is connected to the dedicated GPU.
