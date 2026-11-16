@@ -76,7 +76,9 @@ const zoneName = zoned({ timeZoneName: "short" })
     data-time-zone={info.timeZone}
     popovertarget="clock-flyout"
   >
-    <Clock class="mini-clock size-[22px] drop-shadow-[0_1px_1px_rgba(0,40,90,0.35)]" />
+    <!-- Nudged down 1px: the pill's inset top shadow makes a centred face
+         look high. -->
+    <Clock class="mini-clock size-[22px] translate-y-px drop-shadow-[0_1px_1px_rgba(0,40,90,0.35)]" />
     <span class="sr-only">{info.clockPlace} time: </span>
     <!-- Narrow screens show only the clock face; screen readers still get the time. -->
     <span class="tray-time max-sm:sr-only"></span>
