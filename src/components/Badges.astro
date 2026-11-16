@@ -2,18 +2,33 @@
 import { portfolio as info } from "../content";
 ---
 
+<!--
+  80x15 "antipixel" badges, shown at 2x with crisp pixels. Linked badges get a
+  balloon with their destination like other links.
+-->
 <ul class="mt-0.5 flex flex-wrap justify-center gap-2" aria-label="Site badges">
-  {info.badges.map((badge) => (
-    <li
-      class:list={[
-        "aero-b88 relative grid h-[31px] w-[88px] place-items-center overflow-hidden text-center font-pixel text-[8px] leading-[1.15] uppercase",
-        `b88-${badge.style}`,
-      ]}
-    >
-      <span class="relative whitespace-nowrap">
-        {badge.top}
-        <b class="block text-[9px] font-normal">{badge.bottom}</b>
-      </span>
-    </li>
-  ))}
+  {info.badges.map((badge) => {
+    const image = (
+      <img
+        class="block h-[30px] w-40 [image-rendering:pixelated]"
+        src={badge.image}
+        alt={badge.alt}
+        width="80"
+        height="15"
+        loading="lazy"
+        decoding="async"
+      />
+    );
+    return (
+      <li class="transition-transform duration-200 hover:-translate-y-0.5">
+        {badge.url ? (
+          <a class="block" href={badge.url}>
+            {image}
+          </a>
+        ) : (
+          image
+        )}
+      </li>
+    );
+  })}
 </ul>

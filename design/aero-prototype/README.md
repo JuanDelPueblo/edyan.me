@@ -55,11 +55,11 @@ https://claude.ai/artifact/VvtvwRaHVpn5wTYgahdLLz
 - The layout is ready to implement. The background scene (sky, water, clouds,
   fish, bubbles, grass) will be redesigned after the initial implementation,
   likely in WebGL. Keep it separate from the layout when porting.
-- Tab labels, badge text, "View Code" style labels, "Site last updated" and
-  "Used in" are hard-coded in the prototype. Move any that stay into YAML, along
-  with `monogram`, `avatar`, `timeZone`, `clockPlace`, `updated` and
-  `toolboxTitle`.
+- Tab labels, "View Code" style labels, "Site last updated" and "Used in" are
+  hard-coded in the prototype. Move any that stay into YAML, along with
+  `monogram`, `avatar`, `timeZone`, `clockPlace`, `updated` and `toolboxTitle`.
 - Choose a photo for the header orb, or keep the "EC" monogram.
-- Badge text is placeholder decoration. Confirm or replace each badge.
+- The live site replaced the prototype's CSS 88x31 badges with 80x15 antipixel
+  images in `public/badges/`, listed in `src/content/index.yaml`.
 - The scene images are being replaced. Settle attribution once the final images
   are in.

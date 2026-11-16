@@ -37,7 +37,7 @@ interface Portfolio {
   timeZone: string;
   clockPlace: string;
   toolboxTitle: string;
-  badges: { style: string; top: string; bottom: string }[];
+  badges: { image: string; alt: string; url?: string }[];
   contacts: { name: string; url: string }[];
   projects: string[];
   experiences: string[];
