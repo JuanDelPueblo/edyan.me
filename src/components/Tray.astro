@@ -17,9 +17,11 @@ const zoneName = zoned({ timeZoneName: "short" })
   .find((part) => part.type === "timeZoneName")?.value;
 ---
 
-<div class="aero-tray flex flex-none items-center self-center rounded-[14px] p-0.5 font-head text-xs font-bold tabular-nums no-js:hidden">
+<!-- The negative top margin matches the strip's top padding, so the widget
+     centres in the whole strip rather than beside the tabs. -->
+<div class="aero-tray -mt-2.5 max-sm:-mt-2 flex flex-none items-center gap-0.5 self-center rounded-[14px] p-0.5 font-head text-xs font-bold tabular-nums no-js:hidden">
   <button
-    class="aero-tray-btn flex min-h-[26px] items-center rounded-xl py-px pr-[3px] pl-[5px]"
+    class="aero-tray-btn flex min-h-[26px] items-center rounded-xl px-[5px] py-px"
     id="sound"
     type="button"
     aria-pressed="false"
@@ -68,7 +70,7 @@ const zoneName = zoned({ timeZoneName: "short" })
     </svg>
   </button>
   <button
-    class="aero-tray-btn flex min-h-[26px] items-center gap-1.5 rounded-xl py-px pr-[5px] pl-[3px]"
+    class="aero-tray-btn flex min-h-[26px] items-center gap-1.5 rounded-xl py-px pr-[9px] pl-[5px] max-sm:pr-[5px]"
     id="tray-clock"
     type="button"
     data-time-zone={info.timeZone}
