@@ -70,15 +70,15 @@ const zoneName = zoned({ timeZoneName: "short" })
     </svg>
   </button>
   <button
-    class="aero-tray-btn flex min-h-[26px] items-center gap-1.5 rounded-xl py-px pr-[9px] pl-[5px] max-sm:pr-[5px]"
+    class="aero-tray-btn flex min-h-[26px] items-center gap-1.5 rounded-xl py-px pr-[9px] pl-[3px] max-sm:pr-[3px]"
     id="tray-clock"
     type="button"
     data-time-zone={info.timeZone}
     popovertarget="clock-flyout"
   >
-    <!-- Nudged down 1px: the pill's inset top shadow makes a centred face
-         look high. -->
-    <Clock class="mini-clock size-[22px] translate-y-px drop-shadow-[0_1px_1px_rgba(0,40,90,0.35)]" />
+    <!-- 3px of padding keeps the 20px face concentric with the rounded end of
+         the 26px-tall hover highlight. -->
+    <Clock class="mini-clock size-5 drop-shadow-[0_1px_1px_rgba(0,40,90,0.35)]" />
     <span class="sr-only">{info.clockPlace} time: </span>
     <!-- Narrow screens show only the clock face; screen readers still get the time. -->
     <span class="tray-time max-sm:sr-only"></span>
