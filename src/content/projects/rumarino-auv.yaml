@@ -4,7 +4,7 @@ technologies:
   - ROS
   - Docker
   - CUDA
-image: /images/hydrus.jpeg
+image: hydrus.jpeg
 githubUrl: https://github.com/Rumarino-Team
 description: >-
   Led a team of three software engineers to develop RUMarino's AUV software

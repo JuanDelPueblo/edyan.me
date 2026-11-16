@@ -5,8 +5,9 @@ description: >-
 technologies:
   - TypeScript
 
-# Uncomment optional links and image fields as needed.
-# image: /images/example-project.png
+# Uncomment optional links and image fields as needed. Put screenshots in
+# src/assets/images/ and set image to the filename.
+# image: example-project.png
 # imageAlt: Screenshot of the project
 # githubUrl: https://github.com/juandelpueblo/example-project
 # liveUrl: https://example.com

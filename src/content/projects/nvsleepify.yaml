@@ -2,7 +2,7 @@ title: nvsleepify
 technologies:
   - Rust
   - Linux
-image: /images/nvsleepify.png
+image: nvsleepify.png
 githubUrl: https://github.com/JuandelPueblo/nvsleepify
 description: >-
   An utility for Linux that dynamically enables and disables the Nvidia GPU

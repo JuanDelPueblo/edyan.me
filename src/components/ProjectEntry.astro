@@ -1,4 +1,5 @@
 ---
+import { Image, getImage } from "astro:assets";
 import type { Project } from "../content";
 
 interface Props {
@@ -15,6 +16,9 @@ const {
   githubUrl,
   liveUrl,
 } = Astro.props.project;
+
+// The thumbnail link opens a WebP copy at the original size.
+const fullImage = image && (await getImage({ src: image, format: "webp" }));
 ---
 
 <!-- data-tech lets a toolbox chip find the entries that use it. -->
@@ -25,14 +29,23 @@ const {
   {image ? (
     <a
       class="aero-thumb relative mt-0.5 block cursor-zoom-in rounded-md p-1"
-      href={image}
+      href={fullImage?.src}
       data-title={title}
     >
-      <img
+      <!--
+        Astro generates WebP files at these widths. The column is 156px wide
+        on larger screens and spans the screen below the sm breakpoint. The
+        thumbnails are small and several show without scrolling on tall
+        screens, so they load eagerly.
+      -->
+      <Image
         class="block h-auto w-full rounded-[3px] max-sm:h-[140px] max-sm:object-cover max-sm:object-top"
         src={image}
         alt={imageAlt ?? title}
-        loading="lazy"
+        width={312}
+        widths={[156, 312, 480, 640]}
+        sizes="(max-width: 639px) 100vw, 156px"
+        loading="eager"
         decoding="async"
       />
     </a>

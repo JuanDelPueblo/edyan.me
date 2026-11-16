@@ -4,7 +4,7 @@ technologies:
   - Discord.JS
   - Node.js
   - SQLite
-image: /images/discordapplicationbot.png
+image: discordapplicationbot.png
 githubUrl: https://github.com/juandelpueblo/discord-application-bot
 description: >-
   Discord Bot for managing application forms within a Discord server. Each form

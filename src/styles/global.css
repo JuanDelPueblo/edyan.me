@@ -23,7 +23,7 @@
     Verdana, "DejaVu Sans", "Bitstream Vera Sans", Tahoma, sans-serif;
   --font-head:
     "Trebuchet MS", "Lucida Grande", Tahoma, "DejaVu Sans", sans-serif;
-  --font-pixel: "Silkscreen", Verdana, "DejaVu Sans", sans-serif;
+  --font-pixel: var(--font-silkscreen);
 }
 
 @layer base {

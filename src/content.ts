@@ -1,3 +1,4 @@
+import type { ImageMetadata } from "astro";
 import { parse } from "yaml";
 import contentYaml from "./content/index.yaml?raw";
 
@@ -6,7 +7,7 @@ export interface Project {
   title: string;
   description: string;
   technologies: string[];
-  image?: string;
+  image?: ImageMetadata;
   imageAlt?: string;
   githubUrl?: string;
   liveUrl?: string;
@@ -69,7 +70,25 @@ function loadEntries(group: string, list: string[]) {
 
 export const portfolio = parse(contentYaml) as Portfolio;
 
+// Import project screenshots so Astro can optimise them, keyed by path.
+const images = import.meta.glob<ImageMetadata>("./assets/images/*", {
+  import: "default",
+  eager: true,
+});
+
 export const projects: Project[] = loadEntries("projects", portfolio.projects);
+
+// Replace each YAML image filename with its imported asset.
+for (const project of projects) {
+  if (!project.image) continue;
+  const path = `./assets/images/${project.image}`;
+  if (!(path in images)) {
+    throw new Error(
+      `Missing assets/images/${project.image}, used by project "${project.title}".`,
+    );
+  }
+  project.image = images[path];
+}
 export const experiences: Experience[] = loadEntries(
   "experiences",
   portfolio.experiences,
