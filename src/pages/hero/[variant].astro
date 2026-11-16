@@ -1,0 +1,36 @@
+---
+// Temporary, dev server only: the home page with a candidate hero, at
+// /hero/a (Messenger profile) and /hero/c (wallpaper title). The build makes
+// no pages here. Remove this file once a design is chosen.
+import { portfolio as info } from "../../content";
+import Balloon from "../../components/Balloon.astro";
+import HeroMessenger from "../../components/HeroMessenger.astro";
+import HeroWallpaper from "../../components/HeroWallpaper.astro";
+import Lightbox from "../../components/Lightbox.astro";
+import Scene from "../../components/Scene.astro";
+import SceneToggle from "../../components/SceneToggle.astro";
+import TabWindow from "../../components/TabWindow.astro";
+import Toolbox from "../../components/Toolbox.astro";
+import Layout from "../../layouts/Layout.astro";
+
+export function getStaticPaths() {
+  if (!import.meta.env.DEV) return [];
+  return [{ params: { variant: "a" } }, { params: { variant: "c" } }];
+}
+
+const { variant } = Astro.params;
+---
+
+<Layout title={info.pageTitle} description={info.description}>
+  <div class="aero-site relative min-h-screen overflow-clip pt-5 pr-[max(16px,env(safe-area-inset-right,0px))] pb-[clamp(150px,26vh,280px)] pl-[max(16px,env(safe-area-inset-left,0px))] text-[13px] leading-[1.55]">
+    <Scene />
+    <SceneToggle />
+    <div class="relative z-2 mx-auto max-w-[800px]">
+      {variant === "a" ? <HeroMessenger /> : <HeroWallpaper />}
+      <Toolbox />
+      <TabWindow />
+    </div>
+  </div>
+  <Balloon />
+  <Lightbox />
+</Layout>

@@ -1,0 +1,58 @@
+---
+import { portfolio as info } from "../content";
+import ContactOrbs from "./ContactOrbs.astro";
+
+// Hero design A: a Windows Live Messenger profile. The framed display
+// picture glows green for "available", the status capsule sits above the
+// name, and the introduction is the personal message.
+---
+
+<!--
+  .aero-banner sets the header's height and keeps its content in the sky,
+  above the horizon. The waterline is the header's bottom edge.
+-->
+<header class="aero-banner relative mb-12 flex items-center px-3 max-sm:mb-10 max-sm:px-0.5">
+  <div class="flex w-full items-center gap-6 max-sm:items-start max-sm:gap-3.5">
+    <div
+      class="aero-dp relative z-1 size-[112px] flex-none rounded-2xl p-[5px] max-sm:size-[68px] max-sm:rounded-xl max-sm:p-[3px]"
+      aria-hidden="true"
+    >
+      <div class="aero-dp-face relative grid size-full place-items-center overflow-hidden rounded-[11px] font-head text-[38px] font-bold max-sm:rounded-[9px] max-sm:text-[22px]">
+        {info.avatar ? (
+          <img
+            class="absolute inset-0 size-full object-cover"
+            src={info.avatar}
+            alt=""
+          />
+        ) : (
+          <span class="relative z-2">{info.monogram}</span>
+        )}
+      </div>
+    </div>
+    <div class="relative z-1 grid min-w-0 flex-auto justify-items-start gap-2.5">
+      <p class="aero-status flex items-center gap-1.5 rounded-[14px] py-[3px] pr-3 pl-2 font-head text-sm font-bold">
+        <i class="aero-status-dot size-3 flex-none rounded-full"></i>
+        {info.status}
+      </p>
+      <h1 class="aero-title relative font-head text-[42px] leading-[1.1] font-bold text-balance max-sm:text-[30px]">
+        {info.title}
+      </h1>
+      <p class="aero-pm max-w-[34rem] rounded-[3px] px-2.5 py-1.5 text-[13px] leading-[1.55] italic">
+        {info.introduction}
+      </p>
+      <div class="flex flex-wrap items-center gap-x-4 gap-y-2.5">
+        <a
+          class="aero-leaf aero-glow aero-jelly relative inline-flex items-center justify-center rounded-[20px] px-[22px] py-[9px] font-head text-sm font-bold no-underline"
+          href={info.resume}
+        >
+          View Resume
+        </a>
+        <ContactOrbs />
+      </div>
+    </div>
+  </div>
+</header>
+
+<script>
+  import "../scripts/waterline";
+</script>

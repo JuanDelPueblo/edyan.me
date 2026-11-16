@@ -26,6 +26,8 @@ interface Portfolio {
   description: string;
   greeting: string;
   title: string;
+  status: string;
+  tagline: string;
   introduction: string;
   resume: string;
   contactsTitle: string;
