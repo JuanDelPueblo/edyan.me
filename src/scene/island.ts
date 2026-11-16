@@ -49,6 +49,71 @@ void main() {
 }
 `;
 
+// El Morro, the fort at the mouth of San Juan Bay, on the hill's spit.
+const fortVertex = /* glsl */ `
+attribute vec3 aInfo; // part, metres along the wall (or flag u), height 0..1
+uniform float uTime;
+varying vec3 vW;
+varying vec3 vN;
+varying vec3 vInfo;
+void main() {
+  vec3 p = position;
+  // The flag ripples away from its pole.
+  if (aInfo.x > 3.5) p.z += sin(uTime * 3.0 - aInfo.y * 5.0) * 0.3 * aInfo.y;
+  vec4 w = modelMatrix * vec4(p, 1.0);
+  vW = w.xyz;
+  vN = normal;
+  vInfo = aInfo;
+  gl_Position = projectionMatrix * viewMatrix * w;
+}
+`;
+
+const fortFragment = /* glsl */ `
+${common}
+${haze}
+uniform vec3 uLight;
+varying vec3 vW;
+varying vec3 vN;
+varying vec3 vInfo;
+void main() {
+  float part = vInfo.x;
+  vec3 n = normalize(vN);
+  if (!gl_FrontFacing) n = -n;
+  vec3 alb;
+  if (part < 0.5) {
+    // Weathered sandstone, stained towards the base, with a pale parapet
+    // cut by gun ports.
+    float nz = fbm(vec2(vInfo.y * 0.5, vInfo.z * 4.0));
+    alb = mix(S(0.66, 0.52, 0.34), S(0.90, 0.78, 0.56), nz);
+    alb *= 0.74 + 0.26 * smoothstep(0.0, 0.5, vInfo.z);
+    alb = mix(alb, S(0.96, 0.88, 0.70), smoothstep(0.84, 0.88, vInfo.z));
+    float port = step(0.8, vInfo.z) * step(fract(vInfo.y / 2.4), 0.26);
+    alb = mix(alb, S(0.30, 0.22, 0.14), port);
+  } else if (part < 1.5) {
+    // Garita: pale plaster with a dark lookout slit.
+    alb = S(0.95, 0.88, 0.72);
+    alb = mix(alb, S(0.22, 0.16, 0.10),
+      step(abs(vInfo.z - 0.62), 0.1) * step(fract(vInfo.y), 0.4));
+  } else if (part < 2.5) {
+    // Lighthouse: grey with white bands.
+    alb = mix(S(0.56, 0.58, 0.60), S(0.97, 0.97, 0.95),
+      step(abs(fract(vInfo.z * 2.0) - 0.5), 0.12));
+  } else if (part < 3.5) {
+    alb = S(0.10, 0.12, 0.16);
+  } else {
+    // Puerto Rico's flag: five stripes, a blue triangle and a white star.
+    float t = vInfo.z;
+    alb = mod(floor(t * 5.0), 2.0) < 0.5 ? S(0.90, 0.08, 0.12) : vec3(1.0);
+    if (vInfo.y < 0.577 * (1.0 - 2.0 * abs(t - 0.5))) alb = S(0.02, 0.25, 0.74);
+    alb = mix(alb, vec3(1.0),
+      step(length(vec2((vInfo.y - 0.2) * 1.5, t - 0.5)), 0.12));
+  }
+  float ndl = clamp(dot(n, uLight) * 0.6 + 0.4, 0.0, 1.0);
+  vec3 col = alb * (S(0.50, 0.70, 0.92) * 0.5 + S(1.0, 0.97, 0.84) * 1.15 * ndl);
+  gl_FragColor = vec4(airHaze(col, vW), 1.0);
+}
+`;
+
 const treeVertex = /* glsl */ `
 attribute vec4 aInfo; // kind, shade, leaf u, leaf v
 attribute vec4 iPos; // base position, height
@@ -156,6 +221,189 @@ function islandGeometry(
     pos.setY(i, height(u, v));
   }
   geo.computeVertexNormals();
+  return geo;
+}
+
+// Where the fort stands on the hill: footprint position and the centre of
+// its base in the hill's own metres.
+const FORT_U = 0.82;
+const FORT_V = 0.15;
+// Scale of the fort, which is modelled about 21 m wide and 15 m tall. At
+// this size its flag stays below the header's button.
+const SIZE = 0.8;
+
+// The fort in the hill's local metres. Parts: 0 wall, 1 garita,
+// 2 lighthouse, 3 lantern and pole, 4 flag.
+function fortGeometry(cx: number, cz: number) {
+  const position: number[] = [];
+  const normal: number[] = [];
+  const info: number[] = [];
+  const a = new THREE.Vector3();
+  const b = new THREE.Vector3();
+  // Corners run anticlockwise seen from outside; each carries its own
+  // (along, height) pair.
+  function quad(points: number[][], part: number, uv: number[][]) {
+    a.set(
+      points[1][0] - points[0][0],
+      points[1][1] - points[0][1],
+      points[1][2] - points[0][2],
+    );
+    b.set(
+      points[3][0] - points[0][0],
+      points[3][1] - points[0][1],
+      points[3][2] - points[0][2],
+    );
+    a.cross(b).normalize();
+    for (const i of [0, 1, 2, 0, 2, 3]) {
+      position.push(
+        points[i][0] * SIZE + cx,
+        points[i][1] * SIZE,
+        points[i][2] * SIZE + cz,
+      );
+      normal.push(a.x, a.y, a.z);
+      info.push(part, uv[i][0], uv[i][1]);
+    }
+  }
+  // A ring of quads between two polygons, with a flat top.
+  function ring(
+    x: number,
+    z: number,
+    y0: number,
+    y1: number,
+    bottom: number[][],
+    top: number[][],
+    part: number,
+  ) {
+    let along = 0;
+    const count = bottom.length;
+    for (let i = 0; i < count; i++) {
+      const j = (i + 1) % count;
+      const length = Math.hypot(top[j][0] - top[i][0], top[j][1] - top[i][1]);
+      quad(
+        [
+          [x + bottom[i][0], y0, z + bottom[i][1]],
+          [x + bottom[j][0], y0, z + bottom[j][1]],
+          [x + top[j][0], y1, z + top[j][1]],
+          [x + top[i][0], y1, z + top[i][1]],
+        ],
+        part,
+        [
+          [along, 0],
+          [along + length, 0],
+          [along + length, 1],
+          [along, 1],
+        ],
+      );
+      along += length;
+    }
+    for (let i = 1; i < count - 1; i++) {
+      quad(
+        [
+          [x + top[0][0], y1, z + top[0][1]],
+          [x + top[i][0], y1, z + top[i][1]],
+          [x + top[i + 1][0], y1, z + top[i + 1][1]],
+          [x + top[i + 1][0], y1, z + top[i + 1][1]],
+        ],
+        part,
+        [
+          [0, 0.5],
+          [0, 0.5],
+          [0, 0.5],
+          [0, 0.5],
+        ],
+      );
+    }
+  }
+  // A wall block whose sides lean in: wider at the base by the batter.
+  function block(
+    x: number,
+    z: number,
+    width: number,
+    depth: number,
+    y0: number,
+    y1: number,
+    batter: number,
+  ) {
+    function corners(w: number, d: number) {
+      return [
+        [-w / 2, d / 2],
+        [w / 2, d / 2],
+        [w / 2, -d / 2],
+        [-w / 2, -d / 2],
+      ];
+    }
+    ring(
+      x,
+      z,
+      y0,
+      y1,
+      corners(width + 2 * batter, depth + 2 * batter),
+      corners(width, depth),
+      0,
+    );
+  }
+  // A round tower that tapers from r0 to r1.
+  function tower(
+    x: number,
+    z: number,
+    r0: number,
+    r1: number,
+    y0: number,
+    y1: number,
+    part: number,
+  ) {
+    function circle(r: number) {
+      const points: number[][] = [];
+      for (let i = 0; i < 8; i++) {
+        const turn = -(i / 8) * Math.PI * 2;
+        points.push([Math.cos(turn) * r, Math.sin(turn) * r]);
+      }
+      return points;
+    }
+    ring(x, z, y0, y1, circle(r0), circle(r1), part);
+  }
+  // A sentry box with a domed roof, hung on a wall corner.
+  function garita(x: number, y: number, z: number) {
+    tower(x, z, 0.5, 0.85, y - 1.3, y - 0.4, 1);
+    tower(x, z, 0.85, 0.85, y - 0.4, y + 1.5, 1);
+    tower(x, z, 0.95, 0.55, y + 1.5, y + 2.0, 1);
+    tower(x, z, 0.55, 0.12, y + 2.0, y + 2.5, 1);
+  }
+
+  // Three tiers of walls stepping up and back from the sea.
+  block(0, 0, 21, 11, -0.5, 6.2, 1.7);
+  block(-2.5, -0.8, 13.5, 7.5, 6.2, 9.4, 0.6);
+  block(-5, -1.2, 6.5, 5, 9.4, 11.4, 0.3);
+  garita(10.6, 6.2, 5.6);
+  garita(-10.6, 6.2, 5.6);
+  garita(4.3, 9.4, 3);
+  // Lighthouse: shaft, gallery, lantern and cap.
+  tower(2.3, -1.5, 1.15, 0.9, 9.4, 13, 2);
+  tower(2.3, -1.5, 1.25, 1.25, 13, 13.3, 3);
+  tower(2.3, -1.5, 0.7, 0.7, 13.3, 14.3, 3);
+  tower(2.3, -1.5, 0.9, 0.1, 14.3, 14.9, 3);
+  // Flag on the top tier.
+  tower(-6, -1.2, 0.12, 0.1, 11.4, 14.7, 3);
+  quad(
+    [
+      [-5.9, 12.9, -1.2],
+      [-3.2, 12.9, -1.2],
+      [-3.2, 14.7, -1.2],
+      [-5.9, 14.7, -1.2],
+    ],
+    4,
+    [
+      [0, 0],
+      [1, 0],
+      [1, 1],
+      [0, 1],
+    ],
+  );
+
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute("position", new THREE.Float32BufferAttribute(position, 3));
+  geo.setAttribute("normal", new THREE.Float32BufferAttribute(normal, 3));
+  geo.setAttribute("aInfo", new THREE.Float32BufferAttribute(info, 3));
   return geo;
 }
 
@@ -377,6 +625,23 @@ export function createIslands() {
   );
   hill.frustumCulled = false;
   cay.frustumCulled = false;
+  // The fort is the hill's child, so it moves and scales with it.
+  const fortX = (FORT_U * hillSize[0]) / 2;
+  const fortZ = (FORT_V * hillSize[1]) / 2;
+  const fort = new THREE.Mesh(
+    fortGeometry(fortX, fortZ),
+    makeMaterial({
+      vertexShader: fortVertex,
+      fragmentShader: fortFragment,
+      uniforms: { uLight: U.uLight, uTime: U.uTime },
+      side: THREE.DoubleSide,
+    }),
+  );
+  fort.frustumCulled = false;
+  hill.add(fort);
+  // World position of the middle of the fort and its radius, for clicks.
+  const fortAt = new THREE.Vector3();
+  let fortRadius = 1;
   const broadleaf = treeMesh(broadleafGeometry());
   const palms = treeMesh(palmGeometry());
 
@@ -398,6 +663,8 @@ export function createIslands() {
     const hillX = (Math.max(left * 0.6, 44) - w / 2) * k * hillDist;
     hill.position.set(hillX, 0, -hillDist);
     hill.scale.setScalar(hillScale);
+    fortAt.set(fortX, 6.5, fortZ).multiplyScalar(hillScale).add(hill.position);
+    fortRadius = 10 * hillScale;
 
     // The cay sits further out on the right, under the sun.
     const cayDist = 380;
@@ -453,9 +720,29 @@ export function createIslands() {
       if (cayHeight(u, v) < 0.8) continue;
       plant(fronds, cay, caySize, cayHeight, u, v, 11 + rand() * 6);
     }
-    setTrees(broadleaf, leaves);
-    setTrees(palms, fronds);
+    // No trees where the fort stands. Removing them afterwards leaves the
+    // rest of the planting as it was.
+    function clearOfFort(tree: number[]) {
+      const u = (tree[0] - hill.position.x) / hill.scale.x / (hillSize[0] / 2);
+      return Math.abs(u - FORT_U) > 0.2;
+    }
+    setTrees(broadleaf, leaves.filter(clearOfFort));
+    setTrees(palms, fronds.filter(clearOfFort));
   }
 
-  return { hill, cay, broadleaf, palms, layout };
+  // Whether a point on the page, in px from the canvas's top left corner,
+  // is on the fort as the given camera sees it.
+  const seen = new THREE.Vector3();
+  function onFort(camera: THREE.Camera, x: number, y: number, view: View) {
+    seen.copy(fortAt).project(camera);
+    const reach = Math.max(22, fortRadius / (-fortAt.z * view.k));
+    return (
+      Math.hypot(
+        (seen.x * 0.5 + 0.5) * view.w - x,
+        (0.5 - seen.y * 0.5) * view.h - y,
+      ) < reach
+    );
+  }
+
+  return { hill, cay, broadleaf, palms, layout, onFort };
 }

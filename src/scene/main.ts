@@ -357,13 +357,19 @@ export function startScene(canvas: HTMLCanvasElement, site: HTMLElement) {
   }
   addEventListener("pointerdown", (event) => {
     const target = event.target as Element | null;
-    if (!target || !view.w || lost || reduced.matches) return;
+    if (!target || !view.w || lost) return;
     const open =
       target === site ||
       target.parentElement === site ||
       (target.closest(".aero-banner") && !target.closest("a, button"));
     if (!open) return;
-    if (event.clientY + scrollY < view.wl + 8) return;
+    // A click on the fort is answered by a coqui.
+    const pageY = event.clientY + scrollY;
+    if (islands.onFort(skyCam, event.clientX, pageY - view.top, view)) {
+      sfx("coqui");
+      return;
+    }
+    if (reduced.matches || pageY < view.wl + 8) return;
     const dist = 3.2;
     const y = frameY(event.clientY);
     bubbles.pop(

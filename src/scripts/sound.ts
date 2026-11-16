@@ -1,12 +1,16 @@
-// Sound effects, synthesized with Web Audio so the site needs no audio files.
+// Sound effects, synthesized with Web Audio. The coqui call is the one
+// recording.
 // Sound stays off until the visitor turns it on with the tray's speaker
 // button; browsers only allow audio after a click or key press anyway.
+
+import coquiUrl from "../assets/sounds/coqui.mp3?url";
 
 let soundOn = false;
 let audio: AudioContext | null = null;
 let bus: GainNode;
 let lastBlip = 0;
 let idleTimer = 0;
+let clip: Promise<AudioBuffer> | null = null;
 
 export function isSoundOn() {
   return soundOn;
@@ -93,6 +97,32 @@ function whoosh() {
   src.start(t);
 }
 
+// A recorded call of the coqui tree frog, played twice. The clip loads the
+// first time it is needed; see src/assets/sounds/CREDITS.md for its source.
+function coqui() {
+  const a = audioOut();
+  clip ??= fetch(coquiUrl)
+    .then((response) => response.arrayBuffer())
+    .then((data) => a.decodeAudioData(data));
+  clip
+    .then((buffer) => {
+      const t = audioOut().currentTime;
+      for (const delay of [0, 1.4]) {
+        const src = a.createBufferSource();
+        const level = a.createGain();
+        src.buffer = buffer;
+        level.gain.value = 0.16;
+        src.connect(level);
+        level.connect(bus);
+        src.start(t + delay);
+      }
+    })
+    .catch(() => {
+      // Try again on the next call.
+      clip = null;
+    });
+}
+
 // A bubble is a sine whose pitch shoots up as it pops. Its low start sounds
 // louder than the click at the same level, so it plays much quieter.
 function bubble(vol: number, delay = 0) {
@@ -114,6 +144,7 @@ const sounds = {
     note(520, 1500, 0.06, 0.04);
   },
   whoosh,
+  coqui,
   open() {
     note(880, 880, 0.25, 0.07);
     note(1318.5, 1318.5, 0.35, 0.06, 0.06);
