@@ -59,7 +59,7 @@ void main() {
     // coralline colour and a dusting of sand on top.
     float nz = fbm(vO.xy * 5.0 + vO.z * 4.0 + vLook.y * 10.0);
     float fine = fbm(vO.zx * 17.0 + vO.y * 13.0);
-    alb = mix(S(0.36, 0.35, 0.40), S(0.66, 0.62, 0.58), nz) * (0.75 + 0.5 * fine);
+    alb = mix(S(0.50, 0.52, 0.54), S(0.80, 0.78, 0.72), nz) * (0.8 + 0.4 * fine);
     float crust = smoothstep(0.58, 0.68, fbm(vO.zy * 3.6 + vLook.y * 30.0));
     alb = mix(alb, tint * (0.6 + 0.4 * fine), crust * 0.6);
     float crust2 = smoothstep(0.62, 0.7, fbm(vO.xz * 4.4 + vLook.y * 71.0));

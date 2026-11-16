@@ -257,9 +257,12 @@ export function createBubbles() {
   function update(view: View) {
     const dt = view.dt;
     if (!dt) return;
+    // Upload only when a bubble moved, including the frame it ends on.
+    let moved = false;
     for (let b = 0; b < BURST; b++) {
       const age = burstAge.getX(b);
       if (age >= 1) continue;
+      moved = true;
       const speed = burstState[b * 5];
       const phase = burstState[b * 5 + 1];
       const life = burstState[b * 5 + 2];
@@ -269,8 +272,10 @@ export function createBubbles() {
       burstB.setY(b, y);
       burstAge.setX(b, y > -0.1 ? 1 : Math.min(1, age + dt / life));
     }
-    burstB.needsUpdate = true;
-    burstAge.needsUpdate = true;
+    if (moved) {
+      burstB.needsUpdate = true;
+      burstAge.needsUpdate = true;
+    }
   }
 
   return { streams, burst, motes, layout, pop, update };

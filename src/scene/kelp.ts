@@ -58,8 +58,8 @@ void main() {
   if (vK.w < 0.5) {
     alb = S(0.62, 0.58, 0.16) * 1.3;
   } else {
-    alb = mix(S(0.13, 0.42, 0.07), S(0.66, 0.74, 0.12), vLook);
-    alb = mix(alb, S(0.80, 0.86, 0.22), vK.y * 0.45);
+    alb = mix(S(0.20, 0.56, 0.10), S(0.54, 0.85, 0.24), vLook);
+    alb = mix(alb, S(0.77, 0.97, 0.48), vK.y * 0.45);
     // A darker midrib and paler edges.
     alb *= 0.72 + 0.28 * smoothstep(0.0, 0.3, abs(vK.z));
   }

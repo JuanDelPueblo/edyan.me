@@ -77,6 +77,7 @@ uniform vec2 uCenter; // page position of the viewport centre
 uniform float uFlare;
 uniform float uSunSize;
 uniform float uDeep; // 0 near the surface, 1 far below
+uniform float uBloom; // 0 while bloom is off
 
 float lineWave(float x, float t) {
   return sin(x * 0.011 + t * 0.9) * 3.2
@@ -103,16 +104,20 @@ void main() {
   float dx = sin(page.y * 0.041 + uTime * 1.2 + sin(page.x * 0.017 + uTime * 0.6) * 2.0)
     * 1.5 * wobble;
   vec2 uv = vec2((page.x + dx) / uSize.x, 1.0 - (row - uTop) / uSize.y);
-  vec3 col = texture2D(tScene, uv).rgb + texture2D(tBloom, uv).rgb * 0.5;
+  vec3 col = texture2D(tScene, uv).rgb;
+  if (uBloom > 0.0) col += texture2D(tBloom, uv).rgb * 0.5 * uBloom;
 
-  // Light shafts fanning down from above the surface.
-  vec2 q = vec2(page.x - uSun.x - 60.0, row - uWl + 560.0);
-  float ang = atan(q.x, q.y);
-  float rays = smoothstep(0.38, 0.92, vnoise(vec2(ang * 34.0 + uTime * 0.10, uTime * 0.06))) * 0.6;
-  rays += smoothstep(0.45, 0.95, vnoise(vec2(ang * 81.0 - uTime * 0.15, 3.0 + uTime * 0.05))) * 0.4;
-  float shaft = smoothstep(0.0, 70.0, below) * exp(-below / 1300.0);
-  shaft *= exp(-abs(ang) * 1.1) * step(0.0, row - uWl);
-  col += S(0.72, 0.96, 1.0) * rays * shaft * 0.34;
+  // Light shafts fanning down from above the surface. The branches here
+  // follow whole rows, so skipping work above the water is cheap.
+  if (below > 0.0) {
+    vec2 q = vec2(page.x - uSun.x - 60.0, row - uWl + 560.0);
+    float ang = atan(q.x, q.y);
+    float rays = smoothstep(0.38, 0.92, vnoise(vec2(ang * 34.0 + uTime * 0.10, uTime * 0.06))) * 0.6;
+    rays += smoothstep(0.45, 0.95, vnoise(vec2(ang * 81.0 - uTime * 0.15, 3.0 + uTime * 0.05))) * 0.4;
+    float shaft = smoothstep(0.0, 70.0, below) * exp(-below / 1300.0);
+    shaft *= exp(-abs(ang) * 1.1);
+    col += S(0.72, 0.96, 1.0) * rays * shaft * 0.34;
+  }
 
   // The waterline: a bright core, mist above, a cyan glow and a blue lip
   // below.
@@ -124,8 +129,10 @@ void main() {
   float lip = under * smoothstep(5.0, 15.0, m) * exp(-max(m - 15.0, 0.0) / 12.0);
   col = mix(col, S(0.04, 0.36, 0.68), lip * 0.4);
   col = mix(col, vec3(1.3), core * 0.92);
-  float glint = pow(vnoise(vec2(page.x * 0.09 + uTime * 0.9, uTime * 0.6)), 7.0);
-  col += vec3(2.5) * glint * exp(-m * m / 30.0);
+  if (abs(m) < 40.0) {
+    float glint = pow(vnoise(vec2(page.x * 0.09 + uTime * 0.9, uTime * 0.6)), 7.0);
+    col += vec3(2.5) * glint * exp(-m * m / 30.0);
+  }
 
   // Lens flare along the line from the sun through the viewport centre.
   if (uFlare > 0.001) {
@@ -204,6 +211,7 @@ export function createPost(renderer: THREE.WebGLRenderer, hdr: boolean) {
     uFlare: { value: 1 },
     uSunSize: U.uSunSize,
     uDeep: { value: 0 },
+    uBloom: { value: 1 },
   });
 
   const levels = 5;
@@ -243,7 +251,25 @@ export function createPost(renderer: THREE.WebGLRenderer, hdr: boolean) {
     renderer.render(scene, camera);
   }
 
-  function render(source: THREE.WebGLRenderTarget) {
+  // Starts compiling every pass; the promise resolves when all are ready.
+  function compile() {
+    const waits = [];
+    for (const mat of [bright, down, up, final]) {
+      mesh.material = mat;
+      waits.push(renderer.compileAsync(scene, camera));
+    }
+    return Promise.all(waits);
+  }
+
+  // Draws the bloom chain (unless turned off) and the final pass to the
+  // canvas.
+  function render(source: THREE.WebGLRenderTarget, bloom: boolean) {
+    final.uniforms.tScene.value = source.texture;
+    final.uniforms.uBloom.value = bloom ? 1 : 0;
+    if (!bloom) {
+      draw(final, null);
+      return;
+    }
     bright.uniforms.tMap.value = source.texture;
     bright.uniforms.uTexel.value.set(1 / source.width, 1 / source.height);
     draw(bright, downs[0]);
@@ -263,10 +289,9 @@ export function createPost(renderer: THREE.WebGLRenderer, hdr: boolean) {
       draw(up, ups[i]);
       from = ups[i];
     }
-    final.uniforms.tScene.value = source.texture;
     final.uniforms.tBloom.value = from.texture;
     draw(final, null);
   }
 
-  return { resize, render, uniforms: final.uniforms };
+  return { resize, render, compile, uniforms: final.uniforms };
 }

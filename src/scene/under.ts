@@ -80,7 +80,7 @@ void main() {
   float phase = dot(p, across) * 15.0 + fbm(p * 0.7) * 6.0;
   n.xz += across * cos(phase) * 0.2;
   n = normalize(n);
-  vec3 alb = mix(S(0.95, 0.89, 0.72), S(0.80, 0.72, 0.55), fbm(p * 0.55));
+  vec3 alb = mix(S(1.0, 0.95, 0.80), S(0.88, 0.82, 0.64), fbm(p * 0.55));
   alb *= 0.96 + 0.08 * hash21(floor(p * 80.0));
   vec3 light = underLight(vW, n, 1.0);
   vec3 col = alb * light;
@@ -128,6 +128,8 @@ export function createUnderwater() {
       uniforms: underUniforms(),
     }),
   );
+  // The bounding sphere of so large a plane always meets the frustum;
+  // main.ts hides the sand while the seabed is out of view instead.
   sand.frustumCulled = false;
 
   return { backdrop, ceiling, sand };

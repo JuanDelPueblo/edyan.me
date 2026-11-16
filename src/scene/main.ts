@@ -16,8 +16,18 @@ import { sfx } from "../scripts/sound";
 import { D_REF, EYE, FOV, TAN, U, type View } from "./view";
 
 // Extra canvas above and below the viewport. The canvas scrolls with the
-// page between frames, so this hides its edges during fast scrolling.
-const OVERSCAN = 140;
+// page between frames, so this hides its edges during fast scrolling. Touch
+// flings scroll fastest, so coarse pointers get more.
+const OVERSCAN = matchMedia("(pointer: coarse)").matches ? 140 : 96;
+
+// Quality steps when frames run slow, best first: 0 full, 1 without MSAA,
+// 2 without bloom, then lower resolutions.
+const SCALES = [1, 1, 1, 0.8, 0.64, 0.5];
+// Frame intervals in ms: the normal cap, and the rate after a while
+// without input.
+const FRAME = 1000 / 60;
+const IDLE_FRAME = 1000 / 30;
+const IDLE_AFTER = 30000;
 
 export function startScene(canvas: HTMLCanvasElement, site: HTMLElement) {
   let renderer: THREE.WebGLRenderer;
@@ -28,7 +38,7 @@ export function startScene(canvas: HTMLCanvasElement, site: HTMLElement) {
       alpha: false,
       depth: false,
       stencil: false,
-      powerPreference: "high-performance",
+      powerPreference: "default",
     });
   } catch {
     return false;
@@ -67,12 +77,17 @@ export function startScene(canvas: HTMLCanvasElement, site: HTMLElement) {
     layout: 0,
   };
   let docHeight = 0;
-  let quality = 1;
+  let level = 0;
+  // Best level still allowed; rises when a step back up does not hold.
+  let ceiling = 0;
+  let raisedAt = -Infinity;
+  // Whether this screen gets MSAA at full quality.
+  let msaa = true;
 
   const colorType = hdr ? THREE.HalfFloatType : THREE.UnsignedByteType;
   const main = new THREE.WebGLRenderTarget(4, 4, {
     type: colorType,
-    samples: 4,
+    samples: 0,
     depthBuffer: true,
     minFilter: THREE.LinearFilter,
     magFilter: THREE.LinearFilter,
@@ -150,13 +165,23 @@ export function startScene(canvas: HTMLCanvasElement, site: HTMLElement) {
       view.orbBottom = box.bottom - siteBox.top;
     }
     const h = lvh + 2 * OVERSCAN;
-    // Cap the pixel count; quality drops further if frames run slow.
-    const pr =
-      Math.min(
-        devicePixelRatio,
-        w < 700 ? 1.5 : 2,
-        Math.sqrt(4.6e6 / (w * h)),
-      ) * quality;
+    // Cap the pixel count, lower on high-density screens; quality drops
+    // further if frames run slow.
+    const budget = devicePixelRatio > 1 ? 2.5e6 : 4.6e6;
+    const base = Math.min(
+      devicePixelRatio,
+      w < 700 ? 1.5 : 2,
+      Math.sqrt(budget / (w * h)),
+    );
+    const pr = base * SCALES[level];
+    // Aliasing is hard to see at 1.5 device px per CSS px and above.
+    msaa = base < 1.5;
+    const samples = msaa && level === 0 ? 4 : 0;
+    if (samples !== main.samples) {
+      // The target reallocates with the new sample count on its next use.
+      main.samples = samples;
+      main.dispose();
+    }
     const same =
       w === view.w && lvh === view.lvh && wl === view.wl && left === view.left;
     if (same && pr === view.pr) return;
@@ -280,38 +305,99 @@ export function startScene(canvas: HTMLCanvasElement, site: HTMLElement) {
     drawn = "";
   });
 
+  // Input keeps the full frame rate; scrolling draws on every display
+  // frame so the parallax layers stay in step with the page.
+  let inputAt = performance.now();
+  let scrolledAt = -Infinity;
+  function wake() {
+    const now = performance.now();
+    // Coming back from the idle rate: draw on the next frame, and leave
+    // the long gap out of the timing.
+    if (now - inputAt > IDLE_AFTER) {
+      due = 0;
+      last = 0;
+    }
+    inputAt = now;
+  }
+  for (const type of ["pointermove", "pointerdown", "keydown", "wheel"]) {
+    addEventListener(type, wake, { passive: true });
+  }
+  addEventListener(
+    "scroll",
+    () => {
+      wake();
+      scrolledAt = performance.now();
+    },
+    { passive: true },
+  );
+
+  // Steps quality down or back up. A step up that runs slow again within
+  // a few seconds sets the ceiling, so the targets are not reallocated
+  // back and forth.
+  function setLevel(next: number, now: number) {
+    if (next === 1 && !msaa) next = next > level ? 2 : 0;
+    if (next > level && now - raisedAt < 10000) ceiling = next;
+    if (next < level) raisedAt = now;
+    level = next;
+    dirty = true;
+    pace = expected;
+    slow = 0;
+    good = 0;
+  }
+
   let last = 0;
+  let due = 0;
   let floorSet = false;
   let shown = false;
   let seaShift = 0;
+  // Display frame interval measured before the first draw. A browser that
+  // limits animation frames to 30 fps sets the expected pace, so the cap
+  // alone does not lower quality.
+  let expected = FRAME;
+  let pace = FRAME;
   let slow = 0;
-  let pace = 16;
+  let good = 0;
   let drawn = "";
 
   function frame(now: number) {
     requestAnimationFrame(frame);
     if (document.hidden || lost) {
       last = 0;
+      due = 0;
       return;
     }
+    // Draw at most 60 fps (30 fps when idle). The due time advances by
+    // whole intervals, so 144 Hz screens still average 60.
+    const idle = now - inputAt > IDLE_AFTER;
+    const scrolling = now - scrolledAt < 200;
+    const interval = scrolling ? 0 : idle ? IDLE_FRAME : FRAME;
+    if (now < due - 2) return;
+    due = Math.max(due + interval, now);
+
+    const still = reduced.matches;
     const dt = Math.min(0.05, last ? (now - last) / 1000 : 0.016);
-    // Step the resolution down when frames keep arriving late.
-    if (last) {
+    // Step quality down when frames keep arriving late, and back up after
+    // a long run of frames on time.
+    if (last && !idle && !still) {
       pace += (now - last - pace) * 0.05;
-      slow = pace > 24 ? slow + 1 : 0;
-      if (slow > 120 && quality > 0.5) {
-        quality *= 0.8;
+      if (pace > expected * 1.3) {
+        slow++;
+        good = 0;
+      } else if (pace < expected * 1.1) {
+        good++;
         slow = 0;
-        pace = 16;
-        dirty = true;
+      } else {
+        slow = 0;
+        good = 0;
       }
+      if (slow > 90 && level < SCALES.length - 1) setLevel(level + 1, now);
+      if (good > 900 && level > ceiling) setLevel(level - 1, now);
     }
     last = now;
     if (dirty) measure();
     if (!view.w) return;
 
     const scroll = Math.max(0, scrollY);
-    const still = reduced.matches;
     if (!still) view.time += dt;
     view.dt = still ? 0 : dt;
     view.scroll = scroll;
@@ -377,7 +463,13 @@ export function startScene(canvas: HTMLCanvasElement, site: HTMLElement) {
     seaCam.position.set(view.camX, view.camY + bob, 0);
     skyCam.position.x = lookX * 2.4;
     mirrorCam.position.x = skyCam.position.x;
-    seaCam.setViewOffset(w, lvh, 0, top - frameTop - seaShift, w, h);
+    const offY = top - frameTop - seaShift;
+    seaCam.setViewOffset(w, lvh, 0, offY, w, h);
+    // Skip the sand while the lowest view ray meets the dunes' top beyond
+    // the plane's far edge, about 80 m out.
+    const lowest = (offY + h - lvh / 2) * view.k;
+    const drop = view.camY + 0.07 - (view.floorY + 0.62);
+    sea.sand.visible = drop <= 0 || (lowest > 0 && drop / lowest < 80);
 
     const dw = main.width;
     const dh = main.height;
@@ -416,14 +508,45 @@ export function startScene(canvas: HTMLCanvasElement, site: HTMLElement) {
       0,
       Math.min(1, (p.uSun.value.y - scroll + 70) / 110),
     );
-    post.render(main);
+    post.render(main, level < 2);
 
-    // Shaders compile during the first draw, so the picture is ready now.
+    // Shaders are compiled before the loop starts, so the first picture is
+    // complete.
     if (!shown) {
       shown = true;
       site.classList.add("scene-live");
     }
   }
-  requestAnimationFrame(frame);
+  // Compiles every shader without blocking the page, then starts drawing.
+  // Animation frame intervals measured meanwhile set the expected pace.
+  async function start() {
+    const gaps: number[] = [];
+    let ready = false;
+    let prev = 0;
+    function tick(now: number) {
+      if (prev) gaps.push(now - prev);
+      prev = now;
+      if (!ready || gaps.length < 10) requestAnimationFrame(tick);
+      else begin();
+    }
+    function begin() {
+      gaps.sort((a, b) => a - b);
+      expected = Math.max(FRAME, gaps[Math.floor(gaps.length / 4)]);
+      pace = expected;
+      requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(tick);
+    try {
+      await Promise.all([
+        renderer.compileAsync(skyScene, skyCam),
+        renderer.compileAsync(seaScene, seaCam),
+        post.compile(),
+      ]);
+    } catch {
+      // Anything not compiled yet compiles on its first draw.
+    }
+    ready = true;
+  }
+  start();
   return true;
 }
