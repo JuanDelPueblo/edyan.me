@@ -1,10 +1,25 @@
 ---
-// Placeholder background: the waterline band across the page. The sky and
-// water gradients are on .aero-site in index.astro. This component is where
-// the redesigned scene will go.
+// Background scene. The canvas is drawn by src/scene/main.ts with WebGL.
+// Without JavaScript or WebGL 2, the sky and water gradients on .aero-site
+// and the waterline band below stay as the background.
 ---
 
 <div
   class="aero-waterline pointer-events-none absolute inset-x-0 z-3"
   aria-hidden="true"
 ></div>
+<canvas
+  class="aero-scene pointer-events-none absolute top-0 left-0 z-0 block w-full"
+  aria-hidden="true"
+></canvas>
+
+<script>
+  // three.js loads in its own chunk after the page has rendered.
+  const canvas = document.querySelector<HTMLCanvasElement>(".aero-scene")!;
+  const site = document.querySelector<HTMLElement>(".aero-site")!;
+  import("../scene/main").then(({ startScene }) => startScene(canvas, site));
+  // Add ?scene to the address to look at the background on its own.
+  if (new URLSearchParams(location.search).has("scene")) {
+    site.classList.add("scene-only");
+  }
+</script>

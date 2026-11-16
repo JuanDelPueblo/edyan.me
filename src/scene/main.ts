@@ -1,0 +1,429 @@
+// WebGL background: sky, sun, rainbow, clouds and islands above the
+// waterline, and a sea that deepens down the page to a kelp bed at the bottom.
+import * as THREE from "three";
+import { createBubbles } from "./bubbles";
+import { createDolphins } from "./dolphin";
+import { createFish } from "./fish";
+import { createIslands } from "./island";
+import { createJellies } from "./jelly";
+import { createKelp } from "./kelp";
+import { createOcean } from "./ocean";
+import { createPost } from "./post";
+import { createSeabed } from "./seabed";
+import { createSky } from "./sky";
+import { createUnderwater } from "./under";
+import { sfx } from "../scripts/sound";
+import { D_REF, EYE, FOV, TAN, U, type View } from "./view";
+
+// Extra canvas above and below the viewport. The canvas scrolls with the
+// page between frames, so this hides its edges during fast scrolling.
+const OVERSCAN = 140;
+
+export function startScene(canvas: HTMLCanvasElement, site: HTMLElement) {
+  let renderer: THREE.WebGLRenderer;
+  try {
+    renderer = new THREE.WebGLRenderer({
+      canvas,
+      antialias: false,
+      alpha: false,
+      depth: false,
+      stencil: false,
+      powerPreference: "high-performance",
+    });
+  } catch {
+    return false;
+  }
+  if (!renderer.capabilities.isWebGL2) return false;
+  renderer.autoClear = false;
+  renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
+  const hdr = renderer.extensions.has("EXT_color_buffer_float");
+  const reduced = matchMedia("(prefers-reduced-motion: reduce)");
+
+  // Measures 100lvh, which does not change as mobile toolbars slide away.
+  const probe = document.createElement("div");
+  probe.style.cssText =
+    "position:fixed;top:0;left:0;width:0;height:100lvh;visibility:hidden;pointer-events:none";
+  document.body.append(probe);
+
+  const view: View = {
+    w: 0,
+    h: 0,
+    lvh: 0,
+    top: 0,
+    scroll: 0,
+    wl: 236,
+    hz: 190,
+    left: 16,
+    orbLeft: 0,
+    orbBottom: 0,
+    k: 0.001,
+    mpp: 0.006,
+    pr: 1,
+    time: 0,
+    dt: 0,
+    camX: 0,
+    camY: -1,
+    floorY: -10,
+    layout: 0,
+  };
+  let docHeight = 0;
+  let quality = 1;
+
+  const colorType = hdr ? THREE.HalfFloatType : THREE.UnsignedByteType;
+  const main = new THREE.WebGLRenderTarget(4, 4, {
+    type: colorType,
+    samples: 4,
+    depthBuffer: true,
+    minFilter: THREE.LinearFilter,
+    magFilter: THREE.LinearFilter,
+  });
+  const mirror = new THREE.WebGLRenderTarget(4, 4, {
+    type: colorType,
+    depthBuffer: true,
+    minFilter: THREE.LinearFilter,
+    magFilter: THREE.LinearFilter,
+  });
+  const post = createPost(renderer, hdr);
+
+  // Above the water.
+  const skyScene = new THREE.Scene();
+  const skyCam = new THREE.PerspectiveCamera(FOV, 1, 0.3, 8000);
+  skyCam.position.set(0, EYE, 0);
+  // The mirror camera sits as far below the surface as the sky camera sits
+  // above it; its picture, flipped, is what the water reflects.
+  const mirrorCam = new THREE.PerspectiveCamera();
+  mirrorCam.position.set(0, -EYE, 0);
+  const MIRROR_TAN = 0.5;
+  const sky = createSky();
+  const islands = createIslands();
+  const ocean = createOcean(mirror.texture);
+  skyScene.add(sky.backdrop, sky.clouds, sky.bow, sky.gulls);
+  skyScene.add(islands.hill, islands.cay, islands.broadleaf, islands.palms);
+  const pod = createDolphins();
+  skyScene.add(ocean, pod.dolphins, pod.splashes);
+
+  // Below the water.
+  const seaScene = new THREE.Scene();
+  const seaCam = new THREE.PerspectiveCamera(FOV, 1, 0.15, 160);
+  const sea = createUnderwater();
+  const kelp = createKelp();
+  const seabed = createSeabed();
+  const bubbles = createBubbles();
+  const fish = createFish();
+  const jellies = createJellies();
+  seaScene.add(sea.backdrop, sea.ceiling, sea.sand);
+  seaScene.add(seabed.blobs, seabed.branches, seabed.stars);
+  seaScene.add(kelp.kelp, kelp.grass, ...fish.meshes);
+  seaScene.add(jellies.mesh, bubbles.motes, bubbles.streams, bubbles.burst);
+
+  let dirty = true;
+  const banner = site.querySelector(".aero-banner");
+  const title = site.querySelector(".aero-title");
+  const orb = site.querySelector(".aero-orb");
+  new ResizeObserver(() => (dirty = true)).observe(site);
+  addEventListener("resize", () => (dirty = true));
+  document.fonts?.ready.then(() => (dirty = true));
+
+  // Reads page sizes and rebuilds whatever depends on them.
+  function measure() {
+    dirty = false;
+    const siteBox = site.getBoundingClientRect();
+    const w = site.clientWidth;
+    const lvh = probe.offsetHeight || innerHeight;
+    docHeight = site.offsetHeight;
+    // The waterline is the header's bottom edge.
+    const bannerBox = banner?.getBoundingClientRect();
+    const wl = bannerBox ? Math.round(bannerBox.bottom - siteBox.top) : 300;
+    const left = bannerBox ? bannerBox.left - siteBox.left : 16;
+    if (title) {
+      const box = title.getBoundingClientRect();
+      U.uExcl.value.set(
+        box.left - siteBox.left,
+        box.top - siteBox.top,
+        box.right - siteBox.left,
+        box.bottom - siteBox.top,
+      );
+    }
+    if (orb) {
+      const box = orb.getBoundingClientRect();
+      view.orbLeft = box.left - siteBox.left;
+      view.orbBottom = box.bottom - siteBox.top;
+    }
+    const h = lvh + 2 * OVERSCAN;
+    // Cap the pixel count; quality drops further if frames run slow.
+    const pr =
+      Math.min(
+        devicePixelRatio,
+        w < 700 ? 1.5 : 2,
+        Math.sqrt(4.6e6 / (w * h)),
+      ) * quality;
+    const same =
+      w === view.w && lvh === view.lvh && wl === view.wl && left === view.left;
+    if (same && pr === view.pr) return;
+    const resized = w !== view.w || h !== view.h || pr !== view.pr;
+    view.w = w;
+    view.h = h;
+    view.lvh = lvh;
+    view.wl = wl;
+    view.left = left;
+    view.pr = pr;
+    view.k = (2 * TAN) / lvh;
+    view.mpp = view.k * D_REF;
+    view.hz = wl - Math.min(110, Math.max(34, wl * 0.2));
+    view.layout++;
+
+    if (resized) {
+      canvas.style.height = h + "px";
+      renderer.setPixelRatio(pr);
+      renderer.setSize(w, h, false);
+      const dw = canvas.width;
+      const dh = canvas.height;
+      main.setSize(dw, dh);
+      mirror.setSize(Math.min(768, Math.round(dw / 2.5)), 160);
+      post.resize(dw, dh);
+      post.uniforms.uSize.value.set(w, h);
+      post.uniforms.uPx.value = w / dw;
+    }
+    for (const cam of [skyCam, seaCam]) {
+      cam.aspect = w / lvh;
+    }
+
+    // The sun sits in the right margin; lighting follows from where it is.
+    const narrow = Math.min(1, Math.max(0, (w - 400) / 700));
+    U.uSunSize.value = 0.6 + 0.4 * narrow;
+    const sunX = w - Math.max(44 + 20 * narrow, left * 0.42);
+    const sunRow = Math.max(30, wl * (0.11 + 0.09 * narrow));
+    post.uniforms.uSun.value.set(sunX, sunRow);
+    const sx = (sunX - w / 2) * view.k;
+    const sy = (view.hz - sunRow) * view.k;
+    U.uSunDir.value.set(sx, sy, -1).normalize();
+    U.uLight.value.set(sx * 1.4 + 0.25, 0.8, 0.45).normalize();
+    U.uSunU.value.set(sx * 0.9 + 0.2, 0.86, -0.25).normalize();
+
+    // Mirror frustum: the full width with a margin, from the horizon up.
+    const near = 0.3;
+    const half = (w / 2) * view.k * 1.25;
+    mirrorCam.projectionMatrix.makePerspective(
+      -half * near,
+      half * near,
+      MIRROR_TAN * near,
+      0,
+      near,
+      8000,
+    );
+    mirrorCam.projectionMatrixInverse.copy(mirrorCam.projectionMatrix).invert();
+    ocean.material.uniforms.uReflMap.value.set(1 / (2 * half), 1 / MIRROR_TAN);
+
+    sky.layout(view);
+    islands.layout(view);
+    pod.layout(view);
+    kelp.layout(view);
+    seabed.layout(view);
+    bubbles.layout(view);
+  }
+
+  // Pointer: fish shy away from it, and a click on the open water releases
+  // bubbles and scatters the fish nearby.
+  let hoverX = -1;
+  let hoverY = -1;
+  // Where the pointer is, -1..1, and the eased value the cameras follow.
+  let aimX = 0;
+  let aimY = 0;
+  let lookX = 0;
+  let lookY = 0;
+  addEventListener(
+    "pointermove",
+    (event) => {
+      if (event.pointerType !== "mouse") return;
+      hoverX = event.clientX;
+      hoverY = event.clientY;
+      aimX = (event.clientX / innerWidth) * 2 - 1;
+      aimY = (event.clientY / innerHeight) * 2 - 1;
+    },
+    { passive: true },
+  );
+  // Viewport position to the same position in the underwater camera's frame.
+  function frameY(clientY: number) {
+    return clientY - (innerHeight - view.lvh) / 2 - seaShift;
+  }
+  addEventListener("pointerdown", (event) => {
+    const target = event.target as Element | null;
+    if (!target || !view.w || lost || reduced.matches) return;
+    const open =
+      target === site ||
+      target.parentElement === site ||
+      (target.closest(".aero-banner") && !target.closest("a, button"));
+    if (!open) return;
+    if (event.clientY + scrollY < view.wl + 8) return;
+    const dist = 3.2;
+    const y = frameY(event.clientY);
+    bubbles.pop(
+      view.camX + (event.clientX - view.w / 2) * view.k * dist,
+      Math.min(-0.2, view.camY + (view.lvh / 2 - y) * view.k * dist),
+      -dist,
+      9,
+    );
+    sfx("bubbles");
+    if (fish.startle(view, event.clientX, y, 210, 2.6)) sfx("blip");
+  });
+
+  // The page falls back to its CSS background while the context is lost.
+  let lost = false;
+  canvas.addEventListener("webglcontextlost", (event) => {
+    event.preventDefault();
+    lost = true;
+    site.classList.remove("scene-live");
+  });
+  canvas.addEventListener("webglcontextrestored", () => {
+    lost = false;
+    shown = false;
+    drawn = "";
+  });
+
+  let last = 0;
+  let floorSet = false;
+  let shown = false;
+  let seaShift = 0;
+  let slow = 0;
+  let pace = 16;
+  let drawn = "";
+
+  function frame(now: number) {
+    requestAnimationFrame(frame);
+    if (document.hidden || lost) {
+      last = 0;
+      return;
+    }
+    const dt = Math.min(0.05, last ? (now - last) / 1000 : 0.016);
+    // Step the resolution down when frames keep arriving late.
+    if (last) {
+      pace += (now - last - pace) * 0.05;
+      slow = pace > 24 ? slow + 1 : 0;
+      if (slow > 120 && quality > 0.5) {
+        quality *= 0.8;
+        slow = 0;
+        pace = 16;
+        dirty = true;
+      }
+    }
+    last = now;
+    if (dirty) measure();
+    if (!view.w) return;
+
+    const scroll = Math.max(0, scrollY);
+    const still = reduced.matches;
+    if (!still) view.time += dt;
+    view.dt = still ? 0 : dt;
+    view.scroll = scroll;
+    U.uTime.value = view.time + 20;
+
+    // Park the canvas over the viewport, in page coordinates.
+    const { w, h, lvh, wl, hz, mpp, pr } = view;
+    const frameTop = scroll + (innerHeight - lvh) / 2;
+    const top = Math.round(
+      Math.max(0, Math.min(frameTop - OVERSCAN, docHeight - h)),
+    );
+    view.top = top;
+    canvas.style.transform = `translate3d(0,${top}px,0)`;
+
+    // The underwater camera looks level, so its horizon would sit at the
+    // middle of the viewport. With a tall header the waterline is near
+    // there too, which would leave no view of the surface from below. At
+    // the top of the page the camera's frame is shifted down to keep a
+    // strip of it; the shift eases away over the first stretch of scroll.
+    const strip = lvh * 0.2;
+    function shiftAt(y: number) {
+      return Math.max(0, wl + strip - lvh / 2 - y * 0.5);
+    }
+    // Depth that puts the surface, D_REF away, on the waterline.
+    function depthAt(y: number) {
+      return Math.max(0.4, (lvh / 2 + shiftAt(y) - wl + y) * mpp);
+    }
+    seaShift = shiftAt(scroll);
+    // The camera sinks as the page scrolls, and the seabed sits where the
+    // page ends: D_REF away it shows about a fifth up from the bottom edge.
+    const maxScroll = Math.max(0, docHeight - innerHeight);
+    const above = Math.max(0.6, (lvh * 0.31 - shiftAt(maxScroll)) * mpp);
+    const floorTarget = -(depthAt(maxScroll) + above);
+    if (!floorSet) view.floorY = floorTarget;
+    floorSet = true;
+    view.floorY += (floorTarget - view.floorY) * Math.min(1, dt * 4);
+    view.camY = -depthAt(scroll);
+    U.uCamDepth.value = -view.camY;
+    U.uFloorY.value = view.floorY;
+
+    // With reduced motion the scene is a still picture that only follows
+    // scrolling and resizing.
+    const key = `${scroll}|${top}|${view.layout}|${view.floorY.toFixed(3)}`;
+    if (still && key === drawn) return;
+    drawn = key;
+
+    if (!still && hoverX >= 0) {
+      fish.startle(view, hoverX, frameY(hoverY), 80, 1.1);
+      hoverX = -1;
+    }
+    kelp.update(view);
+    fish.update(view);
+    jellies.update(view);
+    bubbles.update(view);
+
+    skyCam.setViewOffset(w, lvh, 0, top - hz + lvh / 2, w, h);
+    // The cameras drift a little and lean with the pointer, which shifts
+    // near things more than far ones.
+    lookX += (aimX - lookX) * Math.min(1, view.dt * 2.2);
+    lookY += (aimY - lookY) * Math.min(1, view.dt * 2.2);
+    view.camX = lookX * 0.16 + Math.sin(view.time * 0.37) * 0.03;
+    const bob = Math.sin(view.time * 0.5) * 0.02 - lookY * 0.05;
+    seaCam.position.set(view.camX, view.camY + bob, 0);
+    skyCam.position.x = lookX * 2.4;
+    mirrorCam.position.x = skyCam.position.x;
+    seaCam.setViewOffset(w, lvh, 0, top - frameTop - seaShift, w, h);
+
+    const dw = main.width;
+    const dh = main.height;
+    const skyRows = Math.max(0, Math.min(dh, Math.round((wl - top) * pr)));
+    U.uPage.value.set(1 / pr, top + h, 1);
+
+    if (skyRows > 0) {
+      ocean.visible = false;
+      U.uPage.value.z = 0;
+      renderer.setRenderTarget(mirror);
+      renderer.clear();
+      renderer.render(skyScene, mirrorCam);
+      ocean.visible = true;
+      U.uPage.value.z = 1;
+
+      main.scissorTest = true;
+      main.scissor.set(0, dh - skyRows, dw, skyRows);
+      renderer.setRenderTarget(main);
+      renderer.clear();
+      renderer.render(skyScene, skyCam);
+    }
+    if (skyRows < dh) {
+      main.scissorTest = true;
+      main.scissor.set(0, 0, dw, dh - skyRows);
+      renderer.setRenderTarget(main);
+      renderer.clear();
+      renderer.render(seaScene, seaCam);
+    }
+
+    const p = post.uniforms;
+    p.uTop.value = top;
+    p.uWl.value = wl;
+    p.uTime.value = U.uTime.value;
+    p.uCenter.value.set(w / 2, scroll + innerHeight / 2);
+    p.uFlare.value = Math.max(
+      0,
+      Math.min(1, (p.uSun.value.y - scroll + 70) / 110),
+    );
+    post.render(main);
+
+    // Shaders compile during the first draw, so the picture is ready now.
+    if (!shown) {
+      shown = true;
+      site.classList.add("scene-live");
+    }
+  }
+  requestAnimationFrame(frame);
+  return true;
+}

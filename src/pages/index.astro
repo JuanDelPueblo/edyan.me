@@ -11,8 +11,11 @@ import Layout from "../layouts/Layout.astro";
 ---
 
 <Layout title={info.pageTitle} description={info.description}>
-  <!-- .aero-site paints the sky and water; Scene adds the waterline. -->
-  <div class="aero-site relative min-h-screen overflow-clip pt-5 pr-[max(16px,env(safe-area-inset-right,0px))] pb-16 pl-[max(16px,env(safe-area-inset-left,0px))] text-[13px] leading-[1.55]">
+  <!--
+    .aero-site paints the fallback sky and water; Scene draws the WebGL
+    background over them. The bottom padding leaves the seabed in view.
+  -->
+  <div class="aero-site relative min-h-screen overflow-clip pt-5 pr-[max(16px,env(safe-area-inset-right,0px))] pb-[clamp(150px,26vh,280px)] pl-[max(16px,env(safe-area-inset-left,0px))] text-[13px] leading-[1.55]">
     <Scene />
     <div class="relative z-2 mx-auto max-w-[800px]">
       <Hero />

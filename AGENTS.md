@@ -22,8 +22,8 @@ Manage the background server with `astro dev stop`, `astro dev status`, and
   surface (layered gradients, shadows, highlight pseudo-elements) one named
   `aero-*` class in that file instead of long arbitrary-value utilities.
 - Follow the Frutiger Aero prototype in `design/aero-prototype/` for visual
-  details. The background is a placeholder in `Scene.astro` until the scene is
-  redesigned.
+  details. The background is the WebGL scene in `src/scene/`, mounted by
+  `Scene.astro`; the CSS gradients on `.aero-site` are its fallback.
 - Keep the page usable without JavaScript: every panel shows, and controls that
   need scripts use the `no-js:hidden` variant.
 
