@@ -1,0 +1,3837 @@
+<title>Edyan Aero Prototypes</title>
+<meta name="claude:viewport-fit-sides" content="cover" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  rel="stylesheet"
+  href="https://fonts.googleapis.com/css2?family=Silkscreen&display=swap"
+/>
+<style>
+  /* Layout: a student's personal site circa 2007. The header floats in the sky
+   above a thick glass waterline; its reflection ripples in the open water
+   below; then one framed glass page (sticky tab strip, one panel at a time,
+   88x31 badges underneath) sinks toward a grassy floor.
+   Deliberately single-theme (bright daytime). */
+  :root {
+    --sky-top: #0f6fd8;
+    --sky-low: #b3e2ff;
+    --water-top: #43b8f2;
+    --water-deep: #0c63b8;
+    --ink: #0d3555;
+    --ink-soft: #3b6585;
+    --link: #0a5fa8;
+    --leaf-1: #b8f07a;
+    --leaf-2: #3f9e16;
+    --leaf-3: #24750a;
+    --rim: #2b84c0;
+    --wl: 236px; /* waterline from the top of #site; JS sets it to the header bottom */
+    --font-text:
+      Verdana, "DejaVu Sans", "Bitstream Vera Sans", Tahoma, sans-serif;
+    --font-head:
+      "Trebuchet MS", "Lucida Grande", Tahoma, "DejaVu Sans", sans-serif;
+    --font-pixel: "Silkscreen", Verdana, "DejaVu Sans", sans-serif;
+  }
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+  /* Keyboard focus scrolls links clear of the sticky tab strip. */
+  html {
+    scroll-padding-top: calc(56px + env(safe-area-inset-top, 0px));
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+  body {
+    margin: 0;
+    background: var(--water-deep);
+    color: var(--ink);
+    font-family: var(--font-text);
+  }
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0 0 auto;
+    height: env(safe-area-inset-top, 0px);
+    z-index: 10;
+    background: #a6daf6;
+  }
+
+  /* Aqua scrollbar: glossy capsule thumb in a pale water track. */
+  ::-webkit-scrollbar {
+    width: 16px;
+    height: 16px;
+  }
+  ::-webkit-scrollbar-track {
+    background: linear-gradient(90deg, #bfe6fb 0%, #eaf8ff 50%, #bfe6fb 100%);
+    box-shadow: inset 1px 0 0 #7fbde2;
+  }
+  ::-webkit-scrollbar-thumb {
+    border-radius: 8px;
+    border: 1px solid #0a5f9e;
+    background: linear-gradient(
+      90deg,
+      #8fe0fa 0%,
+      #33ade6 40%,
+      #0f7cc0 60%,
+      #2aa0dc 100%
+    );
+    box-shadow:
+      inset 0 0 0 1px rgba(255, 255, 255, 0.5),
+      inset 3px 0 3px rgba(255, 255, 255, 0.45);
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(
+      90deg,
+      #b0ecff 0%,
+      #4cc0f0 40%,
+      #1890d4 60%,
+      #3cb4ec 100%
+    );
+  }
+  /* Browsers without the WebKit pseudo-elements get the colour hint only. */
+  @supports not selector(::-webkit-scrollbar) {
+    html {
+      scrollbar-color: #1f93de #d6f0fd;
+    }
+  }
+
+  /* ================= Scene ================= */
+  #site {
+    position: relative;
+    overflow: clip;
+    min-height: 100vh;
+    font-size: 13px;
+    line-height: 1.55;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    padding-block: 20px 150px;
+    background:
+      radial-gradient(
+        ellipse 70% 260px at 50% var(--wl),
+        rgba(255, 255, 255, 0.45),
+        transparent 70%
+      ),
+      radial-gradient(
+        ellipse 120% 100% at 50% 100%,
+        rgba(0, 30, 90, 0.45),
+        transparent 60%
+      ),
+      linear-gradient(
+        180deg,
+        var(--sky-top) 0,
+        #3d9cf0 calc(var(--wl) * 0.5),
+        var(--sky-low) var(--wl),
+        var(--water-top) var(--wl),
+        #1f93de calc(var(--wl) + 380px),
+        var(--water-deep) 100%
+      );
+  }
+  .scene {
+    position: absolute;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .ribbons {
+    left: 0;
+    width: 100%;
+  }
+  .ribbons.sky {
+    top: 0;
+    height: var(--wl);
+  }
+  .ribbons.sea {
+    top: calc(var(--wl) + 160px);
+    height: 700px;
+    opacity: 0.8;
+  }
+  .ribbons g {
+    animation: ribbon 18s ease-in-out infinite alternate;
+    transform-origin: center;
+  }
+  .ribbons g + g {
+    animation-duration: 25s;
+    animation-direction: alternate-reverse;
+  }
+  @keyframes ribbon {
+    from {
+      transform: translate(-3%, 4px) skewY(-1deg);
+    }
+    to {
+      transform: translate(3%, -6px) skewY(1.5deg);
+    }
+  }
+
+  .sun {
+    top: -80px;
+    right: 4%;
+    width: 260px;
+    height: 260px;
+  }
+  .sun::before {
+    content: "";
+    position: absolute;
+    inset: -80px;
+    border-radius: 50%;
+    background: repeating-conic-gradient(
+      rgba(255, 255, 255, 0.6) 0 2deg,
+      transparent 2deg 11deg
+    );
+    -webkit-mask-image: radial-gradient(circle, #000 12%, transparent 62%);
+    mask-image: radial-gradient(circle, #000 12%, transparent 62%);
+    animation: spin 80s linear infinite;
+  }
+  .sun::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: radial-gradient(
+      circle,
+      #fff 0 13%,
+      rgba(255, 255, 235, 0.9) 18%,
+      rgba(255, 255, 255, 0.35) 36%,
+      transparent 66%
+    );
+  }
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  .flare {
+    border-radius: 50%;
+    animation: flicker 5s ease-in-out infinite alternate;
+  }
+  .flare.halo {
+    top: -70px;
+    right: calc(4% - 60px);
+    width: 380px;
+    height: 380px;
+    opacity: 0.55;
+    background: radial-gradient(
+      circle,
+      transparent 58%,
+      rgba(255, 80, 80, 0.16) 61%,
+      rgba(255, 230, 80, 0.18) 64%,
+      rgba(80, 255, 120, 0.16) 67%,
+      rgba(80, 200, 255, 0.18) 70%,
+      rgba(170, 90, 255, 0.14) 73%,
+      transparent 77%
+    );
+  }
+  .flare.hex {
+    clip-path: polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%);
+    border-radius: 0;
+  }
+  .flare.h1 {
+    top: 150px;
+    right: 20%;
+    width: 46px;
+    height: 40px;
+    background: rgba(150, 255, 220, 0.28);
+  }
+  .flare.h2 {
+    top: 186px;
+    right: 26%;
+    width: 22px;
+    height: 19px;
+    background: rgba(255, 240, 160, 0.4);
+    animation-delay: -2s;
+  }
+  @keyframes flicker {
+    from {
+      opacity: 0.9;
+    }
+    to {
+      opacity: 0.4;
+    }
+  }
+
+  .cloud {
+    height: auto;
+    animation: drift-x 70s ease-in-out infinite alternate;
+    -webkit-mask-image: radial-gradient(
+      ellipse closest-side,
+      #000 55%,
+      transparent 100%
+    );
+    mask-image: radial-gradient(
+      ellipse closest-side,
+      #000 55%,
+      transparent 100%
+    );
+  }
+  .cloud.c1 {
+    top: -6px;
+    left: -3%;
+    width: 380px;
+  }
+  .cloud.c2 {
+    top: 118px;
+    left: 28%;
+    width: 300px;
+    opacity: 0.9;
+    animation-duration: 90s;
+    scale: -1 1;
+  }
+  .cloud.c3 {
+    top: 26px;
+    right: 25%;
+    width: 250px;
+    opacity: 0.95;
+    animation-duration: 60s;
+  }
+  .cloud.c4 {
+    top: 100px;
+    right: -4%;
+    width: 440px;
+    animation-duration: 80s;
+    scale: -1 1;
+  }
+  @keyframes drift-x {
+    to {
+      transform: translateX(70px);
+    }
+  }
+
+  /* Thick glass waterline crossing the whole page at --wl. */
+  .meniscus {
+    top: calc(var(--wl) - 28px);
+    left: 0;
+    right: 0;
+    height: 58px;
+    z-index: 3;
+    overflow: hidden;
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.3) 26%,
+      rgba(255, 255, 255, 0.95) 44%,
+      rgba(205, 246, 255, 0.92) 50%,
+      rgba(110, 205, 248, 0.45) 62%,
+      rgba(10, 90, 165, 0.38) 86%,
+      rgba(10, 90, 165, 0) 100%
+    );
+    -webkit-backdrop-filter: blur(1.5px) saturate(1.4);
+    backdrop-filter: blur(1.5px) saturate(1.4);
+  }
+  .meniscus svg {
+    position: absolute;
+    left: 0;
+    width: 200%;
+    animation: drift 10s linear infinite;
+  }
+  .meniscus svg.hi {
+    top: 18px;
+    height: 16px;
+  }
+  .meniscus svg.lo {
+    top: 34px;
+    height: 14px;
+    animation-duration: 16s;
+    animation-direction: reverse;
+    opacity: 0.7;
+  }
+  @keyframes drift {
+    to {
+      transform: translateX(-50%);
+    }
+  }
+  .meniscus::after {
+    content: "";
+    position: absolute;
+    top: 22px;
+    left: 0;
+    height: 10px;
+    width: 30%;
+    border-radius: 50%;
+    background: radial-gradient(closest-side, #fff, transparent);
+    transform: translateX(-110%);
+    animation: glint 7s ease-in-out infinite;
+  }
+  @keyframes glint {
+    0%,
+    15% {
+      transform: translateX(-110%);
+    }
+    100% {
+      transform: translateX(380%);
+    }
+  }
+  .meniscus .drop {
+    position: absolute;
+    top: 24px;
+    border-radius: 50%;
+    background: radial-gradient(
+      circle at 35% 30%,
+      #fff 0 18%,
+      rgba(255, 255, 255, 0.3) 40%,
+      rgba(150, 225, 255, 0.6) 100%
+    );
+    border: 1px solid rgba(255, 255, 255, 0.85);
+  }
+
+  .shafts {
+    top: var(--wl);
+    left: -20%;
+    right: -20%;
+    height: 760px;
+    -webkit-mask-image: linear-gradient(180deg, #000, transparent);
+    mask-image: linear-gradient(180deg, #000, transparent);
+  }
+  .shafts::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      100deg,
+      transparent 0 70px,
+      rgba(255, 255, 255, 0.16) 90px 130px,
+      transparent 160px 260px
+    );
+    filter: blur(5px);
+    animation: sway 9s ease-in-out infinite alternate;
+  }
+  @keyframes sway {
+    from {
+      transform: translateX(-50px) skewX(-4deg);
+    }
+    to {
+      transform: translateX(50px) skewX(4deg);
+    }
+  }
+  .caustics {
+    top: var(--wl);
+    left: -140px;
+    right: 0;
+    height: 320px;
+    opacity: 0.55;
+    background:
+      radial-gradient(
+          ellipse 60px 14px,
+          rgba(255, 255, 255, 0.4),
+          transparent 70%
+        )
+        0 0 / 140px 46px,
+      radial-gradient(
+          ellipse 40px 10px,
+          rgba(255, 255, 255, 0.35),
+          transparent 70%
+        )
+        70px 23px / 140px 46px;
+    -webkit-mask-image: linear-gradient(180deg, #000, transparent);
+    mask-image: linear-gradient(180deg, #000, transparent);
+    animation: ripple 8s linear infinite;
+  }
+  @keyframes ripple {
+    to {
+      transform: translateX(140px);
+    }
+  }
+
+  .bubbles {
+    top: var(--wl);
+    bottom: 0;
+    left: 0;
+    right: 0;
+    overflow: hidden;
+  }
+  .bubcol {
+    top: var(--wl);
+    bottom: 0;
+    left: calc(50% + 372px);
+    width: 44px;
+    z-index: 3;
+    overflow: hidden;
+  }
+  .bub,
+  .trail.b {
+    position: absolute;
+    border-radius: 50%;
+    background: radial-gradient(
+      circle at 32% 28%,
+      #fff 0 10%,
+      rgba(255, 255, 255, 0.35) 20%,
+      rgba(255, 255, 255, 0.05) 55%,
+      rgba(200, 245, 255, 0.7) 100%
+    );
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    box-shadow: inset -2px -3px 4px rgba(255, 255, 255, 0.4);
+  }
+  .bubbles .bub {
+    bottom: -40px;
+    animation: rise linear infinite;
+  }
+  @keyframes rise {
+    0% {
+      transform: translate(0, 0) scale(0.6);
+      opacity: 0;
+    }
+    8% {
+      opacity: 1;
+    }
+    50% {
+      transform: translate(12px, -45vh) scale(0.9);
+    }
+    100% {
+      transform: translate(8px, -95vh) scale(1.1);
+      opacity: 0;
+    }
+  }
+  .bubcol .bub {
+    bottom: -30px;
+    animation: rise-col linear infinite;
+  }
+  @keyframes rise-col {
+    0% {
+      transform: translate(0, 0);
+      opacity: 0;
+    }
+    4% {
+      opacity: 0.95;
+    }
+    50% {
+      transform: translate(var(--sway, 6px), calc(var(--h, 1500px) * -0.5));
+    }
+    100% {
+      transform: translate(0, calc(var(--h, 1500px) * -1));
+      opacity: 0.9;
+    }
+  }
+  .spark,
+  .trail.s {
+    position: absolute;
+    background:
+      radial-gradient(
+        circle,
+        #fff 0 6%,
+        rgba(255, 255, 255, 0.55) 14%,
+        rgba(180, 240, 255, 0.18) 30%,
+        transparent 48%
+      ),
+      linear-gradient(90deg, transparent, #fff 50%, transparent) 50% 50% / 100%
+        2px no-repeat,
+      linear-gradient(180deg, transparent, #fff 50%, transparent) 50% 50% / 2px
+        100% no-repeat;
+  }
+  .spark {
+    animation: twinkle 3s ease-in-out infinite;
+  }
+  @keyframes twinkle {
+    0%,
+    100% {
+      transform: scale(0) rotate(0);
+    }
+    50% {
+      transform: scale(1) rotate(45deg);
+    }
+  }
+
+  /* Fish are moved by script; they cruise, turn now and then, and dart away
+   from the cursor. The PNGs face right, so "back" mirrors them. */
+  .fish {
+    left: 0;
+    width: 96px;
+    transition: scale 0.25s cubic-bezier(0.2, 1.8, 0.4, 1);
+  }
+  .fish.lane {
+    z-index: 3;
+  }
+  .fish img {
+    width: 100%;
+    height: auto;
+    display: block;
+    animation: wobble 1.6s ease-in-out infinite alternate;
+    filter: drop-shadow(0 8px 6px rgba(0, 40, 100, 0.25));
+  }
+  .fish.back img {
+    transform: scaleX(-1);
+  }
+  .fish.startle {
+    scale: 1.15;
+  }
+  .fish.startle img {
+    animation-duration: 0.25s;
+  }
+  @keyframes wobble {
+    from {
+      translate: 0 -5px;
+    }
+    to {
+      translate: 0 5px;
+    }
+  }
+
+  .grass {
+    left: -2%;
+    right: -2%;
+    bottom: 0;
+    height: 250px;
+    width: 104%;
+    z-index: 3;
+    transform-origin: 50% 100%;
+    animation: grass 5s ease-in-out infinite alternate;
+  }
+  @keyframes grass {
+    from {
+      transform: skewX(-1.2deg);
+    }
+    to {
+      transform: skewX(1.2deg);
+    }
+  }
+  .clover {
+    bottom: -6px;
+    height: auto;
+    z-index: 3;
+    transform-origin: 50% 100%;
+    animation: breeze 4s ease-in-out infinite alternate;
+  }
+  @keyframes breeze {
+    from {
+      transform: rotate(-0.6deg);
+    }
+    to {
+      transform: rotate(0.8deg);
+    }
+  }
+
+  #fx {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 50;
+    overflow: hidden;
+  }
+  .trail {
+    position: absolute;
+    animation: trail 0.9s ease-out forwards;
+  }
+  @keyframes trail {
+    from {
+      transform: translate(-50%, -50%) scale(1);
+      opacity: 1;
+    }
+    to {
+      transform: translate(-50%, -50%) translate(var(--dx, 0), -46px) scale(0.3);
+      opacity: 0;
+    }
+  }
+  .trail.pop {
+    animation: pop 1.6s ease-out forwards;
+  }
+  @keyframes pop {
+    0% {
+      transform: translate(-50%, -50%) scale(0.2);
+      opacity: 0;
+    }
+    15% {
+      opacity: 1;
+    }
+    100% {
+      transform: translate(-50%, -50%) translate(var(--dx, 0), -170px) scale(1);
+      opacity: 0;
+    }
+  }
+
+  /* ================= Header (welcome) ================= */
+  .page {
+    position: relative;
+    z-index: 2;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  .banner {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    padding: 14px 12px 34px;
+    min-height: 200px;
+  }
+  .hero-text {
+    position: relative;
+    z-index: 1;
+    flex: 1 1 auto;
+    min-width: 0;
+    display: grid;
+    justify-items: start;
+    gap: 10px;
+    padding-right: 170px;
+  }
+  .hero-text p {
+    margin: 0;
+  }
+  .orb {
+    position: relative;
+    z-index: 1;
+    flex: 0 0 auto;
+    width: 108px;
+    height: 108px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: radial-gradient(
+      circle at 50% 100%,
+      rgba(190, 250, 255, 0.98) 0%,
+      rgba(60, 180, 240, 0.8) 45%,
+      rgba(10, 90, 190, 0.92) 100%
+    );
+    border: 2px solid rgba(255, 255, 255, 0.85);
+    box-shadow:
+      0 12px 24px rgba(0, 50, 110, 0.4),
+      inset 0 -10px 18px rgba(200, 255, 255, 0.75),
+      inset 0 4px 10px rgba(0, 40, 120, 0.4);
+    font: bold 38px var(--font-head);
+    color: #fff;
+    text-shadow: 0 2px 3px rgba(0, 50, 100, 0.7);
+  }
+  .orb::before {
+    content: "";
+    position: absolute;
+    z-index: 1;
+    top: 5%;
+    left: 15%;
+    right: 15%;
+    height: 45%;
+    border-radius: 50%;
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.95),
+      rgba(255, 255, 255, 0.05)
+    );
+  }
+  .orb::after {
+    content: "";
+    position: absolute;
+    inset: -8px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.7);
+    opacity: 0;
+    animation: ring 1.6s ease-out 0.5s 1 both;
+  }
+  @keyframes ring {
+    from {
+      transform: scale(0.9);
+      opacity: 0.9;
+    }
+    to {
+      transform: scale(1.35);
+      opacity: 0;
+    }
+  }
+  .orb span {
+    position: relative;
+    z-index: 2;
+  }
+  /* A photo fills the orb under a lighter gloss highlight. */
+  .orb:has(img)::before {
+    opacity: 0.55;
+  }
+  .orb img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+  .greet {
+    padding: 3px 14px;
+    border-radius: 14px;
+    font: bold 14px var(--font-head);
+    color: #fff;
+    text-shadow:
+      0 1px 1px rgba(10, 50, 0, 0.9),
+      0 0 2px rgba(10, 50, 0, 0.6);
+    border: 1px solid #1d5f08;
+    background: linear-gradient(
+      180deg,
+      var(--leaf-1) 0%,
+      #5cbf24 14%,
+      var(--leaf-2) 49%,
+      var(--leaf-3) 51%,
+      #2c840c 100%
+    );
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.9),
+      0 2px 4px rgba(0, 60, 0, 0.35);
+  }
+  .greet .wave {
+    display: inline-block;
+    transform-origin: 70% 80%;
+    animation: hand 1.8s ease-in-out 1.2s 1;
+  }
+  .greet:hover .wave {
+    animation: hand-again 1.2s ease-in-out;
+  }
+  @keyframes hand {
+    0%,
+    100% {
+      transform: rotate(0);
+    }
+    20% {
+      transform: rotate(18deg);
+    }
+    40% {
+      transform: rotate(-10deg);
+    }
+    60% {
+      transform: rotate(14deg);
+    }
+    80% {
+      transform: rotate(-4deg);
+    }
+  }
+  @keyframes hand-again {
+    0%,
+    100% {
+      transform: rotate(0);
+    }
+    20% {
+      transform: rotate(18deg);
+    }
+    40% {
+      transform: rotate(-10deg);
+    }
+    60% {
+      transform: rotate(14deg);
+    }
+    80% {
+      transform: rotate(-4deg);
+    }
+  }
+  .site-title {
+    position: relative;
+    margin: 0;
+    font: bold 42px/1.1 var(--font-head);
+    text-wrap: balance;
+    color: transparent;
+    -webkit-background-clip: text;
+    background-clip: text;
+    background-image:
+      linear-gradient(
+        110deg,
+        transparent 40%,
+        rgba(255, 255, 255, 0.95) 50%,
+        transparent 60%
+      ),
+      linear-gradient(
+        180deg,
+        #ffffff 0%,
+        #eaf8ff 48%,
+        #a9dcff 52%,
+        #ffffff 100%
+      );
+    background-size:
+      250% 100%,
+      100% 100%;
+    background-repeat: no-repeat;
+    background-position:
+      130% 0,
+      0 0;
+    filter: drop-shadow(0 0 1px rgba(0, 45, 110, 0.9))
+      drop-shadow(0 2px 2px rgba(0, 50, 120, 0.7))
+      drop-shadow(0 0 10px rgba(0, 60, 150, 0.4));
+    animation: shimmer 1.6s ease-in-out 0.9s 1 both;
+  }
+  @keyframes shimmer {
+    from {
+      background-position:
+        130% 0,
+        0 0;
+    }
+    to {
+      background-position:
+        -30% 0,
+        0 0;
+    }
+  }
+  .intro {
+    max-width: 34rem;
+    padding: 8px 14px;
+    border-radius: 12px;
+    color: var(--ink);
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.86),
+      rgba(225, 245, 255, 0.72)
+    );
+    border: 1px solid rgba(255, 255, 255, 0.95);
+    box-shadow:
+      0 6px 16px rgba(0, 50, 110, 0.25),
+      inset 0 1px 0 #fff;
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+  }
+  .tree {
+    position: absolute;
+    right: -14px;
+    bottom: 0;
+    width: 210px;
+    height: auto;
+    transform-origin: 50% 100%;
+    animation: breeze 6s ease-in-out infinite alternate;
+    filter: drop-shadow(0 4px 6px rgba(0, 60, 120, 0.25));
+  }
+
+  .reflection {
+    position: relative;
+    height: 140px;
+    overflow: hidden;
+    pointer-events: none;
+    opacity: 0.5;
+    -webkit-mask-image: linear-gradient(
+      180deg,
+      #000 0%,
+      rgba(0, 0, 0, 0.6) 40%,
+      transparent 100%
+    );
+    mask-image: linear-gradient(
+      180deg,
+      #000 0%,
+      rgba(0, 0, 0, 0.6) 40%,
+      transparent 100%
+    );
+  }
+  .reflection .banner {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    transform: scaleY(-1);
+    filter: url(#ripple);
+  }
+  .reflection .intro {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+  .reflection::after {
+    content: "";
+    position: absolute;
+    inset: -20px 0 0;
+    background: repeating-linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.22) 0 2px,
+      transparent 2px 10px
+    );
+    animation: lines 5s linear infinite;
+  }
+  @keyframes lines {
+    to {
+      transform: translateY(10px);
+    }
+  }
+
+  /* ================= Page frame ================= */
+  .frame {
+    position: relative;
+    border-radius: 12px;
+    padding-bottom: 100px;
+    border: 1px solid var(--rim);
+    background: linear-gradient(
+      180deg,
+      rgba(243, 251, 255, 0.95) 0%,
+      rgba(226, 245, 255, 0.93) 50%,
+      rgba(206, 236, 252, 0.92) 100%
+    );
+    box-shadow:
+      inset 0 0 0 1px rgba(255, 255, 255, 0.95),
+      inset 0 -10px 24px rgba(120, 200, 245, 0.3),
+      0 4px 0 rgba(0, 60, 120, 0.18),
+      0 18px 40px rgba(0, 40, 100, 0.4);
+    animation: drop-in 0.8s cubic-bezier(0.2, 1.4, 0.4, 1) both;
+  }
+  @keyframes drop-in {
+    from {
+      transform: translateY(-24px) scale(0.97);
+      opacity: 0;
+    }
+    to {
+      transform: none;
+      opacity: 1;
+    }
+  }
+
+  /* Cancels the root scroll padding so a tab switch scrolls the frame's top
+     edge to just under the safe area. */
+  .frame {
+    scroll-margin-top: -56px;
+  }
+
+  /* Tab strip sticks to the top of the window while the frame scrolls past.
+     Only the selected tab's panel is shown. */
+  .tabs {
+    position: sticky;
+    top: env(safe-area-inset-top, 0px);
+    z-index: 5;
+    display: flex;
+    gap: 4px;
+    padding: 10px 14px 0;
+    border-radius: 11px 11px 0 0;
+    border-bottom: 1px solid var(--rim);
+    background: linear-gradient(180deg, #dcf2fe 0%, #a6daf6 100%);
+    box-shadow: inset 0 1px 0 #fff;
+    transition:
+      border-radius 0.3s,
+      box-shadow 0.3s;
+  }
+  .tabs.stuck {
+    border-radius: 0 0 10px 10px;
+    box-shadow:
+      inset 0 1px 0 #fff,
+      0 6px 16px rgba(0, 40, 90, 0.35);
+  }
+  .tablist {
+    display: flex;
+    gap: 4px;
+    flex: 1 1 auto;
+    min-width: 0;
+    align-self: flex-end;
+  }
+
+  /* Notification area at the strip's right end, after the taskbar tray: a
+     sound toggle and a clock that opens a flyout with a large clock and the
+     last-updated date. */
+  .tray {
+    align-self: center;
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    padding: 2px;
+    border: 1px solid rgba(43, 132, 192, 0.55);
+    border-radius: 14px;
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.6),
+      rgba(166, 218, 246, 0.35)
+    );
+    box-shadow:
+      inset 0 1px 2px rgba(0, 40, 90, 0.25),
+      0 1px 0 rgba(255, 255, 255, 0.8);
+    font: bold 12px var(--font-head);
+    font-variant-numeric: tabular-nums;
+    color: #0b3a5c;
+    text-shadow: 0 1px 0 #fff;
+  }
+  .tray-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 26px;
+    padding: 1px 5px;
+    border: 0;
+    border-radius: 12px;
+    background: none;
+    font: inherit;
+    color: inherit;
+    text-shadow: inherit;
+    cursor: pointer;
+  }
+  .tray-btn.clock {
+    padding-right: 9px;
+  }
+  .tray-btn:hover {
+    background: linear-gradient(180deg, #ffffff, #c9efff);
+    box-shadow: inset 0 0 0 1px rgba(43, 132, 192, 0.45);
+  }
+  .tabs .tray-btn:focus-visible {
+    outline: 2px solid #082f55;
+    outline-offset: 0;
+    box-shadow: none;
+  }
+  .spk {
+    width: 20px;
+    height: 20px;
+    filter: drop-shadow(0 1px 1px rgba(0, 40, 90, 0.35));
+  }
+  #sound[aria-pressed="true"] .spk-off,
+  #sound[aria-pressed="false"] .spk-on {
+    display: none;
+  }
+  #sound[aria-pressed="true"] .spk-on path {
+    animation: spk-wave 0.9s ease-out 2;
+  }
+  #sound[aria-pressed="true"] .spk-on path + path {
+    animation-delay: 0.12s;
+  }
+  @keyframes spk-wave {
+    from {
+      opacity: 0.2;
+    }
+  }
+  .mini-clock {
+    width: 22px;
+    height: 22px;
+    filter: drop-shadow(0 1px 1px rgba(0, 40, 90, 0.35));
+  }
+  .sr {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  /* Clock flyout. Script sets top and left under the tray button. */
+  .flyout {
+    position: fixed;
+    inset: auto;
+    margin: 0;
+    width: 228px;
+    padding: 14px 14px 12px;
+    border: 1px solid #6eb2dc;
+    border-radius: 10px;
+    background: linear-gradient(180deg, #ffffff, #e3f4fd);
+    box-shadow:
+      0 12px 30px rgba(0, 20, 60, 0.45),
+      inset 0 1px 0 #fff;
+    color: var(--ink);
+    font: 12px/1.5 var(--font-text);
+    text-align: center;
+  }
+  .flyout:popover-open {
+    animation: tip-in 0.2s ease-out;
+  }
+  .flyout p {
+    margin: 0;
+  }
+  .big-clock {
+    display: block;
+    width: 132px;
+    height: 132px;
+    margin: 0 auto 8px;
+    filter: drop-shadow(0 4px 6px rgba(0, 40, 90, 0.3));
+  }
+  .fly-time {
+    font: bold 20px var(--font-head);
+    font-variant-numeric: tabular-nums;
+    color: #0a4a80;
+    text-shadow: 0 1px 0 #fff;
+  }
+  .fly-place,
+  .fly-upd {
+    font-size: 11px;
+    color: var(--ink-soft);
+  }
+  .flyout .fly-upd {
+    text-wrap: balance;
+    margin-top: 10px;
+    padding-top: 8px;
+    border-top: 1px dotted #8fc0dc;
+  }
+  .tab {
+    position: relative;
+    isolation: isolate;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: -1px;
+    padding: 6px 18px 7px 9px;
+    border: 1px solid #4d95c6;
+    border-bottom: 0;
+    border-radius: 9px 9px 0 0;
+    cursor: pointer;
+    font: bold 13px var(--font-head);
+    color: #0b3a5c;
+    text-shadow: 0 1px 0 #fff;
+    background: linear-gradient(
+      180deg,
+      #ffffff 0%,
+      #e4f5fe 45%,
+      #c3e6f9 50%,
+      #dbf1fd 100%
+    );
+    transition:
+      border-color 0.35s ease,
+      box-shadow 0.35s ease;
+  }
+  /* The selected-tab fill fades in instead of swapping gradients. */
+  .tab::after {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(180deg, #ffffff, #f3fbff);
+    opacity: 0;
+    transition: opacity 0.35s ease;
+  }
+  .tab:hover {
+    color: #0b3a5c;
+    background: linear-gradient(
+      180deg,
+      #f2fcff 0%,
+      #c9efff 45%,
+      #86d4f8 50%,
+      #b6e6fc 100%
+    );
+  }
+  /* The selected tab covers the strip's bottom rule so it joins the page. */
+  .tab[aria-selected="true"] {
+    z-index: 1;
+    border-color: var(--rim);
+    box-shadow: 0 1px 0 #f3fbff;
+  }
+  .tab[aria-selected="true"]::after {
+    opacity: 1;
+  }
+  /* An inset ring stays visible on the pale strip. */
+  .tabs .tab:focus-visible {
+    outline: 2px solid #082f55;
+    outline-offset: -5px;
+    box-shadow: none;
+  }
+  .tabs .tab[aria-selected="true"]:focus-visible {
+    box-shadow: 0 1px 0 #f3fbff;
+  }
+  .tico {
+    width: 20px;
+    height: 20px;
+    flex: 0 0 auto;
+    filter: drop-shadow(0 1px 1px rgba(0, 40, 90, 0.35));
+  }
+
+  /* minmax(0, 1fr) keeps the ticker's long chip row from widening the grid. */
+  .main {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+    min-width: 0;
+    padding: 16px;
+  }
+
+  .box {
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+    background: linear-gradient(180deg, #ffffff 0%, #f0faff 60%, #e2f4fd 100%);
+    border: 1px solid #6fb3de;
+    box-shadow:
+      inset 0 1px 0 #fff,
+      0 2px 4px rgba(0, 50, 100, 0.18);
+    /* The first panel drops in just after the frame. */
+    animation: drop-in 0.7s cubic-bezier(0.2, 1.5, 0.4, 1) 0.25s both;
+  }
+  /* Panels shown by a tab switch fade in quickly instead of dropping in. */
+  .box.switched {
+    animation: panel-in 0.3s ease-out both;
+  }
+  @keyframes panel-in {
+    from {
+      transform: translateY(6px);
+      opacity: 0;
+    }
+  }
+  .box:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 2px;
+    box-shadow: 0 0 0 4px #082f55;
+  }
+  .box-h {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 36px;
+    padding: 6px 10px;
+    margin: 0;
+    font: bold 14px/1.3 var(--font-head);
+    color: #fff;
+    text-shadow:
+      0 1px 1px rgba(0, 30, 70, 0.9),
+      0 0 3px rgba(0, 30, 70, 0.5);
+    background: linear-gradient(
+      180deg,
+      #7fd0f5 0%,
+      #3aa2dc 22%,
+      #1a86c8 49%,
+      #0b64a8 51%,
+      #0f70b3 80%,
+      #2088cc 100%
+    );
+    border-bottom: 1px solid #06508a;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.9),
+      inset 0 -1px 0 rgba(140, 220, 255, 0.6);
+  }
+  .box-h::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 35%;
+    background: linear-gradient(
+      100deg,
+      transparent,
+      rgba(255, 255, 255, 0.6),
+      transparent
+    );
+    transform: translateX(-120%);
+    pointer-events: none;
+  }
+  .box:hover .box-h::after {
+    animation: sweep 0.9s ease-out;
+  }
+  @keyframes sweep {
+    to {
+      transform: translateX(320%);
+    }
+  }
+  .box-b {
+    position: relative;
+    padding: 14px;
+  }
+  .box-b::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 50px;
+    background: radial-gradient(
+      ellipse 80% 100% at 50% -30%,
+      rgba(255, 255, 255, 0.95),
+      transparent 70%
+    );
+    pointer-events: none;
+  }
+  .box-b > :first-child {
+    margin-top: 0;
+  }
+  .box-b > :last-child {
+    margin-bottom: 0;
+  }
+
+  a {
+    color: var(--link);
+  }
+  a:hover {
+    color: #0a86d0;
+  }
+  a:focus-visible,
+  button:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 2px;
+    box-shadow: 0 0 0 4px #082f55;
+  }
+
+  .jelly {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    font-weight: bold;
+  }
+  .jelly:hover {
+    animation: jelly 0.55s ease;
+  }
+  @keyframes jelly {
+    0% {
+      transform: scale(1);
+    }
+    30% {
+      transform: scale(1.08, 0.92);
+    }
+    50% {
+      transform: scale(0.95, 1.05);
+    }
+    70% {
+      transform: scale(1.03, 0.97);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+  .mini {
+    overflow: hidden;
+  }
+  .mini::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 40%;
+    background: linear-gradient(
+      100deg,
+      transparent,
+      rgba(255, 255, 255, 0.75),
+      transparent
+    );
+    transform: translateX(-150%);
+  }
+  .mini:hover::after {
+    animation: shine 0.7s ease forwards;
+  }
+  @keyframes shine {
+    to {
+      transform: translateX(330%);
+    }
+  }
+  .btn {
+    justify-content: center;
+    padding: 9px 22px;
+    border-radius: 20px;
+    font: bold 14px var(--font-head);
+    color: #fff;
+    text-shadow:
+      0 1px 1px rgba(10, 50, 0, 0.9),
+      0 0 2px rgba(10, 50, 0, 0.6);
+    border: 1px solid #1d5f08;
+    background: linear-gradient(
+      180deg,
+      var(--leaf-1) 0%,
+      #5cbf24 14%,
+      var(--leaf-2) 49%,
+      var(--leaf-3) 51%,
+      #2c840c 85%,
+      #3f9e16 100%
+    );
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.9),
+      inset 0 -3px 6px rgba(190, 255, 120, 0.35),
+      0 3px 6px rgba(0, 60, 0, 0.4);
+  }
+  .btn::before {
+    content: "";
+    position: absolute;
+    inset: -5px;
+    border-radius: 24px;
+    box-shadow: 0 0 16px 4px rgba(190, 255, 120, 0.85);
+    opacity: 0;
+    animation: glow-pulse 2.4s ease-in-out 1.6s 3;
+    pointer-events: none;
+  }
+  @keyframes glow-pulse {
+    50% {
+      opacity: 1;
+    }
+  }
+  .btn:hover {
+    color: #fff;
+  }
+  .mini {
+    padding: 3px 12px;
+    border-radius: 11px;
+    font-size: 11px;
+    color: #fff;
+    text-shadow: 0 1px 1px rgba(0, 30, 70, 0.9);
+    border: 1px solid #06507d;
+    background: linear-gradient(
+      180deg,
+      #6fcdf3 0%,
+      #2393d3 30%,
+      #0f78bd 49%,
+      #08609f 51%,
+      #0c6fae 85%,
+      #2288c8 100%
+    );
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.8),
+      0 2px 3px rgba(0, 40, 90, 0.35);
+  }
+  .mini:hover {
+    color: #fff;
+  }
+
+  /* Contacts: a row of glossy app-style tiles in brand colours. */
+  .contact-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+  }
+  .contact-list a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 8px;
+    border-radius: 10px;
+    font-weight: bold;
+  }
+  .contact-list a:hover {
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.9),
+      rgba(190, 232, 252, 0.7)
+    );
+    box-shadow: inset 0 0 0 1px rgba(110, 190, 235, 0.7);
+  }
+  .tile {
+    position: relative;
+    flex: 0 0 auto;
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
+    background: linear-gradient(
+      180deg,
+      var(--c1) 0%,
+      var(--c2) 50%,
+      var(--c3) 100%
+    );
+    border: 1px solid var(--c3);
+    box-shadow:
+      0 2px 4px rgba(0, 40, 90, 0.35),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.35);
+  }
+  .tile::before {
+    content: "";
+    position: absolute;
+    top: 1px;
+    left: 2px;
+    right: 2px;
+    height: 48%;
+    border-radius: 8px 8px 50% 50% / 8px 8px 8px 8px;
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.8),
+      rgba(255, 255, 255, 0.1)
+    );
+  }
+  .tile svg {
+    position: relative;
+    width: 20px;
+    height: 20px;
+    fill: #fff;
+    filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.35));
+  }
+  .tile.c-email svg {
+    width: 26px;
+    height: 26px;
+    filter: drop-shadow(0 1px 1px rgba(0, 40, 90, 0.4));
+  }
+  .contact-list a:hover .tile {
+    animation: jelly 0.55s ease;
+  }
+  .c-email {
+    --c1: #c9f3ff;
+    --c2: #4fc1f0;
+    --c3: #0d6fb2;
+  }
+  .c-github {
+    --c1: #8f9aa6;
+    --c2: #3a434d;
+    --c3: #15191e;
+  }
+  .c-linkedin {
+    --c1: #6fb6f2;
+    --c2: #0a66c2;
+    --c3: #064a8f;
+  }
+  .c-discord {
+    --c1: #a9b2ff;
+    --c2: #5865f2;
+    --c3: #343fbf;
+  }
+
+  /* 88x31 badges in a pixel font, a fixture of 2000s personal sites. */
+  /* Toolbox ticker: a dark glass media bar. Every technology rides past as a
+     chip, slowing to a stop under the pointer or keyboard focus; a chip
+     spotlights the entries that use it. Reduced motion shows a still list. */
+  .ticker {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    height: 50px;
+    padding: 0 6px;
+    border: 1px solid #041a30;
+    border-radius: 25px;
+    background: linear-gradient(
+      180deg,
+      #2d71ad 0%,
+      #14508a 47%,
+      #072b4f 50%,
+      #0a3a68 100%
+    );
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.5),
+      inset 0 -3px 8px rgba(80, 190, 255, 0.35),
+      0 3px 8px rgba(0, 40, 90, 0.35);
+  }
+  /* Its own strip between the reflection and the tab window. */
+  .page > .ticker {
+    margin-bottom: 18px;
+    animation: drop-in 0.8s cubic-bezier(0.2, 1.4, 0.4, 1) 0.1s both;
+  }
+  .ticker::before {
+    content: "";
+    position: absolute;
+    top: 1px;
+    left: 18px;
+    right: 18px;
+    height: 46%;
+    border-radius: 24px 24px 50% 50% / 24px 24px 8px 8px;
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.32),
+      rgba(255, 255, 255, 0.04)
+    );
+    pointer-events: none;
+  }
+  .tk-play {
+    position: relative;
+    flex: 0 0 auto;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    border: 1px solid #031b33;
+    background: radial-gradient(
+      circle at 50% 120%,
+      #a8f5ff 0%,
+      #2aa6e8 40%,
+      #0b5d9e 75%,
+      #06386a 100%
+    );
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.6),
+      0 0 10px rgba(80, 200, 255, 0.55);
+  }
+  .tk-play::before {
+    content: "";
+    position: absolute;
+    top: 2px;
+    left: 6px;
+    right: 6px;
+    height: 46%;
+    border-radius: 50%;
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.85),
+      rgba(255, 255, 255, 0.08)
+    );
+  }
+  .tk-play svg {
+    position: relative;
+    width: 16px;
+    height: 16px;
+    fill: #fff;
+    filter: drop-shadow(0 1px 1px rgba(0, 30, 70, 0.8));
+  }
+  .tk-play:hover {
+    filter: brightness(1.15);
+  }
+  .tk-play[aria-pressed="true"] .ic-pause,
+  .tk-play[aria-pressed="false"] .ic-play {
+    display: none;
+  }
+  /* An LCD window for the label. */
+  .tk-label {
+    flex: 0 0 auto;
+    margin: 0;
+    padding: 4px 8px 3px;
+    border-radius: 6px;
+    background: linear-gradient(180deg, #021226, #06213d);
+    box-shadow:
+      inset 0 1px 3px rgba(0, 0, 0, 0.7),
+      0 1px 0 rgba(255, 255, 255, 0.18);
+    font: 9px/1.2 var(--font-pixel);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    color: #9ff3ff;
+    text-shadow: 0 0 6px rgba(80, 220, 255, 0.9);
+  }
+  .tk-view {
+    position: relative;
+    flex: 1 1 auto;
+    min-width: 0;
+    align-self: stretch;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(
+      90deg,
+      transparent,
+      #000 28px,
+      #000 calc(100% - 28px),
+      transparent
+    );
+    mask-image: linear-gradient(
+      90deg,
+      transparent,
+      #000 28px,
+      #000 calc(100% - 28px),
+      transparent
+    );
+  }
+  .tk-track {
+    display: flex;
+    gap: 8px;
+    margin: 0;
+    padding: 0 20px;
+    list-style: none;
+    will-change: transform;
+  }
+  .tk-track .chip {
+    flex: 0 0 auto;
+  }
+  .chip {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 5px 4px 7px;
+    border: 1px solid rgba(255, 255, 255, 0.55);
+    border-radius: 14px;
+    background: linear-gradient(
+      180deg,
+      #ffffff 0%,
+      #e3f4fd 49%,
+      #c6e7f9 51%,
+      #e8f7ff 100%
+    );
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
+    font: bold 12px var(--font-head);
+    color: #0b3a5c;
+    text-shadow: 0 1px 0 #fff;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+  .chip:hover {
+    background: linear-gradient(
+      180deg,
+      #f2fcff 0%,
+      #c9efff 49%,
+      #86d4f8 51%,
+      #b6e6fc 100%
+    );
+  }
+  .chip .dot {
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: radial-gradient(
+      circle at 35% 30%,
+      #fff 0 14%,
+      hsl(var(--h) 85% 62%) 42%,
+      hsl(var(--h) 80% 30%) 100%
+    );
+    box-shadow: 0 0 0 1px rgba(0, 30, 70, 0.25);
+  }
+  .chip b {
+    min-width: 18px;
+    padding: 1px 5px;
+    border-radius: 9px;
+    background: linear-gradient(180deg, #3aa2dc, #0b5d9e);
+    font-size: 10px;
+    color: #fff;
+    text-shadow: 0 1px 0 rgba(0, 30, 70, 0.8);
+    text-align: center;
+  }
+  .ticker.static {
+    height: auto;
+    padding: 8px;
+    border-radius: 16px;
+  }
+  .ticker.static .tk-play {
+    display: none;
+  }
+  .ticker.static .tk-view {
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+  .ticker.static .tk-track {
+    flex-wrap: wrap;
+    padding: 0;
+  }
+
+  .badges {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    margin: 2px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .b88 {
+    position: relative;
+    width: 88px;
+    height: 31px;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    border: 1px solid #000;
+    text-align: center;
+    font: 8px/1.15 var(--font-pixel);
+    text-transform: uppercase;
+    color: #fff;
+    text-shadow: 1px 1px 0 #000;
+    box-shadow:
+      inset 1px 1px 0 rgba(255, 255, 255, 0.55),
+      inset -1px -1px 0 rgba(0, 0, 0, 0.35),
+      0 2px 3px rgba(0, 40, 90, 0.3);
+    transition: transform 0.2s cubic-bezier(0.2, 1.8, 0.4, 1);
+  }
+  .b88::after {
+    content: "";
+    position: absolute;
+    inset: 0 0 50%;
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.35),
+      rgba(255, 255, 255, 0.08)
+    );
+    pointer-events: none;
+  }
+  .b88 span {
+    position: relative;
+    white-space: nowrap;
+  }
+  .b88 b {
+    display: block;
+    font-size: 9px;
+    font-weight: normal;
+  }
+  .b88:hover {
+    transform: translateY(-2px);
+  }
+  .b-astro {
+    background: linear-gradient(135deg, #ff6a3d 0 18%, #7b3fe4 18% 100%);
+  }
+  .b-tailwind {
+    background: linear-gradient(180deg, #4fd2ff, #0e7aa8);
+  }
+  .b-view {
+    background: linear-gradient(180deg, #f4f8fb, #a9b8c6);
+    color: #10324f;
+    text-shadow: 1px 1px 0 #fff;
+  }
+  .b-pr {
+    background: linear-gradient(
+      180deg,
+      #e0302a 0 20%,
+      #f5f5f5 20% 40%,
+      #e0302a 40% 60%,
+      #f5f5f5 60% 80%,
+      #e0302a 80%
+    );
+  }
+  .b-pr::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 20px;
+    background: #1f5fc4;
+    clip-path: polygon(0 0, 100% 50%, 0 100%);
+  }
+  .b-pr span {
+    margin-left: 10px;
+    padding: 1px 4px;
+    background: rgba(10, 25, 70, 0.62);
+  }
+  .b-pr b {
+    font-size: 8px;
+  }
+  .b-aero {
+    background: linear-gradient(
+      180deg,
+      #b8f07a 0%,
+      #3f9e16 50%,
+      #1a86c8 51%,
+      #0b64a8 100%
+    );
+  }
+
+  /* Entries: thumbnail column + text column; a gap keeps hover highlights apart. */
+  .entry {
+    position: relative;
+    padding: 12px 10px;
+    margin: 0 -8px;
+    border-radius: 8px;
+    transition:
+      background 0.25s,
+      box-shadow 0.25s;
+    display: grid;
+    grid-template-columns: 164px minmax(0, 1fr);
+    gap: 0 16px;
+    align-items: start;
+  }
+  .entry + .entry {
+    margin-top: 14px;
+  }
+  .entry + .entry::before {
+    content: "";
+    position: absolute;
+    left: 10px;
+    right: 10px;
+    top: -8px;
+    border-top: 1px dotted #8fc0dc;
+  }
+  .entry.exp {
+    display: block;
+  }
+  /* Spotlight from a toolbox chip: a glow that pulses twice. */
+  .entry.spot {
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.92),
+      rgba(190, 240, 255, 0.7)
+    );
+    box-shadow:
+      inset 0 0 0 2px #2bb3f0,
+      0 0 16px rgba(43, 179, 240, 0.6);
+    animation: spot 0.65s ease-in-out 4 alternate;
+  }
+  @keyframes spot {
+    from {
+      box-shadow:
+        inset 0 0 0 2px #2bb3f0,
+        0 0 4px rgba(43, 179, 240, 0.2);
+    }
+  }
+  .entry:hover {
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.8),
+      rgba(200, 238, 255, 0.55)
+    );
+    box-shadow: inset 0 0 0 1px rgba(110, 190, 235, 0.6);
+  }
+  .entry-body {
+    min-width: 0;
+  }
+  .entry-body > :last-child {
+    margin-bottom: 0;
+  }
+  .entry h3 {
+    margin: 0 0 4px;
+    font: bold 16px var(--font-head);
+    color: #0a4a80;
+    text-shadow: 0 1px 0 #fff;
+  }
+  .entry p {
+    margin: 0 0 6px;
+  }
+  .entry.exp > :last-child {
+    margin-bottom: 0;
+  }
+  .meta,
+  .tech {
+    color: var(--ink-soft);
+    font-size: 11px;
+  }
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  ul.acc {
+    margin: 4px 0 6px;
+    padding-left: 18px;
+  }
+  .thumb {
+    position: relative;
+    display: block;
+    margin-top: 2px;
+    padding: 4px;
+    border-radius: 6px;
+    background: linear-gradient(180deg, #fff, #e3f4fd);
+    border: 1px solid #6eb2dc;
+    box-shadow: 0 4px 10px rgba(0, 50, 100, 0.3);
+    transition: transform 0.3s cubic-bezier(0.2, 1.6, 0.4, 1);
+  }
+  .thumb::after {
+    content: "";
+    position: absolute;
+    inset: 4px 4px 50%;
+    border-radius: 4px 4px 40% 40% / 4px 4px 12px 12px;
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.45),
+      rgba(255, 255, 255, 0)
+    );
+    pointer-events: none;
+  }
+  .thumb img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 3px;
+  }
+  a.thumb {
+    cursor: zoom-in;
+  }
+  a.thumb::before {
+    content: "+";
+    position: absolute;
+    z-index: 1;
+    right: -6px;
+    bottom: -6px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    font:
+      bold 16px/1 Verdana,
+      "DejaVu Sans",
+      sans-serif;
+    color: #fff;
+    text-shadow: 0 1px 1px rgba(0, 30, 70, 0.9);
+    background: radial-gradient(
+      circle at 50% 115%,
+      #9ff3ff 0%,
+      #2393d3 55%,
+      #08609f 100%
+    );
+    border: 1px solid #06507d;
+    box-shadow: 0 2px 4px rgba(0, 40, 90, 0.4);
+    opacity: 0;
+    transform: scale(0.6);
+    transition:
+      opacity 0.2s,
+      transform 0.25s cubic-bezier(0.2, 1.6, 0.4, 1);
+  }
+  a.thumb:hover::before,
+  a.thumb:focus-visible::before {
+    opacity: 1;
+    transform: none;
+  }
+  .entry:hover .thumb {
+    transform: scale(1.05) rotate(-1.5deg);
+  }
+  .thumb.placeholder {
+    aspect-ratio: 16 / 10;
+  }
+  .thumb.placeholder svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: 3px;
+  }
+
+  .lightbox {
+    padding: 10px;
+    border: 1px solid #6eb2dc;
+    border-radius: 10px;
+    overflow: visible;
+    max-width: min(92vw, 900px);
+    background: linear-gradient(180deg, #ffffff, #e3f4fd);
+    box-shadow: 0 20px 60px rgba(0, 20, 60, 0.6);
+    color: var(--ink);
+    font-family: var(--font-text);
+  }
+  .lightbox[open] {
+    animation: lb-in 0.4s cubic-bezier(0.2, 1.4, 0.4, 1);
+  }
+  .lightbox::backdrop {
+    background: rgba(0, 20, 50, 0.72);
+  }
+  @keyframes lb-in {
+    from {
+      transform: scale(0.85);
+      opacity: 0;
+    }
+  }
+  .lightbox img {
+    display: block;
+    max-width: 100%;
+    max-height: 74vh;
+    width: auto;
+    height: auto;
+    margin: 0 auto;
+    border-radius: 4px;
+    border: 1px solid #9cc6de;
+  }
+  .lightbox p {
+    margin: 8px 2px 0;
+    font: bold 14px var(--font-head);
+    color: #0a4a80;
+  }
+  .lightbox form {
+    margin: 0;
+  }
+  .lb-close {
+    position: absolute;
+    top: -14px;
+    right: -14px;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    font:
+      bold 16px/1 Verdana,
+      "DejaVu Sans",
+      sans-serif;
+    color: #fff;
+    text-shadow: 0 1px 1px rgba(80, 0, 0, 0.8);
+    border: 1px solid #7a0d0d;
+    background: radial-gradient(
+      circle at 50% 115%,
+      #ffb3a3 0%,
+      #e0402a 55%,
+      #9a1408 100%
+    );
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.7),
+      0 3px 6px rgba(0, 0, 0, 0.4);
+  }
+  .lb-close:hover {
+    filter: brightness(1.12);
+  }
+
+  /* XP-style balloon tip for link destinations. Script places it above or
+     below the link and sets --tail to aim the tail at the link's centre. */
+  .balloon {
+    position: fixed;
+    z-index: 60;
+    max-width: min(300px, calc(100vw - 24px));
+    padding: 6px 10px 7px 30px;
+    border: 1px solid #1d1d1d;
+    border-radius: 8px;
+    background: #ffffe1;
+    color: #000;
+    font:
+      11px/1.4 Tahoma,
+      Verdana,
+      "DejaVu Sans",
+      sans-serif;
+    overflow-wrap: anywhere;
+    box-shadow: 3px 3px 4px rgba(0, 0, 0, 0.3);
+    animation: tip-in 0.15s ease-out;
+  }
+  @keyframes tip-in {
+    from {
+      opacity: 0;
+    }
+  }
+  .balloon b,
+  .balloon span {
+    display: block;
+  }
+  .balloon span[hidden] {
+    display: none;
+  }
+  .bl-i {
+    position: absolute;
+    top: 6px;
+    left: 8px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    font:
+      bold italic 11px/1 Georgia,
+      "DejaVu Serif",
+      serif;
+    color: #fff;
+    background: radial-gradient(
+      circle at 50% 115%,
+      #9ff3ff 0%,
+      #2393d3 55%,
+      #08609f 100%
+    );
+    border: 1px solid #06507d;
+  }
+  /* Two stacked triangles: the dark one draws the outline, the pale one
+     covers the balloon's border where the tail joins it. */
+  .balloon::before,
+  .balloon::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: var(--tail, 24px);
+    width: 16px;
+    height: 12px;
+    background: #1d1d1d;
+    clip-path: polygon(0 0, 100% 0, 0 100%);
+  }
+  .balloon::after {
+    left: calc(var(--tail, 24px) + 1px);
+    width: 13px;
+    height: 10px;
+    background: #ffffe1;
+  }
+  .balloon.below::before,
+  .balloon.below::after {
+    top: auto;
+    bottom: 100%;
+    clip-path: polygon(0 0, 0 100%, 100% 100%);
+  }
+
+  @media (max-width: 860px) {
+    .bubcol {
+      left: auto;
+      right: 0;
+    }
+  }
+  @media (max-width: 640px) {
+    .banner {
+      gap: 14px;
+      align-items: flex-start;
+      padding: 6px 2px 30px;
+    }
+    .orb {
+      width: 64px;
+      height: 64px;
+      font-size: 22px;
+    }
+    .site-title {
+      font-size: 30px;
+    }
+    .hero-text {
+      padding-right: 0;
+    }
+    .tree {
+      display: none;
+    }
+    .reflection {
+      height: 96px;
+    }
+    .tabs {
+      padding: 8px 8px 0;
+    }
+    .tablist {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    /* Narrow screens show only the mini clock; the time stays readable to
+       screen readers. */
+    .tray-btn.clock {
+      padding-right: 5px;
+    }
+    .tk-label {
+      display: none;
+    }
+    .tray-t {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
+    .tab {
+      justify-content: center;
+      padding-inline: 4px;
+      font-size: 12px;
+    }
+    .tico {
+      display: none;
+    }
+    .main {
+      padding: 10px;
+    }
+    .contact-list {
+      grid-template-columns: 1fr 1fr;
+    }
+    .entry {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 10px;
+    }
+    .thumb img {
+      height: 140px;
+      object-fit: cover;
+      object-position: top;
+    }
+    .thumb.placeholder {
+      aspect-ratio: auto;
+      height: 150px;
+    }
+    .flare.h1,
+    .flare.h2 {
+      display: none;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation: none !important;
+      transition: none !important;
+    }
+    .bubbles,
+    .bubcol,
+    #sparks,
+    #fx,
+    .fish {
+      display: none !important;
+    }
+    .orb::after {
+      display: none;
+    }
+  }
+</style>
+
+<svg width="0" height="0" style="position: absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="rib" x1="0" x2="1">
+      <stop offset="0" stop-color="#fff" stop-opacity="0" />
+      <stop offset=".45" stop-color="#fff" stop-opacity=".9" />
+      <stop offset="1" stop-color="#fff" stop-opacity="0" />
+    </linearGradient>
+    <linearGradient id="rib-g" x1="0" x2="1">
+      <stop offset="0" stop-color="#c8ff8a" stop-opacity="0" />
+      <stop offset=".55" stop-color="#d8ffa8" stop-opacity=".8" />
+      <stop offset="1" stop-color="#fff" stop-opacity="0" />
+    </linearGradient>
+    <filter id="soft"><feGaussianBlur stdDeviation="7" /></filter>
+    <filter id="ripple" x="-5%" y="-5%" width="110%" height="110%">
+      <feTurbulence
+        type="fractalNoise"
+        baseFrequency="0.004 0.09"
+        numOctaves="2"
+        seed="4"
+        result="noise"
+      />
+      <feDisplacementMap
+        in="SourceGraphic"
+        in2="noise"
+        scale="14"
+        xChannelSelector="R"
+        yChannelSelector="G"
+      />
+    </filter>
+    <!-- Clock: brushed rim, pale glass face, top gloss. -->
+    <linearGradient id="ck-rim" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff" />
+      <stop offset=".45" stop-color="#b9cfe0" />
+      <stop offset=".55" stop-color="#7f9db6" />
+      <stop offset="1" stop-color="#d7e6f2" />
+    </linearGradient>
+    <radialGradient id="ck-face" cx=".5" cy=".6" r=".6">
+      <stop offset="0" stop-color="#ffffff" />
+      <stop offset=".75" stop-color="#eef7fd" />
+      <stop offset="1" stop-color="#bcdcf2" />
+    </radialGradient>
+    <linearGradient id="ck-gloss" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fff" stop-opacity=".85" />
+      <stop offset="1" stop-color="#fff" stop-opacity="0" />
+    </linearGradient>
+    <!-- Full-colour glossy icons. -->
+    <linearGradient id="gf-back" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f9c843" />
+      <stop offset="1" stop-color="#d9940c" />
+    </linearGradient>
+    <linearGradient id="gf-front" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffe993" />
+      <stop offset=".5" stop-color="#fbc93c" />
+      <stop offset="1" stop-color="#e49d0c" />
+    </linearGradient>
+    <linearGradient id="gb-body" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#d08e52" />
+      <stop offset=".55" stop-color="#a5622c" />
+      <stop offset="1" stop-color="#7a4318" />
+    </linearGradient>
+    <linearGradient id="gb-clasp" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fff6b0" />
+      <stop offset="1" stop-color="#d4a40c" />
+    </linearGradient>
+    <linearGradient id="ge-paper" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff" />
+      <stop offset="1" stop-color="#d9e6f1" />
+    </linearGradient>
+    <symbol id="i-folder" viewBox="0 0 32 32">
+      <path
+        d="M2.5 9.5a2 2 0 0 1 2-2h7.2l2.6 2.6h13.2a2 2 0 0 1 2 2V25a2 2 0 0 1-2 2H4.5a2 2 0 0 1-2-2z"
+        fill="url(#gf-back)"
+        stroke="#a86b00"
+        stroke-width=".8"
+      />
+      <rect
+        x="5.5"
+        y="11"
+        width="21"
+        height="10"
+        rx="1"
+        fill="#fff"
+        stroke="#9fb6c8"
+        stroke-width=".6"
+      />
+      <path d="M7.5 13.5h14M7.5 16h11" stroke="#7fb6e0" stroke-width="1" />
+      <path
+        d="M2.5 15a2 2 0 0 1 2-2h23a2 2 0 0 1 2 2V25a2 2 0 0 1-2 2H4.5a2 2 0 0 1-2-2z"
+        fill="url(#gf-front)"
+        stroke="#a86b00"
+        stroke-width=".8"
+      />
+      <path
+        d="M3.5 15.2a1.6 1.6 0 0 1 1.6-1.4h21.8a1.6 1.6 0 0 1 1.6 1.4V19.5H3.5z"
+        fill="#fff"
+        opacity=".45"
+      />
+    </symbol>
+    <symbol id="i-briefcase" viewBox="0 0 32 32">
+      <rect
+        x="11"
+        y="4.5"
+        width="10"
+        height="5.5"
+        rx="2"
+        fill="none"
+        stroke="#5a3210"
+        stroke-width="2.2"
+      />
+      <rect
+        x="2.5"
+        y="8.5"
+        width="27"
+        height="19"
+        rx="3"
+        fill="url(#gb-body)"
+        stroke="#5a3210"
+        stroke-width=".9"
+      />
+      <path d="M2.5 15.5h27" stroke="#5a3210" stroke-width="1" opacity=".55" />
+      <rect
+        x="13.5"
+        y="13.2"
+        width="5"
+        height="4.6"
+        rx="1"
+        fill="url(#gb-clasp)"
+        stroke="#8a6a10"
+        stroke-width=".6"
+      />
+      <path
+        d="M3.5 11.5a2.5 2.5 0 0 1 2.5-2h20a2.5 2.5 0 0 1 2.5 2V14.5h-25z"
+        fill="#fff"
+        opacity=".35"
+      />
+    </symbol>
+    <symbol id="i-envelope" viewBox="0 0 32 32">
+      <rect
+        x="2.5"
+        y="7"
+        width="27"
+        height="19"
+        rx="2"
+        fill="url(#ge-paper)"
+        stroke="#6f86a0"
+        stroke-width=".8"
+      />
+      <path
+        d="M3 25.5l10-8.5M29 25.5l-10-8.5"
+        stroke="#b5c6d6"
+        stroke-width="1"
+      />
+      <path
+        d="M3 8l13 10 13-10"
+        fill="none"
+        stroke="#7d97b0"
+        stroke-width="1.3"
+      />
+      <rect
+        x="22"
+        y="9.5"
+        width="5"
+        height="5.5"
+        fill="#e0402a"
+        stroke="#fff"
+        stroke-width=".8"
+      />
+      <path d="M3 8h26v5.5H3z" fill="#fff" opacity=".35" />
+    </symbol>
+    <!-- Brand glyphs from Simple Icons (CC0); LinkedIn reduced to its letters. -->
+    <symbol id="i-github" viewBox="0 0 24 24">
+      <path
+        d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.070 3.633 17.700 3.633 17.700c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.220 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"
+      />
+    </symbol>
+    <symbol id="i-linkedin" viewBox="2 2 20 20">
+      <path
+        d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.850 3.601 0 4.267 2.370 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452z"
+      />
+    </symbol>
+    <symbol id="i-discord" viewBox="0 0 24 24">
+      <path
+        d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z"
+      />
+    </symbol>
+  </defs>
+</svg>
+
+<div id="site">
+  <svg
+    class="scene ribbons sky"
+    viewBox="0 0 1200 240"
+    preserveAspectRatio="none"
+    aria-hidden="true"
+  >
+    <g>
+      <path
+        d="M-50 210 C 250 120, 500 230, 800 140 S 1150 60, 1260 110"
+        stroke="url(#rib)"
+        stroke-width="46"
+        fill="none"
+        filter="url(#soft)"
+        opacity=".45"
+      />
+      <path
+        d="M-50 205 C 250 115, 500 225, 800 135 S 1150 55, 1260 105"
+        stroke="url(#rib)"
+        stroke-width="2"
+        fill="none"
+        opacity=".9"
+      />
+    </g>
+    <g>
+      <path
+        d="M-50 160 C 300 230, 600 90, 900 170 S 1150 200, 1260 150"
+        stroke="url(#rib-g)"
+        stroke-width="30"
+        fill="none"
+        filter="url(#soft)"
+        opacity=".35"
+      />
+      <path
+        d="M-50 165 C 300 235, 600 95, 900 175 S 1150 205, 1260 155"
+        stroke="url(#rib)"
+        stroke-width="1.5"
+        fill="none"
+        opacity=".8"
+      />
+    </g>
+  </svg>
+  <div class="scene sun" aria-hidden="true"></div>
+  <div class="scene flare halo" aria-hidden="true"></div>
+  <div class="scene flare hex h1" aria-hidden="true"></div>
+  <div class="scene flare hex h2" aria-hidden="true"></div>
+  <img class="scene cloud c1" src="scene/clouds.png" alt="" />
+  <img class="scene cloud c2" src="scene/clouds.png" alt="" />
+  <img class="scene cloud c3" src="scene/clouds.png" alt="" />
+  <img class="scene cloud c4" src="scene/clouds.png" alt="" />
+  <div class="scene shafts" aria-hidden="true"></div>
+  <div class="scene caustics" aria-hidden="true"></div>
+  <svg
+    class="scene ribbons sea"
+    viewBox="0 0 1200 700"
+    preserveAspectRatio="none"
+    aria-hidden="true"
+  >
+    <g>
+      <path
+        d="M-50 120 C 300 20, 600 260, 900 160 S 1150 80, 1260 140"
+        stroke="url(#rib)"
+        stroke-width="60"
+        fill="none"
+        filter="url(#soft)"
+        opacity=".3"
+      />
+      <path
+        d="M-50 125 C 300 25, 600 265, 900 165 S 1150 85, 1260 145"
+        stroke="url(#rib)"
+        stroke-width="2"
+        fill="none"
+        opacity=".7"
+      />
+    </g>
+    <g>
+      <path
+        d="M-50 520 C 250 420, 650 640, 950 480 S 1180 420, 1260 470"
+        stroke="url(#rib-g)"
+        stroke-width="40"
+        fill="none"
+        filter="url(#soft)"
+        opacity=".3"
+      />
+      <path
+        d="M-50 525 C 250 425, 650 645, 950 485 S 1180 425, 1260 475"
+        stroke="url(#rib)"
+        stroke-width="1.5"
+        fill="none"
+        opacity=".7"
+      />
+    </g>
+  </svg>
+  <div class="scene bubbles" id="bubbles" aria-hidden="true"></div>
+  <div class="scene" id="sparks" style="inset: 0" aria-hidden="true"></div>
+  <!-- data-y: depth below the waterline. Lane fish swim in the open water above the frame. -->
+  <div
+    class="scene fish lane"
+    data-y="26"
+    data-speed="55"
+    style="width: 76px"
+    aria-hidden="true"
+  >
+    <img src="scene/fish-kleinii.png" alt="" />
+  </div>
+  <div
+    class="scene fish lane"
+    data-y="72"
+    data-speed="70"
+    style="width: 58px"
+    aria-hidden="true"
+  >
+    <img src="scene/fish-nigripes.png" alt="" />
+  </div>
+  <div
+    class="scene fish"
+    data-y="520"
+    data-speed="45"
+    style="width: 72px"
+    aria-hidden="true"
+  >
+    <img src="scene/fish-sebae.png" alt="" />
+  </div>
+  <div
+    class="scene fish"
+    data-y="980"
+    data-speed="35"
+    style="width: 110px"
+    aria-hidden="true"
+  >
+    <img src="scene/fish-imperator.png" alt="" />
+  </div>
+  <div class="scene bubcol" id="bubcol" aria-hidden="true"></div>
+  <canvas class="scene grass" id="grass" aria-hidden="true"></canvas>
+  <img
+    class="scene clover"
+    src="scene/clover.png"
+    alt=""
+    style="left: 6%; width: 70px"
+  />
+  <img
+    class="scene clover"
+    src="scene/clover.png"
+    alt=""
+    style="left: 24%; width: 52px; animation-delay: -1.5s"
+  />
+  <img
+    class="scene clover"
+    src="scene/clover.png"
+    alt=""
+    style="right: 9%; width: 64px; animation-delay: -2.5s"
+  />
+  <img
+    class="scene clover"
+    src="scene/clover.png"
+    alt=""
+    style="right: 34%; width: 46px; animation-delay: -0.8s"
+  />
+  <div class="scene meniscus" aria-hidden="true">
+    <svg class="hi" viewBox="0 0 2880 16" preserveAspectRatio="none">
+      <path
+        fill="rgba(255,255,255,.85)"
+        d="M0 9 Q90 2 180 9 T360 9 T540 9 T720 9 T900 9 T1080 9 T1260 9 T1440 9 T1620 9 T1800 9 T1980 9 T2160 9 T2340 9 T2520 9 T2700 9 T2880 9 V16 H0Z"
+      />
+    </svg>
+    <svg class="lo" viewBox="0 0 2880 14" preserveAspectRatio="none">
+      <path
+        fill="rgba(20, 100, 175, .35)"
+        d="M0 7 Q120 13 240 7 T480 7 T720 7 T960 7 T1200 7 T1440 7 T1680 7 T1920 7 T2160 7 T2400 7 T2640 7 T2880 7 V0 H0Z"
+      />
+    </svg>
+    <i class="drop" style="left: 12%; width: 9px; height: 9px"></i
+    ><i class="drop" style="left: 31%; width: 6px; height: 6px; top: 27px"></i>
+    <i class="drop" style="left: 57%; width: 11px; height: 11px; top: 22px"></i
+    ><i class="drop" style="left: 83%; width: 7px; height: 7px"></i>
+  </div>
+
+  <div class="page" id="page"></div>
+</div>
+<div id="fx" aria-hidden="true"></div>
+
+<div class="flyout" id="clock-flyout" popover aria-label="Clock">
+  <div class="fly-clock"></div>
+  <p class="fly-time"></p>
+  <p class="fly-date"></p>
+  <p class="fly-place"></p>
+  <p class="fly-upd"></p>
+</div>
+
+<div class="balloon" id="balloon" role="tooltip" hidden>
+  <i class="bl-i" aria-hidden="true">i</i><b></b><span></span>
+</div>
+
+<dialog class="lightbox" id="lightbox" aria-labelledby="lb-cap">
+  <form method="dialog">
+    <button class="lb-close" aria-label="Close">✕</button>
+  </form>
+  <img id="lb-img" src="" alt="" />
+  <p id="lb-cap"></p>
+</dialog>
+
+<script>
+  // Content copied from src/content (order from index.yaml).
+  const info = {
+    pageTitle: "Edyan Cruz",
+    greeting: "Hi 👋",
+    title: "I'm Edyan Antonio Cruz",
+    introduction:
+      "I'm a 4th-year Computer Science student at the University of Puerto Rico Mayagüez, with a passion for user-facing software development and robotics.",
+    resume:
+      "https://drive.google.com/file/d/1zN4vLOaH-EQquWTEVSJRbRAEb7-VgGHk/view?usp=sharing",
+    // Header orb: a photo path for avatar replaces the monogram.
+    monogram: "EC",
+    avatar: "",
+    // Clock gadget: time zone, place name, and the last-updated date. The live
+    // site would stamp the date at build time.
+    timeZone: "America/Puerto_Rico",
+    clockPlace: "Puerto Rico",
+    toolboxTitle: "Toolbox",
+    updated: "2026-11-16",
+    contactsTitle: "Get in Touch",
+    projectsTitle: "My Projects",
+    experiencesTitle: "My Experiences",
+    contacts: [
+      { name: "Email", url: "mailto:edyancruz@outlook.com" },
+      { name: "GitHub", url: "https://github.com/juandelpueblo" },
+      { name: "LinkedIn", url: "https://linkedin.com/in/edyancruz" },
+      { name: "Discord", url: "https://discord.com/users/271392262510870528" },
+    ],
+  };
+  const projects = [
+    {
+      title: "nvsleepify",
+      technologies: ["Rust", "Linux"],
+      image: "images/nvsleepify.png",
+      githubUrl: "https://github.com/JuandelPueblo/nvsleepify",
+      description:
+        "An utility for Linux that dynamically enables and disables the Nvidia GPU based on battery status, significantly improving battery life on laptops.",
+    },
+    {
+      title: "RUMarino Autonomous Underwater Vehicle (AUV)",
+      technologies: ["Python", "ROS", "Docker", "CUDA"],
+      image: "images/hydrus.jpeg",
+      githubUrl: "https://github.com/Rumarino-Team",
+      description:
+        "Led a team of three software engineers to develop RUMarino's AUV software framework utilizing ROS and Docker to participate in RoboSub 2025.",
+    },
+    {
+      title: "Don't Let Him Cook",
+      technologies: ["Godot", "GDScript"],
+      image: "images/dontlethimcook.png",
+      liveUrl: "https://juandelpueblo.itch.io/dont-let-him-cook",
+      githubUrl: "https://github.com/juandelpueblo/dont-let-him-cook",
+      description:
+        "A simple platformer game made using Godot for the Fall 2023 CAHSI Game Jam, which received 3rd place out of 13 total submitted games.",
+    },
+    {
+      title: "Discord Application Bot",
+      technologies: ["TypeScript", "Discord.JS", "Node.js", "SQLite"],
+      image: "images/discordapplicationbot.png",
+      githubUrl: "https://github.com/juandelpueblo/discord-application-bot",
+      description:
+        "Discord Bot for managing application forms within a Discord server. Each form is managed in a single channel where the applications are answered inside threads.",
+    },
+    {
+      title: "Flight Tracker Pro",
+      technologies: ["Kotlin", "Android Studio", "API Integration"],
+      image: "images/flighttrackerpro.png",
+      description:
+        "Collaborated with a 3-person team to build an flight searching app for Android in Kotlin using Android Studio in 3 weeks utilizing queries from the AviationStack API.",
+    },
+    {
+      title: "ClassCorder",
+      technologies: ["Python", "Streamlit", "Google Cloud", "BigQuery"],
+      description:
+        "Led the development of the intuitive dashboard for a lecture recording web application using Python and Streamlit as part of a 3-person group project for Google Tech Exchange.",
+    },
+  ];
+  const experiences = [
+    {
+      position: "SWE Intern",
+      company: "Google",
+      period: "May 2026 - Aug 2026",
+      technologies: ["Kotlin", "Jetpack Compose", "Java"],
+      accomplishments: [
+        "Developed enhanced note-editing capabilities for Google Keep on Android using Kotlin and Java, enabling seamless content conversion and formatting across complex notes.",
+        "Refactored note preview layout components and rendering logic, improving visual rendering accuracy in the main feed and streamlining user interaction flows.",
+      ],
+    },
+    {
+      position: "SWE Intern",
+      company: "Google",
+      period: "May 2025 - Aug 2025",
+      technologies: ["TypeScript", "Angular", "Java"],
+      accomplishments: [
+        "Built an UI component gallery using an internal storybook library for the Gemini web page using Angular and Typescript to preview and test UI elements in isolation, shortening the development process of UI components.",
+        "Prototyped and assessed the feasibility of features such as temporary chat and conversation grouping, gaining hands-on experience in product ideation and user flow optimization.",
+      ],
+    },
+    {
+      position: "STEP Intern",
+      company: "Google",
+      period: "May 2024 - Aug 2024",
+      technologies: ["TypeScript", "Angular"],
+      accomplishments: [
+        "Integrated Google Photos media picker into Google Messages for Web using Angular and TypeScript, reducing time spent attaching media by 50%.",
+        "Added a progress bar and enhanced attachments error handling, improving the existing user end-to-end attachment flow.",
+      ],
+    },
+  ];
+
+  const icon = (id, cls) =>
+    '<svg class="' +
+    cls +
+    '" aria-hidden="true"><use href="#i-' +
+    id +
+    '"/></svg>';
+  // Tabs: [key, label, icon]. The key names the panel and the URL hash.
+  const nav = [
+    ["projects", "Projects", "folder"],
+    ["experiences", "Experiences", "briefcase"],
+    ["contact", info.contactsTitle, "envelope"],
+  ];
+  const keys = nav.map((n) => n[0]);
+  const fromHash = () => keys.find((k) => "#" + k === location.hash);
+  const first = fromHash() || keys[0];
+  // Analog clock face; tick() turns the hands. The mini version has no
+  // second hand and bolder hands so it reads at 22px.
+  function clockSvg(cls, big) {
+    let ticks = "";
+    for (let i = 0; i < 12; i++)
+      ticks +=
+        '<line x1="50" y1="' +
+        (i % 3 ? 13 : 10) +
+        '" x2="50" y2="18" transform="rotate(' +
+        i * 30 +
+        ' 50 50)"/>';
+    return (
+      '<svg class="' +
+      cls +
+      '" viewBox="0 0 100 100" aria-hidden="true">' +
+      '<circle cx="50" cy="50" r="49" fill="url(#ck-rim)" stroke="#5f86a8" stroke-width="1"/>' +
+      '<circle cx="50" cy="50" r="42" fill="url(#ck-face)" stroke="#7f9db6" stroke-width="1"/>' +
+      (big
+        ? '<g stroke="#2d4f6e" stroke-width="2.5" stroke-linecap="round">' +
+          ticks +
+          "</g>"
+        : "") +
+      '<line class="h-hr" x1="50" y1="53" x2="50" y2="28" stroke="#0d3555" stroke-width="' +
+      (big ? 5 : 8) +
+      '" stroke-linecap="round"/>' +
+      '<line class="h-min" x1="50" y1="54" x2="50" y2="' +
+      (big ? 16 : 18) +
+      '" stroke="#0d3555" stroke-width="' +
+      (big ? 3.2 : 6) +
+      '" stroke-linecap="round"/>' +
+      (big
+        ? '<line class="h-sec" x1="50" y1="60" x2="50" y2="14" stroke="#e0402a" stroke-width="1.4" stroke-linecap="round"/>'
+        : "") +
+      '<circle cx="50" cy="50" r="' +
+      (big ? 3.5 : 6) +
+      '" fill="#0d3555"/>' +
+      '<ellipse cx="50" cy="29" rx="33" ry="19" fill="url(#ck-gloss)"/></svg>'
+    );
+  }
+  // Speaker for the sound toggle: waves when on, a red mute badge when off.
+  const speaker =
+    '<svg class="spk" viewBox="0 0 24 24" aria-hidden="true">' +
+    '<path d="M3 9h3.8l5-4.2v14.4l-5-4.2H3z" fill="url(#ck-rim)" stroke="#2d4f6e" stroke-width="1.1" stroke-linejoin="round"/>' +
+    '<g class="spk-on" fill="none" stroke="#1a86c8" stroke-width="1.9" stroke-linecap="round"><path d="M15 8.8a4.4 4.4 0 0 1 0 6.4"/><path d="M17.8 6.2a8.2 8.2 0 0 1 0 11.6"/></g>' +
+    '<g class="spk-off"><circle cx="17.4" cy="15.6" r="4.7" fill="#e0402a" stroke="#fff" stroke-width="1"/><path d="M15.2 13.4l4.4 4.4" stroke="#fff" stroke-width="1.7" stroke-linecap="round"/></g></svg>';
+  const contactIcons = {
+    Email: ["email", "envelope"],
+    GitHub: ["github", "github"],
+    LinkedIn: ["linkedin", "linkedin"],
+    Discord: ["discord", "discord"],
+  };
+  const tech = (list) =>
+    '<p class="tech"><b>Technologies:</b> ' + list.join(", ") + "</p>";
+  const greeting = info.greeting.replace("👋", '<span class="wave">👋</span>');
+  const placeholder =
+    '<div class="thumb placeholder" aria-hidden="true"><svg viewBox="0 0 160 100" preserveAspectRatio="xMidYMid slice">' +
+    '<defs><linearGradient id="ph-sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3d9cf0"/><stop offset="1" stop-color="#c4ebff"/></linearGradient>' +
+    '<linearGradient id="ph-hill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a6ec5c"/><stop offset="1" stop-color="#2f8c0e"/></linearGradient></defs>' +
+    '<rect width="160" height="100" fill="url(#ph-sky)"/><circle cx="122" cy="28" r="13" fill="#fff8c4"/><circle cx="122" cy="28" r="22" fill="#fff" opacity=".25"/>' +
+    '<path d="M0 78 Q40 48 84 72 T160 64 V100 H0Z" fill="url(#ph-hill)"/><path d="M0 88 Q60 70 110 86 T160 82 V100 H0Z" fill="#3f9e16" opacity=".8"/>' +
+    '<rect width="160" height="44" fill="#fff" opacity=".18"/></svg></div>';
+
+  // Tab panel; only the selected one is shown.
+  const boxOpen = (key, title, iconId) =>
+    '<section class="box" role="tabpanel" id="p-' +
+    key +
+    '" aria-labelledby="t-' +
+    key +
+    '" tabindex="0"' +
+    (key === first ? "" : " hidden") +
+    '><h2 class="box-h">' +
+    icon(iconId, "tico") +
+    title +
+    '</h2><div class="box-b">';
+  const boxClose = "</div></section>";
+  const orb = info.avatar
+    ? '<img src="' + info.avatar + '" alt="">'
+    : "<span>" + info.monogram + "</span>";
+
+  let s =
+    '<header class="banner" id="p-hero"><div class="orb" aria-hidden="true">' +
+    orb +
+    '</div><div class="hero-text">' +
+    '<p class="greet">' +
+    greeting +
+    '</p><h1 class="site-title">' +
+    info.title +
+    '</h1><p class="intro">' +
+    info.introduction +
+    "</p>" +
+    '<p><a class="btn jelly" href="' +
+    info.resume +
+    '">View Resume</a></p></div>' +
+    '<img class="tree" src="scene/tree.png" alt=""></header>';
+  s +=
+    '<div class="reflection" id="reflection" aria-hidden="true" inert></div>';
+  // Toolbox ticker, in its own strip above the tab window: each technology
+  // with the entries that use it, most used first. The balloon lists the
+  // entries; a click spotlights them. The chips form one tab stop, and arrow
+  // keys move between them.
+  const used = {};
+  for (const p of projects)
+    for (const t of p.technologies) (used[t] ||= []).push(p.title);
+  for (const e of experiences)
+    for (const t of e.technologies)
+      (used[t] ||= []).push(
+        e.position + " at " + e.company + " (" + e.period.slice(-4) + ")",
+      );
+  const toolbox = Object.keys(used).sort(
+    (a, b) => used[b].length - used[a].length || a.localeCompare(b),
+  );
+  s +=
+    '<section class="ticker" aria-labelledby="tk-label">' +
+    '<button class="tk-play" type="button" aria-pressed="false" aria-label="Pause scrolling">' +
+    '<svg viewBox="0 0 20 20" aria-hidden="true"><g class="ic-pause"><rect x="5" y="4" width="3.6" height="12" rx="1"/><rect x="11.4" y="4" width="3.6" height="12" rx="1"/></g><path class="ic-play" d="M6.5 4l9.5 6-9.5 6z"/></svg></button>' +
+    '<h2 class="tk-label" id="tk-label">' +
+    info.toolboxTitle +
+    '</h2><div class="tk-view"><div class="tk-track" role="toolbar" aria-labelledby="tk-label">';
+  for (const [i, t] of toolbox.entries()) {
+    // A stable hue per name colours the chip's dot.
+    let hue = 0;
+    for (const c of t) hue = (hue * 31 + c.charCodeAt(0)) % 360;
+    s +=
+      '<button class="chip" type="button"' +
+      (i ? ' tabindex="-1"' : "") +
+      ' data-tech="' +
+      t +
+      '" data-tip-title="' +
+      t +
+      '" data-tip-body="Used in ' +
+      used[t].length +
+      ": " +
+      used[t].join(", ") +
+      '"><i class="dot" style="--h:' +
+      hue +
+      '" aria-hidden="true"></i>' +
+      t +
+      "<b>" +
+      used[t].length +
+      "</b></button>";
+  }
+  s += "</div></div></section>";
+  s +=
+    '<div class="frame"><div class="tabs"><div class="tablist" role="tablist" aria-label="Sections">' +
+    nav
+      .map(
+        ([k, n, i]) =>
+          '<button class="tab" type="button" role="tab" id="t-' +
+          k +
+          '" aria-controls="p-' +
+          k +
+          '" aria-selected="' +
+          (k === first) +
+          '"' +
+          (k === first ? "" : ' tabindex="-1"') +
+          ">" +
+          icon(i, "tico") +
+          n +
+          "</button>",
+      )
+      .join("") +
+    '</div><div class="tray">' +
+    '<button class="tray-btn" id="sound" type="button" aria-pressed="false" aria-label="Sound effects" data-tip-title="Sound effects" data-tip-body="Off">' +
+    speaker +
+    '</button><button class="tray-btn clock" id="tray" type="button" popovertarget="clock-flyout">' +
+    clockSvg("mini-clock", false) +
+    '<span class="sr">' +
+    info.clockPlace +
+    ' time: </span><span class="tray-t"></span></button></div></div><main class="main">';
+  s += boxOpen("projects", info.projectsTitle, "folder");
+  for (const p of projects) {
+    s += '<article class="entry" data-tech="' + p.technologies.join("|") + '">';
+    s += p.image
+      ? '<a class="thumb" href="' +
+        p.image +
+        '" data-title="' +
+        p.title +
+        '"><img src="' +
+        p.image +
+        '" alt="' +
+        (p.imageAlt || p.title) +
+        '" loading="lazy"></a>'
+      : placeholder;
+    s +=
+      '<div class="entry-body"><h3>' +
+      p.title +
+      "</h3><p>" +
+      p.description +
+      "</p>" +
+      tech(p.technologies);
+    if (p.liveUrl || p.githubUrl) {
+      s += '<p class="links">';
+      if (p.liveUrl)
+        s += '<a class="mini jelly" href="' + p.liveUrl + '">View Project</a>';
+      if (p.githubUrl)
+        s += '<a class="mini jelly" href="' + p.githubUrl + '">View Code</a>';
+      s += "</p>";
+    }
+    s += "</div></article>";
+  }
+  s += boxClose + boxOpen("experiences", info.experiencesTitle, "briefcase");
+  for (const e of experiences)
+    s +=
+      '<article class="entry exp" data-tech="' +
+      e.technologies.join("|") +
+      '"><h3>' +
+      e.position +
+      '</h3><p class="meta">' +
+      e.company +
+      " · " +
+      e.period +
+      '</p><ul class="acc">' +
+      e.accomplishments.map((a) => "<li>" + a + "</li>").join("") +
+      "</ul>" +
+      tech(e.technologies) +
+      "</article>";
+  s +=
+    boxClose +
+    boxOpen("contact", info.contactsTitle, "envelope") +
+    '<ul class="contact-list">' +
+    info.contacts
+      .map((c) => {
+        const [cls, glyph] = contactIcons[c.name];
+        return (
+          '<li><a href="' +
+          c.url +
+          '"><span class="tile c-' +
+          cls +
+          '" aria-hidden="true"><svg><use href="#i-' +
+          glyph +
+          '"/></svg></span>' +
+          c.name +
+          "</a></li>"
+        );
+      })
+      .join("") +
+    "</ul>" +
+    boxClose;
+  // Badge text is placeholder decoration; swap in whatever applies.
+  s +=
+    '<ul class="badges" aria-label="Site badges">' +
+    '<li class="b88 b-astro"><span>Powered by<b>Astro</b></span></li>' +
+    '<li class="b88 b-tailwind"><span>Styled with<b>Tailwind</b></span></li>' +
+    '<li class="b88 b-view"><span>Best viewed<b>1024x768</b></span></li>' +
+    '<li class="b88 b-pr"><span>Made in<b>Puerto Rico</b></span></li>' +
+    '<li class="b88 b-aero"><span>100%<b>Frutiger Aero</b></span></li></ul>';
+  s += "</main></div>";
+  document.getElementById("page").innerHTML = s;
+
+  // Water reflection: a decorative copy of the header without ids.
+  const banner = document.querySelector(".banner");
+  const reflection = document.getElementById("reflection");
+  reflection.innerHTML = '<div class="banner">' + banner.innerHTML + "</div>";
+  reflection.querySelectorAll("[id]").forEach((el) => el.removeAttribute("id"));
+
+  const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const finePointer = matchMedia("(pointer: fine)").matches;
+
+  // Tabs: one panel at a time, chosen by click or arrow keys. The URL hash
+  // keeps the selection so a tab can be linked directly.
+  const frame = document.querySelector(".frame");
+  const tabBar = document.querySelector(".tabs");
+  const tabs = [...tabBar.querySelectorAll(".tab")];
+  function selectTab(key) {
+    for (const t of tabs) {
+      const on = t.id === "t-" + key;
+      t.setAttribute("aria-selected", String(on));
+      t.tabIndex = on ? 0 : -1;
+      const panel = document.getElementById(t.getAttribute("aria-controls"));
+      // Only a newly revealed panel animates.
+      if (on && panel.hidden) panel.classList.add("switched");
+      panel.hidden = !on;
+    }
+  }
+  function chooseTab(tab) {
+    const key = tab.id.slice(2);
+    selectTab(key);
+    sfx("click");
+    try {
+      history.replaceState(null, "", "#" + key);
+    } catch {}
+    // When the strip is pinned, bring the new panel's top into view.
+    if (tabBar.classList.contains("stuck")) frame.scrollIntoView();
+  }
+  for (const t of tabs) t.addEventListener("click", () => chooseTab(t));
+  tabBar.addEventListener("keydown", (e) => {
+    const i = tabs.indexOf(document.activeElement);
+    const n = tabs.length;
+    const j = {
+      ArrowRight: (i + 1) % n,
+      ArrowLeft: (i - 1 + n) % n,
+      Home: 0,
+      End: n - 1,
+    }[e.key];
+    if (i < 0 || j === undefined) return;
+    e.preventDefault();
+    tabs[j].focus();
+    chooseTab(tabs[j]);
+  });
+  addEventListener("hashchange", () => {
+    const key = fromHash();
+    if (key) selectTab(key);
+  });
+  function markStuck() {
+    tabBar.classList.toggle(
+      "stuck",
+      tabBar.getBoundingClientRect().top <= 1 && scrollY > 50,
+    );
+  }
+  addEventListener("scroll", markStuck, { passive: true });
+
+  // Sound effects, synthesized with Web Audio so no audio files are needed.
+  // Off until the visitor turns them on; the choice is remembered per browser.
+  let soundOn = false,
+    audio = null,
+    bus = null,
+    lastBlip = 0;
+  function audioOut() {
+    if (!audio) {
+      audio = new AudioContext();
+      bus = audio.createGain();
+      bus.gain.value = 0.6;
+      bus.connect(audio.destination);
+      // A short, darkened echo gives every sound a glassy tail.
+      const send = audio.createGain();
+      const echo = audio.createDelay();
+      const tone = audio.createBiquadFilter();
+      const feedback = audio.createGain();
+      send.gain.value = 0.35;
+      echo.delayTime.value = 0.11;
+      tone.type = "lowpass";
+      tone.frequency.value = 2400;
+      feedback.gain.value = 0.3;
+      bus.connect(send);
+      send.connect(echo);
+      echo.connect(tone);
+      tone.connect(feedback);
+      feedback.connect(echo);
+      tone.connect(audio.destination);
+    }
+    if (audio.state === "suspended") audio.resume();
+    return audio;
+  }
+  // One enveloped oscillator gliding from f0 to f1 Hz.
+  function note(f0, f1, dur, vol, delay = 0, type = "sine") {
+    const a = audioOut();
+    const t = a.currentTime + delay;
+    const osc = a.createOscillator();
+    const env = a.createGain();
+    osc.type = type;
+    osc.frequency.setValueAtTime(f0, t);
+    osc.frequency.exponentialRampToValueAtTime(f1, t + dur);
+    env.gain.setValueAtTime(0.0001, t);
+    env.gain.exponentialRampToValueAtTime(vol, t + 0.006);
+    env.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    osc.connect(env);
+    env.connect(bus);
+    osc.start(t);
+    osc.stop(t + dur + 0.05);
+  }
+  // White noise through a rising band-pass filter.
+  function whoosh() {
+    const a = audioOut();
+    const t = a.currentTime,
+      len = 0.45;
+    const buf = a.createBuffer(1, a.sampleRate * len, a.sampleRate);
+    const data = buf.getChannelData(0);
+    for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
+    const src = a.createBufferSource();
+    const band = a.createBiquadFilter();
+    const env = a.createGain();
+    src.buffer = buf;
+    band.type = "bandpass";
+    band.Q.value = 1.2;
+    band.frequency.setValueAtTime(350, t);
+    band.frequency.exponentialRampToValueAtTime(2600, t + len);
+    env.gain.setValueAtTime(0.0001, t);
+    env.gain.exponentialRampToValueAtTime(0.22, t + 0.12);
+    env.gain.exponentialRampToValueAtTime(0.0001, t + len);
+    src.connect(band);
+    band.connect(env);
+    env.connect(bus);
+    src.start(t);
+  }
+  // A bubble is a sine whose pitch shoots up as it pops. Its low start reads
+  // louder than the click at the same level, so it plays much quieter.
+  const bubble = (vol, delay = 0) =>
+    note(
+      240 + Math.random() * 140,
+      900 + Math.random() * 600,
+      0.09,
+      vol,
+      delay,
+    );
+  const sounds = {
+    click: () => {
+      note(2200, 1400, 0.03, 0.08, 0, "triangle");
+      note(1100, 900, 0.05, 0.05, 0.012);
+    },
+    bubble: () => bubble(0.06),
+    bubbles: () => [0, 0.07, 0.15].forEach((d) => bubble(0.04, d)),
+    blip: () => note(520, 1500, 0.06, 0.04),
+    whoosh,
+    open: () => {
+      note(880, 880, 0.25, 0.07);
+      note(1318.5, 1318.5, 0.35, 0.06, 0.06);
+    },
+    // An E major arpeggio with an octave shimmer.
+    on: () =>
+      [659.3, 830.6, 987.8, 1318.5].forEach((f, i) => {
+        note(f, f, 1.1, 0.08, i * 0.075);
+        note(f * 2, f * 2, 0.6, 0.015, i * 0.075);
+      }),
+    off: () => {
+      note(987.8, 987.8, 0.3, 0.07);
+      note(659.3, 659.3, 0.45, 0.07, 0.09);
+    },
+  };
+  function sfx(name) {
+    if (!soundOn) return;
+    // Fish can startle many times a second; keep their blips sparse.
+    if (name === "blip") {
+      if (performance.now() - lastBlip < 300) return;
+      lastBlip = performance.now();
+    }
+    try {
+      sounds[name]();
+    } catch {}
+  }
+  const soundBtn = document.getElementById("sound");
+  function setSound(on) {
+    soundOn = on;
+    soundBtn.setAttribute("aria-pressed", String(on));
+    soundBtn.dataset.tipBody = on ? "On" : "Off";
+    try {
+      localStorage.setItem("aero-sound", on ? "on" : "off");
+    } catch {}
+  }
+  try {
+    if (localStorage.getItem("aero-sound") === "on") setSound(true);
+  } catch {}
+  soundBtn.addEventListener("click", () => {
+    if (soundOn) {
+      sfx("off");
+      setSound(false);
+    } else {
+      setSound(true);
+      sfx("on");
+    }
+  });
+  document.addEventListener("click", (e) => {
+    if (e.target.closest(".mini, .btn, .contact-list a, .lb-close, .tk-play"))
+      sfx("click");
+  });
+
+  // Toolbox ticker. Chips glide left; the first chip moves to the end once it
+  // has scrolled out, so the loop has no seam and no duplicate chips. Speed
+  // eases to zero under the pointer, on focus, or when paused.
+  const ticker = document.querySelector(".ticker");
+  const view = ticker.querySelector(".tk-view");
+  const track = ticker.querySelector(".tk-track");
+  const playBtn = ticker.querySelector(".tk-play");
+  const chipGap = 8;
+  let tickOff = 0;
+  playBtn.addEventListener("click", () => {
+    const paused = playBtn.getAttribute("aria-pressed") !== "true";
+    playBtn.setAttribute("aria-pressed", String(paused));
+    playBtn.setAttribute(
+      "aria-label",
+      paused ? "Resume scrolling" : "Pause scrolling",
+    );
+  });
+  function wrapChips() {
+    while (true) {
+      const first = track.firstElementChild;
+      const w = first.offsetWidth + chipGap;
+      if (-tickOff < w) break;
+      track.append(first);
+      tickOff += w;
+    }
+    while (tickOff > 0) {
+      const last = track.lastElementChild;
+      track.prepend(last);
+      tickOff -= last.offsetWidth + chipGap;
+    }
+    track.style.transform = "translateX(" + tickOff.toFixed(2) + "px)";
+  }
+  if (reduced) ticker.classList.add("static");
+  else {
+    let speed = 0,
+      lastRoll = performance.now(),
+      pointerIn = false;
+    // Pointer events, because :hover does not update while content moves
+    // under a still pointer.
+    view.addEventListener("pointerenter", () => (pointerIn = true));
+    view.addEventListener("pointerleave", () => (pointerIn = false));
+    const roll = (t) => {
+      const dt = Math.min(0.05, (t - lastRoll) / 1000);
+      lastRoll = t;
+      const hold =
+        pointerIn ||
+        playBtn.getAttribute("aria-pressed") === "true" ||
+        view.matches(":focus-within");
+      speed += ((hold ? 0 : 38) - speed) * Math.min(1, dt * 3);
+      if (hold && speed < 0.5) speed = 0;
+      tickOff -= speed * dt;
+      wrapChips();
+      // A chip's balloon follows it while the strip coasts to a stop.
+      if (tipFor && view.contains(tipFor)) placeTip();
+      requestAnimationFrame(roll);
+    };
+    requestAnimationFrame(roll);
+    // Keyboard focus slides the chip into view instead of letting the
+    // browser scroll the clipped strip.
+    view.addEventListener("focusin", (e) => {
+      const v = view.getBoundingClientRect();
+      const r = e.target.getBoundingClientRect();
+      if (r.left < v.left + 28) tickOff += v.left + 28 - r.left;
+      else if (r.right > v.right - 28) tickOff -= r.right - (v.right - 28);
+      wrapChips();
+    });
+    // If the browser scrolls the strip anyway, fold that into the offset so
+    // nothing jumps when the scroll is undone.
+    view.addEventListener("scroll", () => {
+      tickOff -= view.scrollLeft;
+      view.scrollLeft = 0;
+      wrapChips();
+    });
+  }
+  // One tab stop for the chips: the last focused chip keeps it, and arrow
+  // keys, Home and End move between chips in their on-screen order.
+  track.addEventListener("focusin", (e) => {
+    for (const chip of track.children)
+      chip.tabIndex = chip === e.target ? 0 : -1;
+  });
+  track.addEventListener("keydown", (e) => {
+    const chips = [...track.children];
+    const i = chips.indexOf(document.activeElement);
+    const n = chips.length;
+    const j = {
+      ArrowRight: (i + 1) % n,
+      ArrowLeft: (i - 1 + n) % n,
+      Home: 0,
+      End: n - 1,
+    }[e.key];
+    if (i < 0 || j === undefined) return;
+    e.preventDefault();
+    chips[j].focus();
+  });
+  // A chip spotlights every entry that uses it, switching to the tab that
+  // holds them when the current one has none.
+  track.addEventListener("click", (e) => {
+    const chip = e.target.closest(".chip");
+    if (!chip) return;
+    const hits = [...document.querySelectorAll(".entry")].filter((el) =>
+      el.dataset.tech.split("|").includes(chip.dataset.tech),
+    );
+    const target = hits.find((el) => !el.closest(".box").hidden) || hits[0];
+    const panel = target.closest(".box");
+    if (panel.hidden) {
+      const key = panel.id.slice(2);
+      selectTab(key);
+      try {
+        history.replaceState(null, "", "#" + key);
+      } catch {}
+    }
+    for (const el of hits) {
+      clearTimeout(el.spotTimer);
+      el.classList.remove("spot");
+      void el.offsetWidth; // restart the pulse
+      el.classList.add("spot");
+      el.spotTimer = setTimeout(() => el.classList.remove("spot"), 2800);
+    }
+    target.scrollIntoView({ block: "center" });
+    sfx("bubble");
+  });
+
+  // Clock gadget: tray time and hands in the configured time zone, and a
+  // flyout with a large clock, the date and the last-updated date.
+  const tray = document.getElementById("tray");
+  const trayTime = tray.querySelector(".tray-t");
+  const flyout = document.getElementById("clock-flyout");
+  flyout.querySelector(".fly-clock").innerHTML = clockSvg("big-clock", true);
+  const zoned = (opts) =>
+    new Intl.DateTimeFormat("en-US", { timeZone: info.timeZone, ...opts });
+  const clockParts = zoned({
+    hour: "numeric",
+    minute: "numeric",
+    second: "numeric",
+    hourCycle: "h23",
+  });
+  const shortTime = zoned({ hour: "numeric", minute: "2-digit" });
+  const longTime = zoned({
+    hour: "numeric",
+    minute: "2-digit",
+    second: "2-digit",
+  });
+  const longDate = zoned({
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
+  flyout.querySelector(".fly-place").textContent =
+    info.clockPlace +
+    " (" +
+    zoned({ timeZoneName: "short" })
+      .formatToParts(new Date())
+      .find((x) => x.type === "timeZoneName").value +
+    ")";
+  // Noon UTC keeps the date the same in any American time zone.
+  flyout.querySelector(".fly-upd").textContent =
+    "Site last updated " +
+    zoned({ month: "long", day: "numeric", year: "numeric" }).format(
+      new Date(info.updated + "T12:00:00Z"),
+    );
+  function tick() {
+    const now = new Date();
+    const t = {};
+    for (const x of clockParts.formatToParts(now)) t[x.type] = +x.value;
+    for (const svg of document.querySelectorAll(".mini-clock, .big-clock")) {
+      const turn = (cls, deg) =>
+        svg
+          .querySelector(cls)
+          ?.setAttribute("transform", "rotate(" + deg + " 50 50)");
+      turn(".h-hr", (t.hour % 12) * 30 + t.minute * 0.5);
+      turn(".h-min", t.minute * 6 + t.second * 0.1);
+      turn(".h-sec", t.second * 6);
+    }
+    const short = shortTime.format(now);
+    if (trayTime.textContent !== short) trayTime.textContent = short;
+    flyout.querySelector(".fly-time").textContent = longTime.format(now);
+    flyout.querySelector(".fly-date").textContent = longDate.format(now);
+  }
+  tick();
+  setInterval(tick, 1000);
+  // Place the flyout under the tray button, right-aligned, inside the window.
+  function placeFlyout() {
+    const r = tray.getBoundingClientRect();
+    const w = parseFloat(getComputedStyle(flyout).width);
+    flyout.style.top = r.bottom + 8 + "px";
+    flyout.style.left =
+      Math.max(12, Math.min(r.right - w, innerWidth - w - 12)) + "px";
+  }
+  flyout.addEventListener("beforetoggle", (e) => {
+    if (e.newState !== "open") return;
+    placeFlyout();
+    sfx("open");
+  });
+  addEventListener(
+    "scroll",
+    () => flyout.matches(":popover-open") && placeFlyout(),
+    { passive: true },
+  );
+  addEventListener(
+    "resize",
+    () => flyout.matches(":popover-open") && placeFlyout(),
+  );
+
+  // Balloon tips: show where a link goes, on mouse hover and keyboard focus.
+  // The pointer can move onto the balloon; Escape dismisses it.
+  const tip = document.getElementById("balloon");
+  const tipTitle = tip.querySelector("b");
+  const tipBody = tip.querySelector("span");
+  // Links show their destination; other controls carry their own balloon
+  // text in data-tip-title and data-tip-body.
+  const tipLinks = "#page a[href]:not(.thumb), #page [data-tip-title]";
+  let tipFor = null,
+    tipTimer = 0;
+  function showTip(a) {
+    clearTimeout(tipTimer);
+    tipNext = null;
+    if (tipFor && tipFor !== a) tipFor.removeAttribute("aria-describedby");
+    let title, path;
+    if (a.dataset.tipTitle)
+      [title, path] = [a.dataset.tipTitle, a.dataset.tipBody];
+    else {
+      const url = new URL(a.href);
+      title = url.hostname.replace(/^www\./, "");
+      path = decodeURI(url.pathname + url.search).replace(/\/$/, "");
+      if (url.protocol === "mailto:") [title, path] = [url.pathname, ""];
+      if (path.length > 44) path = path.slice(0, 42) + "…";
+    }
+    tipTitle.textContent = title;
+    tipBody.textContent = path;
+    tipBody.hidden = !path;
+    tip.hidden = false;
+    tipFor = a;
+    a.setAttribute("aria-describedby", "balloon");
+    placeTip();
+  }
+  function placeTip() {
+    const r = tipFor.getBoundingClientRect();
+    const w = tip.offsetWidth,
+      h = tip.offsetHeight;
+    const cx = r.left + r.width / 2;
+    // Prefer above the link; flip below when it would leave the window.
+    const below = r.top - h - 14 < 8;
+    const left = Math.max(12, Math.min(cx - 28, innerWidth - w - 12));
+    tip.classList.toggle("below", below);
+    tip.style.left = left + "px";
+    tip.style.top = (below ? r.bottom + 14 : r.top - h - 14) + "px";
+    tip.style.setProperty(
+      "--tail",
+      Math.max(14, Math.min(cx - left, w - 30)) + "px",
+    );
+  }
+  function hideTip() {
+    clearTimeout(tipTimer);
+    tipNext = null;
+    if (!tipFor) return;
+    tipFor.removeAttribute("aria-describedby");
+    tipFor = null;
+    tip.hidden = true;
+  }
+  // Mouse only: the first balloon waits a moment, moving between links swaps
+  // it at once, and leaving hides it after a short grace period.
+  let tipNext = null;
+  document.addEventListener("pointerover", (e) => {
+    if (e.pointerType !== "mouse") return;
+    const a = e.target.closest(tipLinks);
+    if (a && a === tipNext) return;
+    if (a && tipFor && a !== tipFor) showTip(a);
+    else if (a && !tipFor) {
+      clearTimeout(tipTimer);
+      tipNext = a;
+      tipTimer = setTimeout(() => showTip(a), 400);
+    } else if (a || e.target.closest("#balloon")) clearTimeout(tipTimer);
+  });
+  document.addEventListener("pointerout", (e) => {
+    if (e.pointerType !== "mouse") return;
+    const from = e.target.closest(tipLinks + ", #balloon");
+    const to = e.relatedTarget;
+    if (!from) return;
+    // Moves within the link, within the balloon, or between the two count
+    // as staying.
+    if (
+      to &&
+      (from.contains(to) ||
+        to.closest("#balloon") ||
+        (tipFor && tipFor.contains(to)))
+    )
+      return;
+    clearTimeout(tipTimer);
+    tipNext = null;
+    tipTimer = setTimeout(hideTip, 150);
+  });
+  document.addEventListener("focusin", (e) => {
+    const a = e.target.closest(tipLinks);
+    if (a && a.matches(":focus-visible")) showTip(a);
+    else hideTip();
+  });
+  document.addEventListener("focusout", (e) => {
+    if (e.target === tipFor) hideTip();
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") hideTip();
+  });
+  document.addEventListener("click", hideTip);
+  addEventListener("scroll", () => tipFor && placeTip(), { passive: true });
+  addEventListener("resize", () => tipFor && placeTip());
+
+  // Keep the waterline at the bottom of the header, whose height depends on text wrap.
+  const site = document.getElementById("site");
+  const bubcol = document.getElementById("bubcol");
+  const fishes = [...document.querySelectorAll(".fish")].map((el) => ({
+    el,
+    depth: +el.dataset.y,
+    speed: +el.dataset.speed,
+    x: Math.random() * innerWidth,
+    dir: Math.random() < 0.5 ? 1 : -1,
+    dy: 0,
+    vy: 0,
+    boost: 0,
+    top: 0,
+    w: 0,
+    h: 0,
+  }));
+  function layoutScene() {
+    const wl = Math.round(
+      banner.getBoundingClientRect().bottom - site.getBoundingClientRect().top,
+    );
+    site.style.setProperty("--wl", wl + "px");
+    bubcol.style.setProperty("--h", bubcol.clientHeight + 40 + "px");
+    for (const f of fishes) {
+      f.top = wl + f.depth;
+      f.el.style.top = f.top + "px";
+      f.w = f.el.offsetWidth;
+      f.h = f.el.offsetHeight;
+    }
+  }
+  layoutScene();
+  new ResizeObserver(layoutScene).observe(site);
+  if (document.fonts) document.fonts.ready.then(layoutScene);
+
+  // Fish: cruise, occasionally turn, and dart away from the pointer with a
+  // puff of bubbles. Pointer position is kept in viewport coordinates.
+  let pointer = null,
+    pointerUntil = 0;
+  addEventListener(
+    "pointermove",
+    (e) => {
+      if (e.pointerType === "mouse") {
+        pointer = [e.clientX, e.clientY];
+        pointerUntil = Infinity;
+      }
+    },
+    { passive: true },
+  );
+  addEventListener("pointerdown", (e) => {
+    pointer = [e.clientX, e.clientY];
+    pointerUntil = performance.now() + 600;
+  });
+  document.documentElement.addEventListener(
+    "pointerleave",
+    () => (pointer = null),
+  );
+  let lastT = performance.now();
+  function swim(t) {
+    const dt = Math.min(0.05, (t - lastT) / 1000);
+    lastT = t;
+    const rect = site.getBoundingClientRect();
+    const W = rect.width;
+    const p =
+      pointer && t < pointerUntil
+        ? [pointer[0] - rect.left, pointer[1] - rect.top]
+        : null;
+    for (const f of fishes) {
+      const cx = f.x + f.w / 2,
+        cy = f.top + f.dy + f.h / 2;
+      if (p) {
+        const dx = cx - p[0],
+          dy = cy - p[1];
+        if (dx * dx + dy * dy < 140 * 140) {
+          if (f.boost < 0.3) {
+            f.el.classList.add("startle");
+            sfx("blip");
+            setTimeout(() => f.el.classList.remove("startle"), 260);
+            for (let i = 0; i < 3; i++)
+              spawn(
+                rect.left + cx,
+                rect.top + cy,
+                "b",
+                4 + Math.random() * 7,
+                (Math.random() - 0.5) * 24,
+              );
+          }
+          f.dir = dx >= 0 ? 1 : -1;
+          f.vy = (dy >= 0 ? 1 : -1) * 90;
+          f.boost = 1;
+        }
+      }
+      if (f.boost === 0 && Math.random() < dt * 0.04) f.dir *= -1;
+      f.x += f.dir * f.speed * (1 + 4 * f.boost) * dt;
+      f.boost = Math.max(0, f.boost - dt * 0.7);
+      f.dy += f.vy * dt;
+      f.vy *= Math.pow(0.08, dt);
+      f.dy += -f.dy * Math.min(1, dt * 0.6);
+      f.dy = Math.max(-40, Math.min(40, f.dy));
+      if (f.x > W + 30) f.x = -f.w - 30;
+      if (f.x < -f.w - 30) f.x = W + 30;
+      f.el.classList.toggle("back", f.dir < 0);
+      f.el.style.transform =
+        "translate(" + f.x.toFixed(1) + "px," + f.dy.toFixed(1) + "px)";
+    }
+    requestAnimationFrame(swim);
+  }
+  if (!reduced) requestAnimationFrame(swim);
+
+  // Ambient bubbles, the bubble column and glints.
+  const bubbles = document.getElementById("bubbles");
+  for (let i = 0; i < 14; i++) {
+    const b = document.createElement("i");
+    b.className = "bub";
+    const size = 8 + Math.random() * 26;
+    b.style.width = b.style.height = size + "px";
+    b.style.left = Math.random() * 100 + "%";
+    b.style.animationDuration = 15 + Math.random() * 10 + "s";
+    b.style.animationDelay = -Math.random() * 25 + "s";
+    bubbles.appendChild(b);
+  }
+  for (let i = 0; i < 12; i++) {
+    const b = document.createElement("i");
+    b.className = "bub";
+    const size = 5 + Math.random() * 14;
+    b.style.width = b.style.height = size + "px";
+    b.style.left = 8 + Math.random() * 20 + "px";
+    b.style.setProperty("--sway", (Math.random() - 0.5) * 16 + "px");
+    b.style.animationDuration = 18 + Math.random() * 10 + "s";
+    b.style.animationDelay = -Math.random() * 28 + "s";
+    bubcol.appendChild(b);
+  }
+  const sparks = document.getElementById("sparks");
+  for (let i = 0; i < 16; i++) {
+    const g = document.createElement("i");
+    g.className = "spark";
+    const size = 12 + Math.random() * 16;
+    g.style.width = g.style.height = size + "px";
+    const sky = i < 6;
+    g.style.left =
+      (sky
+        ? Math.random() < 0.5
+          ? Math.random() * 14
+          : 86 + Math.random() * 12
+        : Math.random() * 100) + "%";
+    g.style.top = sky
+      ? 20 + Math.random() * 160 + "px"
+      : "calc(var(--wl) + " + Math.round(160 + Math.random() * 900) + "px)";
+    g.style.animationDelay = -Math.random() * 3 + "s";
+    g.style.animationDuration = 2 + Math.random() * 3 + "s";
+    sparks.appendChild(g);
+  }
+
+  // Cursor trail and click bursts, mouse only, capped in number.
+  const fx = document.getElementById("fx");
+  function spawn(x, y, cls, size, dx) {
+    if (reduced || fx.childElementCount > 40) return;
+    const el = document.createElement("i");
+    el.className = "trail " + cls;
+    el.style.left = x + "px";
+    el.style.top = y + "px";
+    el.style.width = el.style.height = size + "px";
+    el.style.setProperty("--dx", dx + "px");
+    el.addEventListener("animationend", () => el.remove());
+    fx.appendChild(el);
+  }
+  if (!reduced && finePointer) {
+    let last = 0;
+    addEventListener("pointermove", (e) => {
+      const now = performance.now();
+      if (now - last < 45) return;
+      last = now;
+      spawn(
+        e.clientX,
+        e.clientY,
+        Math.random() < 0.35 ? "s" : "b",
+        5 + Math.random() * 9,
+        (Math.random() - 0.5) * 30,
+      );
+    });
+    addEventListener("click", (e) => {
+      if (e.target.closest("a, button, dialog")) return;
+      sfx("bubbles");
+      for (let i = 0; i < 9; i++)
+        spawn(
+          e.clientX + (Math.random() - 0.5) * 30,
+          e.clientY,
+          "b pop",
+          8 + Math.random() * 20,
+          (Math.random() - 0.5) * 90,
+        );
+    });
+  }
+
+  // Lightbox for project screenshots; without JS the link opens the image.
+  const lb = document.getElementById("lightbox");
+  const lbImg = document.getElementById("lb-img");
+  const lbCap = document.getElementById("lb-cap");
+  document.addEventListener("click", (e) => {
+    const a = e.target.closest("a.thumb");
+    if (!a || !lb.showModal) return;
+    e.preventDefault();
+    lbImg.src = a.getAttribute("href");
+    lbImg.alt = a.querySelector("img").alt;
+    lbCap.textContent = a.dataset.title;
+    lb.showModal();
+    sfx("whoosh");
+  });
+  lb.addEventListener("click", (e) => {
+    if (e.target === lb) lb.close();
+  });
+
+  // Grass: layered glossy blades with droplets, redrawn on resize.
+  const canvas = document.getElementById("grass");
+  function drawGrass() {
+    const w = canvas.clientWidth,
+      h = canvas.clientHeight,
+      dpr = devicePixelRatio || 1;
+    canvas.width = w * dpr;
+    canvas.height = h * dpr;
+    const ctx = canvas.getContext("2d");
+    ctx.scale(dpr, dpr);
+    let seed = 7;
+    const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+    const layers = [
+      { dark: "#155c0c", light: "#4f9e22", tall: 0.7, step: 4, shine: false },
+      { dark: "#22800c", light: "#8ad83e", tall: 0.9, step: 5, shine: true },
+      { dark: "#2f9612", light: "#c4f77a", tall: 0.55, step: 7, shine: true },
+    ];
+    for (const layer of layers) {
+      for (let x = -10; x < w + 10; x += layer.step * (0.5 + rnd())) {
+        const bh = h * layer.tall * (0.35 + rnd() * 0.65),
+          lean = (rnd() - 0.5) * 60,
+          bw = 3 + rnd() * 5;
+        const g = ctx.createLinearGradient(0, h, 0, h - bh);
+        g.addColorStop(0, layer.dark);
+        g.addColorStop(1, layer.light);
+        ctx.fillStyle = g;
+        ctx.beginPath();
+        ctx.moveTo(x - bw, h);
+        ctx.quadraticCurveTo(x + lean * 0.3, h - bh * 0.6, x + lean, h - bh);
+        ctx.quadraticCurveTo(
+          x + lean * 0.3 + bw * 0.6,
+          h - bh * 0.6,
+          x + bw,
+          h,
+        );
+        ctx.fill();
+        if (layer.shine && rnd() < 0.5) {
+          ctx.strokeStyle = "rgba(255,255,255,.35)";
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(x, h - bh * 0.15);
+          ctx.quadraticCurveTo(
+            x + lean * 0.3,
+            h - bh * 0.6,
+            x + lean * 0.9,
+            h - bh * 0.95,
+          );
+          ctx.stroke();
+        }
+        if (rnd() < 0.07) {
+          const dx = x + lean * 0.6,
+            dy = h - bh * 0.7,
+            r = 1.8 + rnd() * 2.5;
+          ctx.fillStyle = "rgba(255,255,255,.55)";
+          ctx.beginPath();
+          ctx.arc(dx, dy, r, 0, 7);
+          ctx.fill();
+          ctx.fillStyle = "#fff";
+          ctx.beginPath();
+          ctx.arc(dx - r * 0.35, dy - r * 0.35, r * 0.35, 0, 7);
+          ctx.fill();
+        }
+      }
+    }
+  }
+  drawGrass();
+  let lastW = canvas.clientWidth;
+  addEventListener("resize", () => {
+    if (canvas.clientWidth !== lastW) {
+      lastW = canvas.clientWidth;
+      drawGrass();
+    }
+  });
+</script>
