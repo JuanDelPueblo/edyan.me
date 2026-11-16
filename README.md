@@ -1,10 +1,6 @@
 # edyan.me
 
-Portfolio website for Edyan Antonio Cruz, built with Astro.
-
-Profile information and ordered project/experience lists are stored in
-`src/content/index.yaml`. Omit an entry from its list to hide it. Templates for
-new entries are in `src/content/templates/`.
+Portfolio website for Edyan Antonio Cruz, built with Astro and TailwindCSS.
 
 ## Development server
 
