@@ -1,4 +1,5 @@
 ---
+import * as simpleIcons from "simple-icons";
 import { portfolio as info, projects, experiences } from "../content";
 
 // Every technology with the entries that use it, most used first.
@@ -15,7 +16,20 @@ const toolbox = Object.keys(used).sort(
   (a, b) => used[b].length - used[a].length || a.localeCompare(b),
 );
 
-// A stable hue per name colours the chip's dot.
+// Simple Icons exports each icon as si + the capitalised slug, such as
+// siNodedotjs for nodedotjs. Only the paths used here end up in the page.
+function icon(tech: string) {
+  const slug = info.toolboxIcons[tech];
+  if (!slug) return undefined;
+  const found = (simpleIcons as Record<string, unknown>)[
+    "si" + slug[0].toUpperCase() + slug.slice(1)
+  ] as { path: string; hex: string } | undefined;
+  if (!found)
+    throw new Error(`Unknown Simple Icons slug "${slug}" for ${tech}.`);
+  return found;
+}
+
+// A stable hue per name colours the dot of a chip without an icon.
 function hue(name: string) {
   let h = 0;
   for (const c of name) h = (h * 31 + c.charCodeAt(0)) % 360;
@@ -72,11 +86,22 @@ function hue(name: string) {
           data-tip-title={tech}
           data-tip-body={`Used in ${used[tech].length}: ${used[tech].join(", ")}`}
         >
-          <i
-            class="aero-chip-dot size-[11px] rounded-full"
-            style={`--h: ${hue(tech)}`}
-            aria-hidden="true"
-          />
+          {icon(tech) ? (
+            <svg
+              class="size-3.5 flex-none drop-shadow-[0_1px_0_#fff]"
+              viewBox="0 0 24 24"
+              fill={`#${icon(tech)!.hex}`}
+              aria-hidden="true"
+            >
+              <path d={icon(tech)!.path} />
+            </svg>
+          ) : (
+            <i
+              class="aero-chip-dot size-[11px] rounded-full"
+              style={`--h: ${hue(tech)}`}
+              aria-hidden="true"
+            />
+          )}
           {tech}
           <b class="aero-count min-w-[18px] rounded-[9px] px-[5px] py-px text-center text-[10px]">
             {used[tech].length}

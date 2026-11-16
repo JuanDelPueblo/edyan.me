@@ -22,6 +22,29 @@ monogram: EC
 timeZone: America/Puerto_Rico
 clockPlace: Puerto Rico
 toolboxTitle: Toolbox
+# Icons for Toolbox chips: technology name to a Simple Icons slug, as listed at
+# https://simpleicons.org. Technologies without an icon show a coloured dot.
+toolboxIcons:
+  Android Studio: androidstudio
+  Angular: angular
+  BigQuery: googlebigquery
+  CUDA: nvidia
+  Discord.JS: discorddotjs
+  Docker: docker
+  GDScript: godotengine
+  Godot: godotengine
+  Google Cloud: googlecloud
+  Java: openjdk
+  Jetpack Compose: jetpackcompose
+  Kotlin: kotlin
+  Linux: linux
+  Node.js: nodedotjs
+  Python: python
+  ROS: ros
+  Rust: rust
+  SQLite: sqlite
+  Streamlit: streamlit
+  TypeScript: typescript
 # 80x15 badges under the tab window. Images live in public/badges/; url is
 # optional. Fedora, Puerto Rico and 1024x768 come from the web.badges.world
 # archive; the rest were made with its badge generator.
