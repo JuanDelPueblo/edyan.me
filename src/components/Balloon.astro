@@ -23,8 +23,9 @@
 
 <script>
   const tip = document.getElementById("balloon")!;
-  const tipTitle = tip.querySelector("b")!;
-  const tipBody = tip.querySelector("span")!;
+  // Direct children only: the info icon holds a span of its own.
+  const tipTitle = tip.querySelector(":scope > b")!;
+  const tipBody = tip.querySelector<HTMLElement>(":scope > span")!;
   const targets =
     ".aero-site a[href]:not(.aero-thumb), .aero-site [data-tip-title]";
   let tipFor: HTMLElement | null = null;
