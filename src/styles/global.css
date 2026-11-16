@@ -35,6 +35,23 @@
 }
 
 @layer base {
+  /* One device pixel in CSS px, for .aero-screen. The inline script in
+     Layout.astro sets the exact value, which also follows browser zoom. */
+  :root {
+    --dpx: 1px;
+    @media (resolution >= 1.25dppx) {
+      --dpx: 0.8px;
+    }
+    @media (resolution >= 1.5dppx) {
+      --dpx: calc(1px / 1.5);
+    }
+    @media (resolution >= 2dppx) {
+      --dpx: 0.5px;
+    }
+    @media (resolution >= 3dppx) {
+      --dpx: calc(1px / 3);
+    }
+  }
   /* Keyboard focus scrolls content clear of the sticky tab strip. */
   html {
     scroll-padding-top: calc(56px + env(safe-area-inset-top, 0px));
@@ -704,6 +721,10 @@
   #sound[aria-pressed="false"] .spk-on {
     display: none;
   }
+  #screen-filter[aria-pressed="true"] .scr-off,
+  #screen-filter[aria-pressed="false"] .scr-on {
+    display: none;
+  }
   #sound[aria-pressed="true"] .spk-on path {
     animation: aero-fade-in 0.9s ease-out 2;
   }
@@ -1037,6 +1058,60 @@
     box-shadow:
       0 0 0 4px var(--color-focus),
       var(--aero-shadow, 0 0 #0000);
+  }
+
+  /* LCD screen texture over the whole page: RGB subpixel stripes one device
+     pixel wide, in rows three device pixels tall with a dark one-pixel gap,
+     multiplied onto everything below. Sizes use --dpx (one device pixel) so
+     the pattern lands on whole pixels; fractional sizes beat against the
+     pixel grid and show as bands. The stripe tints are a 5% mask
+     (255/70/70 at 0.05) folded into the colours. Click-through, and drawn
+     without JavaScript. */
+  .aero-screen {
+    position: fixed;
+    inset: 0;
+    z-index: 70;
+    pointer-events: none;
+    mix-blend-mode: multiply;
+    background:
+      repeating-linear-gradient(
+        to bottom,
+        rgb(0 0 0 / 0.09) 0 var(--dpx),
+        transparent var(--dpx) calc(var(--dpx) * 3)
+      ),
+      repeating-linear-gradient(
+        to right,
+        rgb(255 246 246) 0 var(--dpx),
+        rgb(246 255 246) var(--dpx) calc(var(--dpx) * 2),
+        rgb(246 246 255) calc(var(--dpx) * 2) calc(var(--dpx) * 3)
+      );
+  }
+  /* Slight softness, like a panel driven below its native resolution. A
+     separate element, because a blur and a blend on one element would
+     multiply the blurred page onto itself. */
+  .aero-screen-blur {
+    position: fixed;
+    inset: 0;
+    z-index: 70;
+    pointer-events: none;
+    backdrop-filter: blur(0.25px);
+  }
+  /* The tray toggle in Tray.astro sets data-screen="off" on <html>. Narrow
+     screens skip the texture, and the tab strip has no room for its toggle. */
+  html[data-screen="off"] :is(.aero-screen, .aero-screen-blur) {
+    display: none;
+  }
+  @media (width < 40rem) {
+    .aero-screen,
+    .aero-screen-blur {
+      display: none;
+    }
+  }
+  @media print {
+    .aero-screen,
+    .aero-screen-blur {
+      display: none;
+    }
   }
 }
 

@@ -2,7 +2,8 @@
 import { portfolio as info } from "../content";
 import Clock from "./Clock.astro";
 
-// Notification area at the right end of the tab strip: a sound toggle and a
+// Notification area at the right end of the tab strip: a sound toggle, a
+// toggle for the LCD screen texture (.aero-screen in global.css) and a
 // clock in the configured time zone that opens a flyout. The flyout shows the
 // build date as the last-updated date.
 const zoned = (options: Intl.DateTimeFormatOptions) =>
@@ -60,6 +61,68 @@ const zoneName = zoned({ timeZoneName: "short" })
           d="M15.2 13.4l4.4 4.4"
           stroke="#fff"
           stroke-width="1.7"
+          stroke-linecap="round"
+        ></path>
+      </g>
+    </svg>
+  </button>
+  <button
+    class="aero-tray-btn flex min-h-[26px] cursor-pointer items-center rounded-xl px-[5px] py-px max-sm:hidden"
+    id="screen-filter"
+    type="button"
+    aria-pressed="true"
+    aria-label="Screen filter"
+    data-tip-title="Screen filter"
+    data-tip-body="On"
+  >
+    <!-- Monitor: RGB subpixel bars on a lit screen when on, a dark screen
+         when off. -->
+    <svg class="size-5 drop-shadow-icon" viewBox="0 0 24 24" aria-hidden="true">
+      <path
+        d="M10.5 17.5h3l.8 2.7H9.7zM7.5 20.5h9"
+        fill="url(#ck-rim)"
+        stroke="#2d4f6e"
+        stroke-width="1.1"
+        stroke-linejoin="round"
+        stroke-linecap="round"
+      ></path>
+      <rect
+        x="2.5"
+        y="3.5"
+        width="19"
+        height="14"
+        rx="2"
+        fill="url(#ck-rim)"
+        stroke="#2d4f6e"
+        stroke-width="1.1"
+      ></rect>
+      <g class="scr-on">
+        <rect
+          x="4.5"
+          y="5.5"
+          width="15"
+          height="10"
+          rx="0.8"
+          fill="#2f9fe0"
+        ></rect>
+        <path d="M9.6 7.5v6" stroke="#ff6a5a" stroke-width="1.6"></path>
+        <path d="M12 7.5v6" stroke="#6fe07a" stroke-width="1.6"></path>
+        <path d="M14.4 7.5v6" stroke="#9fc4ff" stroke-width="1.6"></path>
+      </g>
+      <g class="scr-off">
+        <rect
+          x="4.5"
+          y="5.5"
+          width="15"
+          height="10"
+          rx="0.8"
+          fill="#3b5168"
+        ></rect>
+        <path
+          d="M6 13.5l6-6.5"
+          stroke="#fff"
+          stroke-opacity=".3"
+          stroke-width="1.2"
           stroke-linecap="round"
         ></path>
       </g>
@@ -131,6 +194,28 @@ const zoneName = zoned({ timeZoneName: "short" })
       sfx("on");
     }
   });
+  // Screen filter toggle. The inline script in Layout.astro applies a saved
+  // "off" before first paint.
+  const screenBtn = document.getElementById("screen-filter")!;
+  const html = document.documentElement;
+  function showScreen(on: boolean) {
+    screenBtn.setAttribute("aria-pressed", String(on));
+    screenBtn.dataset.tipBody = on ? "On" : "Off";
+    if (on) delete html.dataset.screen;
+    else html.dataset.screen = "off";
+  }
+  showScreen(html.dataset.screen !== "off");
+  screenBtn.addEventListener("click", () => {
+    const on = html.dataset.screen === "off";
+    showScreen(on);
+    sfx("click");
+    try {
+      localStorage.setItem("aero-screen", on ? "on" : "off");
+    } catch {
+      // Storage can be blocked; the toggle still works for this visit.
+    }
+  });
+
   // A glassy click for buttons and links across the page.
   document.addEventListener("click", (e) => {
     const target = e.target as Element;

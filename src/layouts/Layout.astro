@@ -30,7 +30,8 @@ const { title, description } = Astro.props;
     <Font cssVariable="--font-silkscreen" preload />
     <!--
       Runs before first paint: picks the tab from the URL hash so only that
-      panel renders. Without JavaScript, every panel shows.
+      panel renders, and applies a saved "screen filter off" choice. Without
+      JavaScript, every panel shows.
     -->
     <script is:inline>
       const tabKeys = ["projects", "experiences", "contact"];
@@ -38,6 +39,26 @@ const { title, description } = Astro.props;
       document.documentElement.dataset.tab = tabKeys.includes(hashKey)
         ? hashKey
         : "projects";
+      try {
+        if (localStorage.getItem("aero-screen") === "off")
+          document.documentElement.dataset.screen = "off";
+      } catch {
+        // Storage can be blocked; the filter stays on.
+      }
+      // Exact device pixel size for the .aero-screen texture. Zooming changes
+      // devicePixelRatio, which ends the current resolution query.
+      const setDpx = () => {
+        document.documentElement.style.setProperty(
+          "--dpx",
+          1 / devicePixelRatio + "px",
+        );
+        matchMedia(`(resolution: ${devicePixelRatio}dppx)`).addEventListener(
+          "change",
+          setDpx,
+          { once: true },
+        );
+      };
+      setDpx();
     </script>
   </head>
   <body class="m-0">
@@ -50,5 +71,8 @@ const { title, description } = Astro.props;
     </a>
     <!-- The page content goes in this slot. -->
     <slot />
+    <!-- LCD screen texture over everything; see .aero-screen in global.css. -->
+    <div class="aero-screen-blur" aria-hidden="true"></div>
+    <div class="aero-screen" aria-hidden="true"></div>
   </body>
 </html>
