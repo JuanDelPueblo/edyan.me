@@ -1240,3 +1240,38 @@ html[data-tab="contact"] #p-contact {
     opacity: 0;
   }
 }
+
+/* Aero cursors, drawn in design/cursors/ and exported to public/cursors/ at
+   32px. The 2x files double those pixels for a low-res look on dense
+   screens. Unlayered, so they override the cursor-pointer utility. Each
+   rule repeats the plain url() for browsers without image-set() cursors. */
+html {
+  cursor:
+    url("/cursors/arrow.png") 2 2,
+    default;
+  cursor:
+    image-set(url("/cursors/arrow.png") 1x, url("/cursors/arrow@2x.png") 2x) 2 2,
+    default;
+}
+:is(p, h1, h2, h3, h4, li, dd, dt, figcaption, blockquote) {
+  cursor:
+    url("/cursors/text.png") 16 16,
+    text;
+  cursor:
+    image-set(url("/cursors/text.png") 1x, url("/cursors/text@2x.png") 2x) 16 16,
+    text;
+}
+:is(a[href], button, [role="tab"], .cursor-pointer),
+:is(a[href], button, [role="tab"], .cursor-pointer) * {
+  cursor:
+    url("/cursors/hand.png") 11 1,
+    pointer;
+  cursor:
+    image-set(url("/cursors/hand.png") 1x, url("/cursors/hand@2x.png") 2x) 11 1,
+    pointer;
+}
+/* Project thumbnails keep the zoom cursor that says they open larger. */
+.cursor-zoom-in,
+.cursor-zoom-in * {
+  cursor: zoom-in;
+}

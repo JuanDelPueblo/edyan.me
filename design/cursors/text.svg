@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+  <!-- Text beam: white with a dark outline so it shows on any background.
+       Hotspot: 16 16. -->
+  <defs>
+    <path id="beam" d="M13 5.5C14.8 5.5 15.8 6.1 16.5 7.1C17.2 6.1 18.2 5.5 20 5.5M16.5 7.1V24.9M13 26.5C14.8 26.5 15.8 25.9 16.5 24.9C17.2 25.9 18.2 26.5 20 26.5"/>
+  </defs>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <use href="#beam" stroke="#16212e" stroke-width="3"/>
+    <use href="#beam" stroke="#ffffff" stroke-width="1"/>
+  </g>
+</svg>

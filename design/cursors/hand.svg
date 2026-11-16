@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+  <!-- Aero-style pointing hand with a light-blue gloss. Hotspot: 11 1.
+       The shapes are drawn twice: once with a thick dark stroke for the
+       outline, then filled on top so they merge into one hand. -->
+  <defs>
+    <!-- One gradient across the whole hand, not one per finger. -->
+    <linearGradient id="fill" gradientUnits="userSpaceOnUse" x1="7" y1="1" x2="13" y2="29">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.55" stop-color="#eef7fe"/>
+      <stop offset="1" stop-color="#c4e3f8"/>
+    </linearGradient>
+    <filter id="shadow" x="-30%" y="-30%" width="180%" height="180%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="0.9"/>
+      <feOffset dx="1" dy="1.6"/>
+      <feComponentTransfer><feFuncA type="linear" slope="0.4"/></feComponentTransfer>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <g id="hand">
+      <rect x="8.8" y="1.5" width="4.6" height="15" rx="2.3"/>
+      <rect x="13.4" y="9" width="4.1" height="8.5" rx="2"/>
+      <rect x="17.5" y="10" width="3.9" height="8" rx="1.95"/>
+      <rect x="21.4" y="11.6" width="3.4" height="7" rx="1.7"/>
+      <path d="M8.8 13.5H24.8V20.5C24.8 25.2 21.8 28.2 17.4 28.2H14.6C11.6 28.2 10.1 26.8 8.6 24.4L4.4 17.9C3.7 16.7 4.1 15.3 5.3 14.8C6.4 14.4 7.4 14.9 8.1 15.9L8.8 17Z"/>
+    </g>
+  </defs>
+  <g filter="url(#shadow)" transform="translate(1 0.5) scale(0.93)">
+    <use href="#hand" fill="#16212e" stroke="#16212e" stroke-width="2" stroke-linejoin="round"/>
+    <use href="#hand" fill="url(#fill)"/>
+    <path d="M13.4 11.2V15.6M17.5 12.2V16M21.4 13.6V16.6" stroke="#16212e" stroke-width="0.9" stroke-linecap="round"/>
+  </g>
+</svg>
