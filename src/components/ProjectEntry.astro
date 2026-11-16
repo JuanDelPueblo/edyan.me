@@ -17,47 +17,77 @@ const {
 } = Astro.props.project;
 ---
 
-<article class="my-10">
-  <h3 class="my-4 text-xl font-bold leading-tight">{title}</h3>
-  <p class="my-4">{description}</p>
-  {technologies.length > 0 && (
-    <p class="my-4">Technologies: {technologies.join(", ")}</p>
-  )}
-  <!-- Projects can have a demo, a repository, both, or neither. -->
-  {(liveUrl || githubUrl) && (
-    <ul
-      class="my-4 flex flex-wrap gap-x-5 gap-y-2"
-      aria-label={`${title} links`}
+<!-- data-tech lets a toolbox chip find the entries that use it. -->
+<article
+  class="aero-entry relative -mx-2 grid grid-cols-[164px_minmax(0,1fr)] items-start gap-x-4 rounded-lg px-2.5 py-3 max-sm:grid-cols-1 max-sm:gap-2.5"
+  data-tech={technologies.join("|")}
+>
+  {image ? (
+    <a
+      class="aero-thumb relative mt-0.5 block cursor-zoom-in rounded-md p-1"
+      href={image}
+      data-title={title}
     >
-      {liveUrl && (
-        <li>
+      <img
+        class="block h-auto w-full rounded-[3px] max-sm:h-[140px] max-sm:object-cover max-sm:object-top"
+        src={image}
+        alt={imageAlt ?? title}
+        loading="lazy"
+        decoding="async"
+      />
+    </a>
+  ) : (
+    // Projects without a screenshot get a decorative landscape.
+    <div
+      class="aero-thumb relative mt-0.5 aspect-[16/10] max-w-full rounded-md p-1 max-sm:aspect-auto max-sm:h-[150px]"
+      aria-hidden="true"
+    >
+      <svg
+        class="block size-full rounded-[3px]"
+        viewBox="0 0 160 100"
+        preserveAspectRatio="xMidYMid slice"
+      >
+        <rect width="160" height="100" fill="url(#ph-sky)" />
+        <circle cx="122" cy="28" r="13" fill="#fff8c4" />
+        <circle cx="122" cy="28" r="22" fill="#fff" opacity=".25" />
+        <path d="M0 78 Q40 48 84 72 T160 64 V100 H0Z" fill="url(#ph-hill)" />
+        <path
+          d="M0 88 Q60 70 110 86 T160 82 V100 H0Z"
+          fill="#3f9e16"
+          opacity=".8"
+        />
+        <rect width="160" height="44" fill="#fff" opacity=".18" />
+      </svg>
+    </div>
+  )}
+  <div class="min-w-0 space-y-1.5">
+    <h3 class="mb-1 font-head text-base font-bold text-heading">{title}</h3>
+    <p>{description}</p>
+    {technologies.length > 0 && (
+      <p class="text-[11px] text-ink-soft">
+        <b>Technologies:</b> {technologies.join(", ")}
+      </p>
+    )}
+    <!-- Projects can have a demo, a repository, both, or neither. -->
+    {(liveUrl || githubUrl) && (
+      <p class="flex flex-wrap gap-1.5">
+        {liveUrl && (
           <a
-            class="text-blue-800 underline underline-offset-2 focus-visible:outline-2 focus-visible:outline-offset-4"
+            class="aero-pill aero-jelly relative inline-flex items-center rounded-[11px] px-3 py-[3px] text-[11px] font-bold no-underline"
             href={liveUrl}
           >
             View Project
           </a>
-        </li>
-      )}
-      {githubUrl && (
-        <li>
+        )}
+        {githubUrl && (
           <a
-            class="text-blue-800 underline underline-offset-2 focus-visible:outline-2 focus-visible:outline-offset-4"
+            class="aero-pill aero-jelly relative inline-flex items-center rounded-[11px] px-3 py-[3px] text-[11px] font-bold no-underline"
             href={githubUrl}
           >
             View Code
           </a>
-        </li>
-      )}
-    </ul>
-  )}
-  {image && (
-    <img
-      class="block h-auto max-w-full"
-      src={image}
-      alt={imageAlt ?? title}
-      loading="lazy"
-      decoding="async"
-    />
-  )}
+        )}
+      </p>
+    )}
+  </div>
 </article>

@@ -1,0 +1,78 @@
+---
+// Analog clock face. The tray clock script turns the hands. The small version
+// drops the ticks and second hand and thickens the hands so it reads at 22px.
+interface Props {
+  class: string;
+  big?: boolean;
+}
+
+const { class: className, big = false } = Astro.props;
+const ticks = [];
+for (let i = 0; i < 12; i++) ticks.push(i);
+---
+
+<svg class={className} viewBox="0 0 100 100" aria-hidden="true">
+  <circle
+    cx="50"
+    cy="50"
+    r="49"
+    fill="url(#ck-rim)"
+    stroke="#5f86a8"
+    stroke-width="1"
+  ></circle>
+  <circle
+    cx="50"
+    cy="50"
+    r="42"
+    fill="url(#ck-face)"
+    stroke="#7f9db6"
+    stroke-width="1"
+  ></circle>
+  {big && (
+    <g stroke="#2d4f6e" stroke-width="2.5" stroke-linecap="round">
+      {ticks.map((i) => (
+        <line
+          x1="50"
+          y1={i % 3 ? 13 : 10}
+          x2="50"
+          y2="18"
+          transform={`rotate(${i * 30} 50 50)`}
+        />
+      ))}
+    </g>
+  )}
+  <line
+    class="h-hr"
+    x1="50"
+    y1="53"
+    x2="50"
+    y2="28"
+    stroke="#0d3555"
+    stroke-width={big ? 5 : 8}
+    stroke-linecap="round"
+  ></line>
+  <line
+    class="h-min"
+    x1="50"
+    y1="54"
+    x2="50"
+    y2={big ? 16 : 18}
+    stroke="#0d3555"
+    stroke-width={big ? 3.2 : 6}
+    stroke-linecap="round"
+  ></line>
+  {big && (
+    <line
+      class="h-sec"
+      x1="50"
+      y1="60"
+      x2="50"
+      y2="14"
+      stroke="#e0402a"
+      stroke-width="1.4"
+      stroke-linecap="round"
+    />
+  )}
+  <circle cx="50" cy="50" r={big ? 3.5 : 6} fill="#0d3555"></circle>
+  <ellipse cx="50" cy="29" rx="33" ry="19" fill="url(#ck-gloss)"></ellipse>
+</svg>

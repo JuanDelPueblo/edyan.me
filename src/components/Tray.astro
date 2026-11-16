@@ -1,0 +1,203 @@
+---
+import { portfolio as info } from "../content";
+import Clock from "./Clock.astro";
+
+// Notification area at the right end of the tab strip: a sound toggle and a
+// clock in the configured time zone that opens a flyout. The flyout shows the
+// build date as the last-updated date.
+const zoned = (options: Intl.DateTimeFormatOptions) =>
+  new Intl.DateTimeFormat("en-US", { timeZone: info.timeZone, ...options });
+const updated = zoned({
+  month: "long",
+  day: "numeric",
+  year: "numeric",
+}).format(new Date());
+const zoneName = zoned({ timeZoneName: "short" })
+  .formatToParts(new Date())
+  .find((part) => part.type === "timeZoneName")?.value;
+---
+
+<div class="aero-tray flex flex-none items-center self-center rounded-[14px] p-0.5 font-head text-xs font-bold tabular-nums no-js:hidden">
+  <button
+    class="aero-tray-btn flex min-h-[26px] items-center rounded-xl py-px pr-[3px] pl-[5px]"
+    id="sound"
+    type="button"
+    aria-pressed="false"
+    aria-label="Sound effects"
+    data-tip-title="Sound effects"
+    data-tip-body="Off"
+  >
+    <!-- Speaker: waves when on, a red mute badge when off. -->
+    <svg
+      class="size-5 drop-shadow-[0_1px_1px_rgba(0,40,90,0.35)]"
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+    >
+      <path
+        d="M3 9h3.8l5-4.2v14.4l-5-4.2H3z"
+        fill="url(#ck-rim)"
+        stroke="#2d4f6e"
+        stroke-width="1.1"
+        stroke-linejoin="round"
+      ></path>
+      <g
+        class="spk-on"
+        fill="none"
+        stroke="#1a86c8"
+        stroke-width="1.9"
+        stroke-linecap="round"
+      >
+        <path d="M15 8.8a4.4 4.4 0 0 1 0 6.4"></path>
+        <path d="M17.8 6.2a8.2 8.2 0 0 1 0 11.6"></path>
+      </g>
+      <g class="spk-off">
+        <circle
+          cx="17.4"
+          cy="15.6"
+          r="4.7"
+          fill="#e0402a"
+          stroke="#fff"
+        ></circle>
+        <path
+          d="M15.2 13.4l4.4 4.4"
+          stroke="#fff"
+          stroke-width="1.7"
+          stroke-linecap="round"
+        ></path>
+      </g>
+    </svg>
+  </button>
+  <button
+    class="aero-tray-btn flex min-h-[26px] items-center gap-1.5 rounded-xl py-px pr-[5px] pl-[3px]"
+    id="tray-clock"
+    type="button"
+    data-time-zone={info.timeZone}
+    popovertarget="clock-flyout"
+  >
+    <Clock class="mini-clock size-[22px] drop-shadow-[0_1px_1px_rgba(0,40,90,0.35)]" />
+    <span class="sr-only">{info.clockPlace} time: </span>
+    <!-- Narrow screens show only the clock face; screen readers still get the time. -->
+    <span class="tray-time max-sm:sr-only"></span>
+  </button>
+</div>
+
+<div
+  class="aero-flyout fixed inset-auto m-0 w-[228px] rounded-[10px] px-3.5 pt-3.5 pb-3 text-center text-xs leading-normal"
+  id="clock-flyout"
+  popover
+  aria-label="Clock"
+>
+  <Clock
+    class="big-clock mx-auto mb-2 block size-[132px] drop-shadow-[0_4px_6px_rgba(0,40,90,0.3)]"
+    big
+  />
+  <p class="fly-time font-head text-xl font-bold text-heading tabular-nums text-shadow-[0_1px_0_#fff]"></p>
+  <p class="fly-date"></p>
+  <p class="text-[11px] text-ink-soft">
+    {info.clockPlace} ({zoneName})
+  </p>
+  <p class="mt-2.5 border-t border-dotted border-[#8fc0dc] pt-2 text-[11px] text-balance text-ink-soft">
+    Site last updated {updated}
+  </p>
+</div>
+
+<script>
+  import { isSoundOn, setSoundOn, sfx } from "../scripts/sound";
+
+  // Sound toggle. The choice is remembered per browser.
+  const soundBtn = document.getElementById("sound")!;
+  function showSound(on: boolean) {
+    setSoundOn(on);
+    soundBtn.setAttribute("aria-pressed", String(on));
+    soundBtn.dataset.tipBody = on ? "On" : "Off";
+    try {
+      localStorage.setItem("aero-sound", on ? "on" : "off");
+    } catch {
+      // Storage can be blocked; the toggle still works for this visit.
+    }
+  }
+  try {
+    if (localStorage.getItem("aero-sound") === "on") showSound(true);
+  } catch {
+    // Without storage, sound starts off.
+  }
+  soundBtn.addEventListener("click", () => {
+    if (isSoundOn()) {
+      sfx("off");
+      showSound(false);
+    } else {
+      showSound(true);
+      sfx("on");
+    }
+  });
+  // A glassy click for buttons and links across the page.
+  document.addEventListener("click", (e) => {
+    const target = e.target as Element;
+    if (target.closest(".aero-pill, a.aero-leaf, .aero-contact, .aero-close"))
+      sfx("click");
+  });
+
+  // Clock: hands and times in the configured time zone, updated each second.
+  const trayClock = document.getElementById("tray-clock")!;
+  const trayTime = trayClock.querySelector(".tray-time")!;
+  const flyout = document.getElementById("clock-flyout")!;
+  const timeZone = trayClock.dataset.timeZone;
+  const zoned = (options: Intl.DateTimeFormatOptions) =>
+    new Intl.DateTimeFormat("en-US", { timeZone, ...options });
+  const clockParts = zoned({
+    hour: "numeric",
+    minute: "numeric",
+    second: "numeric",
+    hourCycle: "h23",
+  });
+  const shortTime = zoned({ hour: "numeric", minute: "2-digit" });
+  const longTime = zoned({
+    hour: "numeric",
+    minute: "2-digit",
+    second: "2-digit",
+  });
+  const longDate = zoned({
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
+  function tick() {
+    const now = new Date();
+    const t: Record<string, number> = {};
+    for (const part of clockParts.formatToParts(now))
+      t[part.type] = +part.value;
+    for (const svg of document.querySelectorAll(".mini-clock, .big-clock")) {
+      const turn = (hand: string, deg: number) =>
+        svg
+          .querySelector(hand)
+          ?.setAttribute("transform", `rotate(${deg} 50 50)`);
+      turn(".h-hr", (t.hour % 12) * 30 + t.minute * 0.5);
+      turn(".h-min", t.minute * 6 + t.second * 0.1);
+      turn(".h-sec", t.second * 6);
+    }
+    const short = shortTime.format(now);
+    if (trayTime.textContent !== short) trayTime.textContent = short;
+    flyout.querySelector(".fly-time")!.textContent = longTime.format(now);
+    flyout.querySelector(".fly-date")!.textContent = longDate.format(now);
+  }
+  tick();
+  setInterval(tick, 1000);
+
+  // Place the flyout under the clock button, right-aligned, inside the window.
+  function placeFlyout() {
+    const r = trayClock.getBoundingClientRect();
+    const w = parseFloat(getComputedStyle(flyout).width);
+    flyout.style.top = r.bottom + 8 + "px";
+    flyout.style.left =
+      Math.max(12, Math.min(r.right - w, innerWidth - w - 12)) + "px";
+  }
+  flyout.addEventListener("beforetoggle", (e) => {
+    if ((e as ToggleEvent).newState !== "open") return;
+    placeFlyout();
+    sfx("open");
+  });
+  const followFlyout = () => flyout.matches(":popover-open") && placeFlyout();
+  addEventListener("scroll", followFlyout, { passive: true });
+  addEventListener("resize", followFlyout);
+</script>

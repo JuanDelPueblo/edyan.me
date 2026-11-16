@@ -1,0 +1,115 @@
+---
+import { portfolio as info, projects, experiences } from "../content";
+import Badges from "./Badges.astro";
+import ContactList from "./ContactList.astro";
+import ExperienceEntry from "./ExperienceEntry.astro";
+import Panel from "./Panel.astro";
+import ProjectEntry from "./ProjectEntry.astro";
+import Tray from "./Tray.astro";
+
+// [key, label, icon] for each tab. The key names the panel and the URL hash.
+const tabs = [
+  ["projects", info.projectsTab, "folder"],
+  ["experiences", info.experiencesTab, "briefcase"],
+  ["contact", info.contactsTitle, "envelope"],
+];
+---
+
+<div class="aero-frame relative rounded-xl pb-6">
+  <!-- The strip sticks to the top of the window while the frame scrolls. -->
+  <div class="aero-tabstrip sticky top-[env(safe-area-inset-top,0px)] z-5 flex gap-1 px-3.5 pt-2.5 max-sm:px-2 max-sm:pt-2">
+    <div
+      class="flex min-w-0 flex-auto gap-1 self-end max-sm:grid max-sm:grid-cols-3 no-js:hidden"
+      role="tablist"
+      aria-label="Sections"
+    >
+      {tabs.map(([key, label, icon], i) => (
+        <button
+          class="aero-tab -mb-px flex cursor-pointer items-center gap-2 pt-1.5 pr-[18px] pb-[7px] pl-[9px] font-head text-[13px] font-bold max-sm:justify-center max-sm:px-1 max-sm:text-xs"
+          type="button"
+          role="tab"
+          id={`t-${key}`}
+          aria-controls={`p-${key}`}
+          aria-selected={i === 0 ? "true" : "false"}
+          tabindex={i === 0 ? 0 : -1}
+        >
+          <svg
+            class="size-5 flex-none drop-shadow-[0_1px_1px_rgba(0,40,90,0.35)] max-sm:hidden"
+            aria-hidden="true"
+          >
+            <use href={`#i-${icon}`} />
+          </svg>
+          {label}
+        </button>
+      ))}
+    </div>
+    <Tray />
+  </div>
+  <main
+    id="main-content"
+    class="grid grid-cols-[minmax(0,1fr)] gap-4 p-4 max-sm:p-2.5"
+  >
+    <Panel tabKey="projects" title={info.projectsTitle} icon="folder">
+      {projects.map((project) => (
+        <ProjectEntry project={project} />
+      ))}
+    </Panel>
+    <Panel tabKey="experiences" title={info.experiencesTitle} icon="briefcase">
+      {experiences.map((experience) => (
+        <ExperienceEntry experience={experience} />
+      ))}
+    </Panel>
+    <Panel tabKey="contact" title={info.contactsTitle} icon="envelope">
+      <ContactList />
+    </Panel>
+    <Badges />
+  </main>
+</div>
+
+<script>
+  import { markTabs, selectTab, tabKeys } from "../scripts/tabs";
+  import { sfx } from "../scripts/sound";
+
+  // Tabs: one panel at a time, chosen by click or arrow keys.
+  const frame = document.querySelector<HTMLElement>(".aero-frame")!;
+  const strip = document.querySelector(".aero-tabstrip")!;
+  const tabs = tabKeys.map((key) => document.getElementById("t-" + key)!);
+  markTabs();
+
+  function chooseTab(tab: HTMLElement) {
+    selectTab(tab.id.slice(2));
+    sfx("click");
+    // When the strip is pinned, bring the new panel's top into view.
+    if (strip.classList.contains("stuck")) frame.scrollIntoView();
+  }
+  for (const tab of tabs) tab.addEventListener("click", () => chooseTab(tab));
+  strip.addEventListener("keydown", (e) => {
+    const event = e as KeyboardEvent;
+    const i = tabs.indexOf(document.activeElement as HTMLElement);
+    const n = tabs.length;
+    const moves: Record<string, number> = {
+      ArrowRight: (i + 1) % n,
+      ArrowLeft: (i - 1 + n) % n,
+      Home: 0,
+      End: n - 1,
+    };
+    const j = moves[event.key];
+    if (i < 0 || j === undefined) return;
+    event.preventDefault();
+    tabs[j].focus();
+    chooseTab(tabs[j]);
+  });
+  addEventListener("hashchange", () => {
+    const key = location.hash.slice(1);
+    if (tabKeys.includes(key)) selectTab(key);
+  });
+
+  // Square off the strip's top corners once it pins to the window top.
+  function markStuck() {
+    strip.classList.toggle(
+      "stuck",
+      strip.getBoundingClientRect().top <= 1 && scrollY > 50,
+    );
+  }
+  addEventListener("scroll", markStuck, { passive: true });
+</script>

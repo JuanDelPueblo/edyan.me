@@ -1,1 +1,1147 @@
 @import "tailwindcss";
+
+/* no-js: styles for visitors without JavaScript, who have no data-tab. */
+@custom-variant no-js (html:not([data-tab]) &);
+
+/* Frutiger Aero theme. Markup handles layout, spacing and type with Tailwind
+   utilities. Each glossy surface is one named class in the components layer,
+   because its layered gradients and shadows do not read well as utilities.
+   The background is a placeholder until the scene is redesigned. */
+
+@theme {
+  --color-ink: #0d3555;
+  --color-ink-soft: #3b6585;
+  --color-heading: #0a4a80;
+  --color-tab-ink: #0b3a5c;
+  --color-link: #0a5fa8;
+  --color-link-hover: #0a86d0;
+  --color-rim: #2b84c0;
+  --color-focus: #082f55;
+  --color-water-deep: #0c63b8;
+  --color-strip: #a6daf6;
+  --font-text:
+    Verdana, "DejaVu Sans", "Bitstream Vera Sans", Tahoma, sans-serif;
+  --font-head:
+    "Trebuchet MS", "Lucida Grande", Tahoma, "DejaVu Sans", sans-serif;
+  --font-pixel: "Silkscreen", Verdana, "DejaVu Sans", sans-serif;
+}
+
+@layer base {
+  /* Keyboard focus scrolls content clear of the sticky tab strip. */
+  html {
+    scroll-padding-top: calc(56px + env(safe-area-inset-top, 0px));
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+  a {
+    color: var(--color-link);
+  }
+  a:hover {
+    color: var(--color-link-hover);
+  }
+  a:focus-visible,
+  button:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 2px;
+    box-shadow: 0 0 0 4px var(--color-focus);
+  }
+
+  /* Aqua scrollbar: glossy capsule thumb in a pale water track. */
+  ::-webkit-scrollbar {
+    width: 16px;
+    height: 16px;
+  }
+  ::-webkit-scrollbar-track {
+    background: linear-gradient(90deg, #bfe6fb 0%, #eaf8ff 50%, #bfe6fb 100%);
+    box-shadow: inset 1px 0 0 #7fbde2;
+  }
+  ::-webkit-scrollbar-thumb {
+    border-radius: 8px;
+    border: 1px solid #0a5f9e;
+    background: linear-gradient(
+      90deg,
+      #8fe0fa 0%,
+      #33ade6 40%,
+      #0f7cc0 60%,
+      #2aa0dc 100%
+    );
+    box-shadow:
+      inset 0 0 0 1px rgba(255, 255, 255, 0.5),
+      inset 3px 0 3px rgba(255, 255, 255, 0.45);
+  }
+  /* Browsers without the WebKit pseudo-elements get the colour hint only. */
+  @supports not selector(::-webkit-scrollbar) {
+    html {
+      scrollbar-color: #1f93de #d6f0fd;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation: none !important;
+      transition: none !important;
+    }
+  }
+}
+
+@layer components {
+  /* ===== Placeholder scene ===== */
+
+  /* Sky above the waterline, water below. --wl is the waterline's distance
+     from the top of .aero-site; Hero.astro sets it to the header's bottom. */
+  .aero-site {
+    --wl: 236px;
+    background:
+      radial-gradient(
+        ellipse 70% 260px at 50% var(--wl),
+        rgba(255, 255, 255, 0.45),
+        transparent 70%
+      ),
+      radial-gradient(
+        ellipse 120% 100% at 50% 100%,
+        rgba(0, 30, 90, 0.45),
+        transparent 60%
+      ),
+      linear-gradient(
+        180deg,
+        #0f6fd8 0,
+        #3d9cf0 calc(var(--wl) * 0.5),
+        #b3e2ff var(--wl),
+        #43b8f2 var(--wl),
+        #1f93de calc(var(--wl) + 380px),
+        var(--color-water-deep) 100%
+      );
+  }
+  /* Thick glass band across the page at the waterline. */
+  .aero-waterline {
+    top: calc(var(--wl) - 28px);
+    height: 58px;
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.3) 26%,
+      rgba(255, 255, 255, 0.95) 44%,
+      rgba(205, 246, 255, 0.92) 50%,
+      rgba(110, 205, 248, 0.45) 62%,
+      rgba(10, 90, 165, 0.38) 86%,
+      rgba(10, 90, 165, 0) 100%
+    );
+  }
+  /* Wet-floor reflection of the header, rippled by the #ripple filter. */
+  .aero-reflection {
+    opacity: 0.5;
+    -webkit-mask-image: linear-gradient(
+      180deg,
+      #000 0%,
+      rgba(0, 0, 0, 0.6) 40%,
+      transparent 100%
+    );
+    mask-image: linear-gradient(
+      180deg,
+      #000 0%,
+      rgba(0, 0, 0, 0.6) 40%,
+      transparent 100%
+    );
+  }
+  .aero-reflection > div {
+    transform: scaleY(-1);
+    filter: url(#ripple);
+  }
+  .aero-reflection::after {
+    content: "";
+    position: absolute;
+    inset: -20px 0 0;
+    background: repeating-linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.22) 0 2px,
+      transparent 2px 10px
+    );
+    animation: aero-lines 5s linear infinite;
+  }
+  .aero-reflection .aero-glass-card {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+
+  /* ===== Header ===== */
+
+  .aero-orb {
+    background: radial-gradient(
+      circle at 50% 100%,
+      rgba(190, 250, 255, 0.98) 0%,
+      rgba(60, 180, 240, 0.8) 45%,
+      rgba(10, 90, 190, 0.92) 100%
+    );
+    border: 2px solid rgba(255, 255, 255, 0.85);
+    box-shadow:
+      0 12px 24px rgba(0, 50, 110, 0.4),
+      inset 0 -10px 18px rgba(200, 255, 255, 0.75),
+      inset 0 4px 10px rgba(0, 40, 120, 0.4);
+    color: #fff;
+    text-shadow: 0 2px 3px rgba(0, 50, 100, 0.7);
+  }
+  .aero-orb::before {
+    content: "";
+    position: absolute;
+    z-index: 1;
+    top: 5%;
+    left: 15%;
+    right: 15%;
+    height: 45%;
+    border-radius: 50%;
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.95),
+      rgba(255, 255, 255, 0.05)
+    );
+  }
+  /* A photo sits under a lighter gloss. */
+  .aero-orb:has(img)::before {
+    opacity: 0.55;
+  }
+  .aero-orb::after {
+    content: "";
+    position: absolute;
+    inset: -8px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.7);
+    opacity: 0;
+    animation: aero-ring 1.6s ease-out 0.5s 1 both;
+  }
+
+  /* Green gloss: the greeting pill and the resume button. */
+  .aero-leaf {
+    color: #fff;
+    text-shadow:
+      0 1px 1px rgba(10, 50, 0, 0.9),
+      0 0 2px rgba(10, 50, 0, 0.6);
+    border: 1px solid #1d5f08;
+    background: linear-gradient(
+      180deg,
+      #b8f07a 0%,
+      #5cbf24 14%,
+      #3f9e16 49%,
+      #24750a 51%,
+      #2c840c 85%,
+      #3f9e16 100%
+    );
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.9),
+      inset 0 -3px 6px rgba(190, 255, 120, 0.35),
+      0 3px 6px rgba(0, 60, 0, 0.4);
+  }
+  .aero-leaf:hover {
+    color: #fff;
+  }
+  /* The resume button glows three times after the page loads. */
+  .aero-glow::before {
+    content: "";
+    position: absolute;
+    inset: -5px;
+    border-radius: 24px;
+    box-shadow: 0 0 16px 4px rgba(190, 255, 120, 0.85);
+    opacity: 0;
+    animation: aero-glow 2.4s ease-in-out 1.6s 3;
+    pointer-events: none;
+  }
+  .aero-wave {
+    display: inline-block;
+    transform-origin: 70% 80%;
+    animation: aero-hand 1.8s ease-in-out 1.2s 1;
+  }
+  :hover > .aero-wave {
+    animation: aero-hand-again 1.2s ease-in-out;
+  }
+
+  /* Glossy title: white-to-sky fill with an outline glow and one shimmer. */
+  .aero-title {
+    color: transparent;
+    -webkit-background-clip: text;
+    background-clip: text;
+    background-image:
+      linear-gradient(
+        110deg,
+        transparent 40%,
+        rgba(255, 255, 255, 0.95) 50%,
+        transparent 60%
+      ),
+      linear-gradient(
+        180deg,
+        #ffffff 0%,
+        #eaf8ff 48%,
+        #a9dcff 52%,
+        #ffffff 100%
+      );
+    background-size:
+      250% 100%,
+      100% 100%;
+    background-repeat: no-repeat;
+    background-position:
+      130% 0,
+      0 0;
+    filter: drop-shadow(0 0 1px rgba(0, 45, 110, 0.9))
+      drop-shadow(0 2px 2px rgba(0, 50, 120, 0.7))
+      drop-shadow(0 0 10px rgba(0, 60, 150, 0.4));
+    animation: aero-shimmer 1.6s ease-in-out 0.9s 1 both;
+  }
+
+  .aero-glass-card {
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.86),
+      rgba(225, 245, 255, 0.72)
+    );
+    border: 1px solid rgba(255, 255, 255, 0.95);
+    box-shadow:
+      0 6px 16px rgba(0, 50, 110, 0.25),
+      inset 0 1px 0 #fff;
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+  }
+
+  .aero-jelly:hover {
+    animation: aero-jelly 0.55s ease;
+  }
+
+  /* ===== Toolbox ticker ===== */
+
+  /* Dark glass media bar. */
+  .aero-tube {
+    border: 1px solid #041a30;
+    background: linear-gradient(
+      180deg,
+      #2d71ad 0%,
+      #14508a 47%,
+      #072b4f 50%,
+      #0a3a68 100%
+    );
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.5),
+      inset 0 -3px 8px rgba(80, 190, 255, 0.35),
+      0 3px 8px rgba(0, 40, 90, 0.35);
+    animation: aero-drop-in 0.8s cubic-bezier(0.2, 1.4, 0.4, 1) 0.1s both;
+  }
+  .aero-tube::before {
+    content: "";
+    position: absolute;
+    top: 1px;
+    left: 18px;
+    right: 18px;
+    height: 46%;
+    border-radius: 24px 24px 50% 50% / 24px 24px 8px 8px;
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.32),
+      rgba(255, 255, 255, 0.04)
+    );
+    pointer-events: none;
+  }
+  .aero-play {
+    border: 1px solid #031b33;
+    background: radial-gradient(
+      circle at 50% 120%,
+      #a8f5ff 0%,
+      #2aa6e8 40%,
+      #0b5d9e 75%,
+      #06386a 100%
+    );
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.6),
+      0 0 10px rgba(80, 200, 255, 0.55);
+  }
+  .aero-play::before {
+    content: "";
+    position: absolute;
+    top: 2px;
+    left: 6px;
+    right: 6px;
+    height: 46%;
+    border-radius: 50%;
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.85),
+      rgba(255, 255, 255, 0.08)
+    );
+  }
+  .aero-play:hover {
+    filter: brightness(1.15);
+  }
+  .aero-play[aria-pressed="true"] .ic-pause,
+  .aero-play[aria-pressed="false"] .ic-play {
+    display: none;
+  }
+  /* LCD window for the label. */
+  .aero-lcd {
+    background: linear-gradient(180deg, #021226, #06213d);
+    box-shadow:
+      inset 0 1px 3px rgba(0, 0, 0, 0.7),
+      0 1px 0 rgba(255, 255, 255, 0.18);
+    color: #9ff3ff;
+    text-shadow: 0 0 6px rgba(80, 220, 255, 0.9);
+  }
+  /* The chip strip fades out at both ends. */
+  .aero-fade-x {
+    -webkit-mask-image: linear-gradient(
+      90deg,
+      transparent,
+      #000 28px,
+      #000 calc(100% - 28px),
+      transparent
+    );
+    mask-image: linear-gradient(
+      90deg,
+      transparent,
+      #000 28px,
+      #000 calc(100% - 28px),
+      transparent
+    );
+  }
+  .aero-chip {
+    border: 1px solid rgba(255, 255, 255, 0.55);
+    background: linear-gradient(
+      180deg,
+      #ffffff 0%,
+      #e3f4fd 49%,
+      #c6e7f9 51%,
+      #e8f7ff 100%
+    );
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
+    color: var(--color-tab-ink);
+    text-shadow: 0 1px 0 #fff;
+  }
+  .aero-chip:hover {
+    background: linear-gradient(
+      180deg,
+      #f2fcff 0%,
+      #c9efff 49%,
+      #86d4f8 51%,
+      #b6e6fc 100%
+    );
+  }
+  /* --h sets the dot's hue. */
+  .aero-chip-dot {
+    background: radial-gradient(
+      circle at 35% 30%,
+      #fff 0 14%,
+      hsl(var(--h) 85% 62%) 42%,
+      hsl(var(--h) 80% 30%) 100%
+    );
+    box-shadow: 0 0 0 1px rgba(0, 30, 70, 0.25);
+  }
+  .aero-count {
+    background: linear-gradient(180deg, #3aa2dc, #0b5d9e);
+    color: #fff;
+    text-shadow: 0 1px 0 rgba(0, 30, 70, 0.8);
+  }
+
+  /* ===== Tab window ===== */
+
+  .aero-frame {
+    border: 1px solid var(--color-rim);
+    background: linear-gradient(
+      180deg,
+      rgba(243, 251, 255, 0.95) 0%,
+      rgba(226, 245, 255, 0.93) 50%,
+      rgba(206, 236, 252, 0.92) 100%
+    );
+    box-shadow:
+      inset 0 0 0 1px rgba(255, 255, 255, 0.95),
+      inset 0 -10px 24px rgba(120, 200, 245, 0.3),
+      0 4px 0 rgba(0, 60, 120, 0.18),
+      0 18px 40px rgba(0, 40, 100, 0.4);
+    animation: aero-drop-in 0.8s cubic-bezier(0.2, 1.4, 0.4, 1) both;
+    /* Cancels the root scroll padding so a tab switch scrolls the frame's
+       top edge to just under the safe area. */
+    scroll-margin-top: -56px;
+  }
+
+  /* The strip rounds its lower corners once it pins to the window top. */
+  .aero-tabstrip {
+    border-radius: 11px 11px 0 0;
+    border-bottom: 1px solid var(--color-rim);
+    background: linear-gradient(180deg, #dcf2fe 0%, var(--color-strip) 100%);
+    box-shadow: inset 0 1px 0 #fff;
+    transition:
+      border-radius 0.3s,
+      box-shadow 0.3s;
+  }
+  .aero-tabstrip.stuck {
+    border-radius: 0 0 10px 10px;
+    box-shadow:
+      inset 0 1px 0 #fff,
+      0 6px 16px rgba(0, 40, 90, 0.35);
+  }
+  .aero-tab {
+    position: relative;
+    isolation: isolate;
+    border: 1px solid #4d95c6;
+    border-bottom: 0;
+    border-radius: 9px 9px 0 0;
+    color: var(--color-tab-ink);
+    text-shadow: 0 1px 0 #fff;
+    background: linear-gradient(
+      180deg,
+      #ffffff 0%,
+      #e4f5fe 45%,
+      #c3e6f9 50%,
+      #dbf1fd 100%
+    );
+    transition:
+      border-color 0.35s ease,
+      box-shadow 0.35s ease;
+  }
+  /* The selected-tab fill fades in instead of swapping gradients. */
+  .aero-tab::after {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(180deg, #ffffff, #f3fbff);
+    opacity: 0;
+    transition: opacity 0.35s ease;
+  }
+  .aero-tab:hover {
+    background: linear-gradient(
+      180deg,
+      #f2fcff 0%,
+      #c9efff 45%,
+      #86d4f8 50%,
+      #b6e6fc 100%
+    );
+  }
+  /* The selected tab covers the strip's bottom rule so it joins the page. */
+  .aero-tab[aria-selected="true"] {
+    z-index: 1;
+    border-color: var(--color-rim);
+    box-shadow: 0 1px 0 #f3fbff;
+  }
+  .aero-tab[aria-selected="true"]::after {
+    opacity: 1;
+  }
+  .aero-tab:focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: -5px;
+    box-shadow: none;
+  }
+  .aero-tab[aria-selected="true"]:focus-visible {
+    box-shadow: 0 1px 0 #f3fbff;
+  }
+
+  /* Recessed notification area holding the sound toggle and the clock. */
+  .aero-tray {
+    border: 1px solid rgba(43, 132, 192, 0.55);
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.6),
+      rgba(166, 218, 246, 0.35)
+    );
+    box-shadow:
+      inset 0 1px 2px rgba(0, 40, 90, 0.25),
+      0 1px 0 rgba(255, 255, 255, 0.8);
+    color: var(--color-tab-ink);
+    text-shadow: 0 1px 0 #fff;
+  }
+  .aero-tray-btn:hover {
+    background: linear-gradient(180deg, #ffffff, #c9efff);
+    box-shadow: inset 0 0 0 1px rgba(43, 132, 192, 0.45);
+  }
+  .aero-tray-btn:focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 0;
+    box-shadow: none;
+  }
+  #sound[aria-pressed="true"] .spk-off,
+  #sound[aria-pressed="false"] .spk-on {
+    display: none;
+  }
+  #sound[aria-pressed="true"] .spk-on path {
+    animation: aero-fade-in 0.9s ease-out 2;
+  }
+  #sound[aria-pressed="true"] .spk-on path + path {
+    animation-delay: 0.12s;
+  }
+
+  .aero-flyout {
+    border: 1px solid #6eb2dc;
+    background: linear-gradient(180deg, #ffffff, #e3f4fd);
+    box-shadow:
+      0 12px 30px rgba(0, 20, 60, 0.45),
+      inset 0 1px 0 #fff;
+    color: var(--color-ink);
+  }
+  .aero-flyout:popover-open {
+    animation: aero-fade-in 0.2s ease-out;
+  }
+
+  /* Panel with a glossy title bar. */
+  .aero-box {
+    background: linear-gradient(180deg, #ffffff 0%, #f0faff 60%, #e2f4fd 100%);
+    border: 1px solid #6fb3de;
+    box-shadow:
+      inset 0 1px 0 #fff,
+      0 2px 4px rgba(0, 50, 100, 0.18);
+    /* The first panel drops in just after the frame. */
+    animation: aero-drop-in 0.7s cubic-bezier(0.2, 1.5, 0.4, 1) 0.25s both;
+  }
+  /* Panels shown by a tab switch fade in quickly instead. */
+  .aero-box.switched {
+    animation: aero-panel-in 0.3s ease-out both;
+  }
+  .aero-box:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 2px;
+    box-shadow: 0 0 0 4px var(--color-focus);
+  }
+  .aero-titlebar {
+    color: #fff;
+    text-shadow:
+      0 1px 1px rgba(0, 30, 70, 0.9),
+      0 0 3px rgba(0, 30, 70, 0.5);
+    background: linear-gradient(
+      180deg,
+      #7fd0f5 0%,
+      #3aa2dc 22%,
+      #1a86c8 49%,
+      #0b64a8 51%,
+      #0f70b3 80%,
+      #2088cc 100%
+    );
+    border-bottom: 1px solid #06508a;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.9),
+      inset 0 -1px 0 rgba(140, 220, 255, 0.6);
+  }
+  /* A light sweep crosses the title bar on hover. */
+  .aero-titlebar::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 35%;
+    background: linear-gradient(
+      100deg,
+      transparent,
+      rgba(255, 255, 255, 0.6),
+      transparent
+    );
+    transform: translateX(-120%);
+    pointer-events: none;
+  }
+  .aero-box:hover .aero-titlebar::after {
+    animation: aero-sweep 0.9s ease-out;
+  }
+  .aero-box-body::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 50px;
+    background: radial-gradient(
+      ellipse 80% 100% at 50% -30%,
+      rgba(255, 255, 255, 0.95),
+      transparent 70%
+    );
+    pointer-events: none;
+  }
+
+  /* Entries: a dotted rule between them and a soft highlight on hover. */
+  .aero-entry {
+    transition:
+      background 0.25s,
+      box-shadow 0.25s;
+  }
+  .aero-entry + .aero-entry {
+    margin-top: 14px;
+  }
+  .aero-entry + .aero-entry::before {
+    content: "";
+    position: absolute;
+    left: 10px;
+    right: 10px;
+    top: -8px;
+    border-top: 1px dotted #8fc0dc;
+  }
+  .aero-entry:hover {
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.8),
+      rgba(200, 238, 255, 0.55)
+    );
+    box-shadow: inset 0 0 0 1px rgba(110, 190, 235, 0.6);
+  }
+  /* Spotlight from a toolbox chip: a glow that pulses twice. */
+  .aero-entry.spot {
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.92),
+      rgba(190, 240, 255, 0.7)
+    );
+    box-shadow:
+      inset 0 0 0 2px #2bb3f0,
+      0 0 16px rgba(43, 179, 240, 0.6);
+    animation: aero-spot 0.65s ease-in-out 4 alternate;
+  }
+  .aero-entry h3 {
+    text-shadow: 0 1px 0 #fff;
+  }
+
+  .aero-thumb {
+    background: linear-gradient(180deg, #fff, #e3f4fd);
+    border: 1px solid #6eb2dc;
+    box-shadow: 0 4px 10px rgba(0, 50, 100, 0.3);
+    transition: transform 0.3s cubic-bezier(0.2, 1.6, 0.4, 1);
+  }
+  .aero-thumb::after {
+    content: "";
+    position: absolute;
+    inset: 4px 4px 50%;
+    border-radius: 4px 4px 40% 40% / 4px 4px 12px 12px;
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.45),
+      rgba(255, 255, 255, 0)
+    );
+    pointer-events: none;
+  }
+  /* A "+" bubble appears on thumbnails that open the lightbox. */
+  a.aero-thumb::before {
+    content: "+";
+    position: absolute;
+    z-index: 1;
+    right: -6px;
+    bottom: -6px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    font:
+      bold 16px/1 Verdana,
+      "DejaVu Sans",
+      sans-serif;
+    color: #fff;
+    text-shadow: 0 1px 1px rgba(0, 30, 70, 0.9);
+    background: radial-gradient(
+      circle at 50% 115%,
+      #9ff3ff 0%,
+      #2393d3 55%,
+      #08609f 100%
+    );
+    border: 1px solid #06507d;
+    box-shadow: 0 2px 4px rgba(0, 40, 90, 0.4);
+    opacity: 0;
+    transform: scale(0.6);
+    transition:
+      opacity 0.2s,
+      transform 0.25s cubic-bezier(0.2, 1.6, 0.4, 1);
+  }
+  a.aero-thumb:hover::before,
+  a.aero-thumb:focus-visible::before {
+    opacity: 1;
+    transform: none;
+  }
+  .aero-entry:hover .aero-thumb {
+    transform: scale(1.05) rotate(-1.5deg);
+  }
+
+  /* Blue gloss: the small "View Code" style buttons. A shine crosses on
+     hover. */
+  .aero-pill {
+    overflow: hidden;
+    color: #fff;
+    text-shadow: 0 1px 1px rgba(0, 30, 70, 0.9);
+    border: 1px solid #06507d;
+    background: linear-gradient(
+      180deg,
+      #6fcdf3 0%,
+      #2393d3 30%,
+      #0f78bd 49%,
+      #08609f 51%,
+      #0c6fae 85%,
+      #2288c8 100%
+    );
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.8),
+      0 2px 3px rgba(0, 40, 90, 0.35);
+  }
+  .aero-pill:hover {
+    color: #fff;
+  }
+  .aero-pill::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 40%;
+    background: linear-gradient(
+      100deg,
+      transparent,
+      rgba(255, 255, 255, 0.75),
+      transparent
+    );
+    transform: translateX(-150%);
+  }
+  .aero-pill:hover::after {
+    animation: aero-shine 0.7s ease forwards;
+  }
+
+  .aero-contact:hover {
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.9),
+      rgba(190, 232, 252, 0.7)
+    );
+    box-shadow: inset 0 0 0 1px rgba(110, 190, 235, 0.7);
+  }
+  .aero-contact:hover .aero-tile {
+    animation: aero-jelly 0.55s ease;
+  }
+  /* App-style tile; --c1 to --c3 set the brand colours. */
+  .aero-tile {
+    background: linear-gradient(
+      180deg,
+      var(--c1) 0%,
+      var(--c2) 50%,
+      var(--c3) 100%
+    );
+    border: 1px solid var(--c3);
+    box-shadow:
+      0 2px 4px rgba(0, 40, 90, 0.35),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.35);
+  }
+  .aero-tile::before {
+    content: "";
+    position: absolute;
+    top: 1px;
+    left: 2px;
+    right: 2px;
+    height: 48%;
+    border-radius: 8px 8px 50% 50% / 8px 8px 8px 8px;
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.8),
+      rgba(255, 255, 255, 0.1)
+    );
+  }
+  .tile-email {
+    --c1: #c9f3ff;
+    --c2: #4fc1f0;
+    --c3: #0d6fb2;
+  }
+  .tile-github {
+    --c1: #8f9aa6;
+    --c2: #3a434d;
+    --c3: #15191e;
+  }
+  .tile-linkedin {
+    --c1: #6fb6f2;
+    --c2: #0a66c2;
+    --c3: #064a8f;
+  }
+  .tile-discord {
+    --c1: #a9b2ff;
+    --c2: #5865f2;
+    --c3: #343fbf;
+  }
+
+  /* 88x31 badges in a pixel font, a fixture of 2000s personal sites. */
+  .aero-b88 {
+    border: 1px solid #000;
+    color: #fff;
+    text-shadow: 1px 1px 0 #000;
+    box-shadow:
+      inset 1px 1px 0 rgba(255, 255, 255, 0.55),
+      inset -1px -1px 0 rgba(0, 0, 0, 0.35),
+      0 2px 3px rgba(0, 40, 90, 0.3);
+    transition: transform 0.2s cubic-bezier(0.2, 1.8, 0.4, 1);
+  }
+  .aero-b88::after {
+    content: "";
+    position: absolute;
+    inset: 0 0 50%;
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.35),
+      rgba(255, 255, 255, 0.08)
+    );
+    pointer-events: none;
+  }
+  .aero-b88:hover {
+    transform: translateY(-2px);
+  }
+  .b88-astro {
+    background: linear-gradient(135deg, #ff6a3d 0 18%, #7b3fe4 18% 100%);
+  }
+  .b88-tailwind {
+    background: linear-gradient(180deg, #4fd2ff, #0e7aa8);
+  }
+  .b88-view {
+    background: linear-gradient(180deg, #f4f8fb, #a9b8c6);
+    color: #10324f;
+    text-shadow: 1px 1px 0 #fff;
+  }
+  .b88-pr {
+    background: linear-gradient(
+      180deg,
+      #e0302a 0 20%,
+      #f5f5f5 20% 40%,
+      #e0302a 40% 60%,
+      #f5f5f5 60% 80%,
+      #e0302a 80%
+    );
+  }
+  .b88-pr::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 20px;
+    background: #1f5fc4;
+    clip-path: polygon(0 0, 100% 50%, 0 100%);
+  }
+  .b88-pr span {
+    margin-left: 10px;
+    padding: 1px 4px;
+    background: rgba(10, 25, 70, 0.62);
+  }
+  .b88-aero {
+    background: linear-gradient(
+      180deg,
+      #b8f07a 0%,
+      #3f9e16 50%,
+      #1a86c8 51%,
+      #0b64a8 100%
+    );
+  }
+
+  /* ===== Overlays ===== */
+
+  .aero-lightbox {
+    border: 1px solid #6eb2dc;
+    background: linear-gradient(180deg, #ffffff, #e3f4fd);
+    box-shadow: 0 20px 60px rgba(0, 20, 60, 0.6);
+    color: var(--color-ink);
+  }
+  .aero-lightbox[open] {
+    animation: aero-lb-in 0.4s cubic-bezier(0.2, 1.4, 0.4, 1);
+  }
+  .aero-lightbox::backdrop {
+    background: rgba(0, 20, 50, 0.72);
+  }
+  /* Red glass close button. */
+  .aero-close {
+    color: #fff;
+    text-shadow: 0 1px 1px rgba(80, 0, 0, 0.8);
+    border: 1px solid #7a0d0d;
+    background: radial-gradient(
+      circle at 50% 115%,
+      #ffb3a3 0%,
+      #e0402a 55%,
+      #9a1408 100%
+    );
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.7),
+      0 3px 6px rgba(0, 0, 0, 0.4);
+  }
+  .aero-close:hover {
+    filter: brightness(1.12);
+  }
+
+  /* XP-style balloon tip. Balloon.astro places it above or below its target
+     and sets --tail to aim the tail at the target's centre. */
+  .aero-balloon {
+    border: 1px solid #1d1d1d;
+    background: #ffffe1;
+    color: #000;
+    box-shadow: 3px 3px 4px rgba(0, 0, 0, 0.3);
+    animation: aero-fade-in 0.15s ease-out;
+  }
+  /* Two stacked triangles: the dark one draws the outline, the pale one
+     covers the balloon's border where the tail joins it. */
+  .aero-balloon::before,
+  .aero-balloon::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: var(--tail, 24px);
+    width: 16px;
+    height: 12px;
+    background: #1d1d1d;
+    clip-path: polygon(0 0, 100% 0, 0 100%);
+  }
+  .aero-balloon::after {
+    left: calc(var(--tail, 24px) + 1px);
+    width: 13px;
+    height: 10px;
+    background: #ffffe1;
+  }
+  .aero-balloon.below::before,
+  .aero-balloon.below::after {
+    top: auto;
+    bottom: 100%;
+    clip-path: polygon(0 0, 0 100%, 100% 100%);
+  }
+  /* Blue glass "i" for the balloon and other small badges. */
+  .aero-info {
+    color: #fff;
+    background: radial-gradient(
+      circle at 50% 115%,
+      #9ff3ff 0%,
+      #2393d3 55%,
+      #08609f 100%
+    );
+    border: 1px solid #06507d;
+  }
+}
+
+/* Tabs work without JavaScript as plain stacked sections. The inline script
+   in Layout.astro sets data-tab on <html>, which shows only that panel. */
+html[data-tab] [role="tabpanel"] {
+  display: none;
+}
+html[data-tab="projects"] #p-projects,
+html[data-tab="experiences"] #p-experiences,
+html[data-tab="contact"] #p-contact {
+  display: block;
+}
+
+@keyframes aero-drop-in {
+  from {
+    transform: translateY(-24px) scale(0.97);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+@keyframes aero-panel-in {
+  from {
+    transform: translateY(6px);
+    opacity: 0;
+  }
+}
+@keyframes aero-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes aero-lines {
+  to {
+    transform: translateY(10px);
+  }
+}
+@keyframes aero-ring {
+  from {
+    transform: scale(0.9);
+    opacity: 0.9;
+  }
+  to {
+    transform: scale(1.35);
+    opacity: 0;
+  }
+}
+@keyframes aero-glow {
+  50% {
+    opacity: 1;
+  }
+}
+@keyframes aero-hand {
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+  20% {
+    transform: rotate(18deg);
+  }
+  40% {
+    transform: rotate(-10deg);
+  }
+  60% {
+    transform: rotate(14deg);
+  }
+  80% {
+    transform: rotate(-4deg);
+  }
+}
+/* A copy of aero-hand, so hovering restarts the wave. */
+@keyframes aero-hand-again {
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+  20% {
+    transform: rotate(18deg);
+  }
+  40% {
+    transform: rotate(-10deg);
+  }
+  60% {
+    transform: rotate(14deg);
+  }
+  80% {
+    transform: rotate(-4deg);
+  }
+}
+@keyframes aero-shimmer {
+  from {
+    background-position:
+      130% 0,
+      0 0;
+  }
+  to {
+    background-position:
+      -30% 0,
+      0 0;
+  }
+}
+@keyframes aero-jelly {
+  0% {
+    transform: scale(1);
+  }
+  30% {
+    transform: scale(1.08, 0.92);
+  }
+  50% {
+    transform: scale(0.95, 1.05);
+  }
+  70% {
+    transform: scale(1.03, 0.97);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+@keyframes aero-sweep {
+  to {
+    transform: translateX(320%);
+  }
+}
+@keyframes aero-shine {
+  to {
+    transform: translateX(330%);
+  }
+}
+@keyframes aero-spot {
+  from {
+    box-shadow:
+      inset 0 0 0 2px #2bb3f0,
+      0 0 4px rgba(43, 179, 240, 0.2);
+  }
+}
+@keyframes aero-lb-in {
+  from {
+    transform: scale(0.85);
+    opacity: 0;
+  }
+}

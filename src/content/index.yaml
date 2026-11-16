@@ -11,6 +11,35 @@ resume: https://drive.google.com/file/d/1zN4vLOaH-EQquWTEVSJRbRAEb7-VgGHk/view?u
 contactsTitle: Get in Touch
 projectsTitle: My Projects
 experiencesTitle: My Experiences
+# Tab labels. The third tab uses contactsTitle.
+projectsTab: Projects
+experiencesTab: Experiences
+# Header orb. Set avatar to an image in public/, such as /images/avatar.jpg, to
+# show a photo instead of the monogram.
+monogram: EC
+# avatar: /images/avatar.jpg
+# Clock in the tab strip. timeZone is an IANA time zone name.
+timeZone: America/Puerto_Rico
+clockPlace: Puerto Rico
+toolboxTitle: Toolbox
+# 88x31 badges under the tab window. style is one of: astro, tailwind, view,
+# pr, aero.
+badges:
+  - style: astro
+    top: Powered by
+    bottom: Astro
+  - style: tailwind
+    top: Styled with
+    bottom: Tailwind
+  - style: view
+    top: Best viewed
+    bottom: 1024x768
+  - style: pr
+    top: Made in
+    bottom: Puerto Rico
+  - style: aero
+    top: 100%
+    bottom: Frutiger Aero
 contacts:
   - name: Email
     url: mailto:edyancruz@outlook.com

@@ -1,0 +1,19 @@
+---
+import { portfolio as info } from "../content";
+---
+
+<ul class="mt-0.5 flex flex-wrap justify-center gap-2" aria-label="Site badges">
+  {info.badges.map((badge) => (
+    <li
+      class:list={[
+        "aero-b88 relative grid h-[31px] w-[88px] place-items-center overflow-hidden text-center font-pixel text-[8px] leading-[1.15] uppercase",
+        `b88-${badge.style}`,
+      ]}
+    >
+      <span class="relative whitespace-nowrap">
+        {badge.top}
+        <b class="block text-[9px] font-normal">{badge.bottom}</b>
+      </span>
+    </li>
+  ))}
+</ul>

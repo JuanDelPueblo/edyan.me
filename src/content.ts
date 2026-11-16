@@ -30,6 +30,14 @@ interface Portfolio {
   contactsTitle: string;
   projectsTitle: string;
   experiencesTitle: string;
+  projectsTab: string;
+  experiencesTab: string;
+  monogram: string;
+  avatar?: string;
+  timeZone: string;
+  clockPlace: string;
+  toolboxTitle: string;
+  badges: { style: string; top: string; bottom: string }[];
   contacts: { name: string; url: string }[];
   projects: string[];
   experiences: string[];

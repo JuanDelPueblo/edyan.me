@@ -17,8 +17,15 @@ Manage the background server with `astro dev stop`, `astro dev status`, and
   exported content data where needed.
 - Destructure component data directly from `Astro.props.project` or
   `Astro.props.experience` instead of creating an intermediate variable.
-- Use Tailwind utility classes for styling. Keep the plain presentation until a
-  visual design is requested.
+- Use Tailwind utility classes for layout, spacing and type, with colour and
+  font tokens in the `@theme` block of `src/styles/global.css`. Give each glossy
+  surface (layered gradients, shadows, highlight pseudo-elements) one named
+  `aero-*` class in that file instead of long arbitrary-value utilities.
+- Follow the Frutiger Aero prototype in `design/aero-prototype/` for visual
+  details. The background is a placeholder in `Scene.astro` until the scene is
+  redesigned.
+- Keep the page usable without JavaScript: every panel shows, and controls that
+  need scripts use the `no-js:hidden` variant.
 
 ## Content
 

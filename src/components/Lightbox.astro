@@ -1,0 +1,52 @@
+---
+// Enlarged project screenshots. Without JavaScript, a thumbnail link opens
+// the image itself.
+---
+
+<dialog
+  class="aero-lightbox m-auto max-w-[min(92vw,900px)] overflow-visible rounded-[10px] p-2.5"
+  id="lightbox"
+  aria-labelledby="lb-caption"
+>
+  <form method="dialog">
+    <button
+      class="aero-close absolute -top-3.5 -right-3.5 size-8 cursor-pointer rounded-full font-text text-base leading-none font-bold"
+      aria-label="Close"
+    >
+      ✕
+    </button>
+  </form>
+  <img
+    class="mx-auto block h-auto max-h-[74vh] w-auto max-w-full rounded border border-[#9cc6de]"
+    src=""
+    alt=""
+  />
+  <p
+    class="mx-0.5 mt-2 font-head text-sm font-bold text-heading"
+    id="lb-caption"
+  ></p>
+</dialog>
+
+<script>
+  import { sfx } from "../scripts/sound";
+
+  const lightbox = document.getElementById("lightbox") as HTMLDialogElement;
+  const image = lightbox.querySelector("img")!;
+  const caption = lightbox.querySelector("p")!;
+  document.addEventListener("click", (e) => {
+    const link = (e.target as Element).closest<HTMLAnchorElement>(
+      "a.aero-thumb",
+    );
+    if (!link) return;
+    e.preventDefault();
+    image.src = link.getAttribute("href")!;
+    image.alt = link.querySelector("img")!.alt;
+    caption.textContent = link.dataset.title ?? "";
+    lightbox.showModal();
+    sfx("whoosh");
+  });
+  // A click on the backdrop closes the dialog.
+  lightbox.addEventListener("click", (e) => {
+    if (e.target === lightbox) lightbox.close();
+  });
+</script>

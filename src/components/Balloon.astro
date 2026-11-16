@@ -1,0 +1,139 @@
+---
+// XP-style balloon tip. Links show their destination; other controls carry
+// their own text in data-tip-title and data-tip-body. It appears on mouse
+// hover and keyboard focus, the pointer can move onto it, and Escape
+// dismisses it.
+---
+
+<div
+  class="aero-balloon fixed z-60 max-w-[min(300px,calc(100vw-24px))] rounded-lg py-1.5 pr-2.5 pl-[30px] text-[11px] leading-[1.4] wrap-anywhere [font-family:Tahoma,Verdana,'DejaVu_Sans',sans-serif]"
+  id="balloon"
+  role="tooltip"
+  hidden
+>
+  <i
+    class="aero-info absolute top-1.5 left-2 grid size-4 place-items-center rounded-full font-serif text-[11px] leading-none font-bold"
+    aria-hidden="true"
+  >
+    i
+  </i>
+  <b class="block"></b>
+  <span class="block"></span>
+</div>
+
+<script>
+  const tip = document.getElementById("balloon")!;
+  const tipTitle = tip.querySelector("b")!;
+  const tipBody = tip.querySelector("span")!;
+  const targets =
+    ".aero-site a[href]:not(.aero-thumb), .aero-site [data-tip-title]";
+  let tipFor: HTMLElement | null = null;
+  let tipNext: HTMLElement | null = null;
+  let tipTimer = 0;
+
+  function showTip(el: HTMLElement) {
+    clearTimeout(tipTimer);
+    tipNext = null;
+    if (tipFor && tipFor !== el) tipFor.removeAttribute("aria-describedby");
+    let title: string;
+    let body: string;
+    if (el.dataset.tipTitle) {
+      title = el.dataset.tipTitle;
+      body = el.dataset.tipBody ?? "";
+    } else {
+      // Show a link's host in bold and its path below, or an email address.
+      const url = new URL((el as HTMLAnchorElement).href);
+      title = url.hostname.replace(/^www\./, "");
+      body = decodeURI(url.pathname + url.search).replace(/\/$/, "");
+      if (url.protocol === "mailto:") [title, body] = [url.pathname, ""];
+      if (body.length > 44) body = body.slice(0, 42) + "…";
+    }
+    tipTitle.textContent = title;
+    tipBody.textContent = body;
+    tipBody.hidden = !body;
+    tip.hidden = false;
+    tipFor = el;
+    el.setAttribute("aria-describedby", "balloon");
+    placeTip();
+    // Targets inside the moving toolbox strip are followed while it coasts
+    // to a stop.
+    if (el.closest(".tk-view")) requestAnimationFrame(follow);
+  }
+  function follow() {
+    if (!tipFor || !tipFor.closest(".tk-view")) return;
+    placeTip();
+    requestAnimationFrame(follow);
+  }
+  function placeTip() {
+    const r = tipFor!.getBoundingClientRect();
+    const w = tip.offsetWidth;
+    const h = tip.offsetHeight;
+    const cx = r.left + r.width / 2;
+    // Prefer above the target; flip below when it would leave the window.
+    const below = r.top - h - 14 < 8;
+    const left = Math.max(12, Math.min(cx - 28, innerWidth - w - 12));
+    tip.classList.toggle("below", below);
+    tip.style.left = left + "px";
+    tip.style.top = (below ? r.bottom + 14 : r.top - h - 14) + "px";
+    tip.style.setProperty(
+      "--tail",
+      Math.max(14, Math.min(cx - left, w - 30)) + "px",
+    );
+  }
+  function hideTip() {
+    clearTimeout(tipTimer);
+    tipNext = null;
+    if (!tipFor) return;
+    tipFor.removeAttribute("aria-describedby");
+    tipFor = null;
+    tip.hidden = true;
+  }
+
+  // Mouse: the first balloon waits a moment, moving between targets swaps it
+  // at once, and leaving hides it after a short grace period.
+  document.addEventListener("pointerover", (e) => {
+    if (e.pointerType !== "mouse") return;
+    const el = (e.target as Element).closest<HTMLElement>(targets);
+    if (el && el === tipNext) return;
+    if (el && tipFor && el !== tipFor) showTip(el);
+    else if (el && !tipFor) {
+      clearTimeout(tipTimer);
+      tipNext = el;
+      tipTimer = window.setTimeout(() => showTip(el), 400);
+    } else if (el || (e.target as Element).closest("#balloon"))
+      clearTimeout(tipTimer);
+  });
+  document.addEventListener("pointerout", (e) => {
+    if (e.pointerType !== "mouse") return;
+    const from = (e.target as Element).closest(targets + ", #balloon");
+    const to = e.relatedTarget as Element | null;
+    if (!from) return;
+    // Moves within the target, within the balloon, or between the two count
+    // as staying.
+    if (
+      to &&
+      (from.contains(to) ||
+        to.closest("#balloon") ||
+        (tipFor && tipFor.contains(to)))
+    )
+      return;
+    clearTimeout(tipTimer);
+    tipNext = null;
+    tipTimer = window.setTimeout(hideTip, 150);
+  });
+  document.addEventListener("focusin", (e) => {
+    const el = (e.target as Element).closest<HTMLElement>(targets);
+    if (el && el.matches(":focus-visible")) showTip(el);
+    else hideTip();
+  });
+  document.addEventListener("focusout", (e) => {
+    if (e.target === tipFor) hideTip();
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") hideTip();
+  });
+  document.addEventListener("click", hideTip);
+  const followTip = () => tipFor && placeTip();
+  addEventListener("scroll", followTip, { passive: true });
+  addEventListener("resize", followTip);
+</script>

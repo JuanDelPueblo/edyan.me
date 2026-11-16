@@ -1,5 +1,6 @@
 ---
 import "../styles/global.css";
+import Icons from "../components/Icons.astro";
 
 // Shared document layout with page-specific metadata.
 interface Props {
@@ -11,23 +12,41 @@ const { title, description } = Astro.props;
 ---
 
 <!doctype html>
-<html
-  lang="en"
-  class="bg-white font-sans leading-[1.6] wrap-anywhere text-[#222]"
->
+<html lang="en" class="bg-water-deep font-text text-ink wrap-break-word">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
     <!-- Files in public/ are served at fixed URLs. -->
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png" />
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
     <meta name="generator" content={Astro.generator} />
     <meta name="description" content={description} />
     <title>{title}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Silkscreen&display=swap"
+    />
+    <!--
+      Runs before first paint: picks the tab from the URL hash so only that
+      panel renders. Without JavaScript, every panel shows.
+    -->
+    <script is:inline>
+      const tabKeys = ["projects", "experiences", "contact"];
+      const hashKey = location.hash.slice(1);
+      document.documentElement.dataset.tab = tabKeys.includes(hashKey)
+        ? hashKey
+        : "projects";
+    </script>
   </head>
-  <body class="mx-auto max-w-[52rem] p-6">
+  <body class="m-0">
+    <Icons />
     <a
-      class="absolute -top-20 left-4 z-10 bg-white p-2 text-blue-800 underline focus:top-2 focus-visible:outline-2 focus-visible:outline-offset-4"
+      class="absolute -top-20 left-4 z-60 rounded bg-white p-2 text-link underline focus:top-2"
       href="#main-content"
     >
       Skip to content

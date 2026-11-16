@@ -1,89 +1,25 @@
 ---
 // Astro builds this file as /. The script runs before the HTML renders.
-import { portfolio as info, projects, experiences } from "../content";
-import ExperienceEntry from "../components/ExperienceEntry.astro";
-import ProjectEntry from "../components/ProjectEntry.astro";
+import { portfolio as info } from "../content";
+import Balloon from "../components/Balloon.astro";
+import Hero from "../components/Hero.astro";
+import Lightbox from "../components/Lightbox.astro";
+import Scene from "../components/Scene.astro";
+import TabWindow from "../components/TabWindow.astro";
+import Toolbox from "../components/Toolbox.astro";
 import Layout from "../layouts/Layout.astro";
 ---
 
 <Layout title={info.pageTitle} description={info.description}>
-  <header>
-    <nav aria-label="Main navigation">
-      <ul class="my-4 flex flex-wrap gap-x-5 gap-y-2">
-        <li>
-          <a
-            class="text-blue-800 underline underline-offset-2 focus-visible:outline-2 focus-visible:outline-offset-4"
-            href="#hero"
-          >
-            Home
-          </a>
-        </li>
-        <li>
-          <a
-            class="text-blue-800 underline underline-offset-2 focus-visible:outline-2 focus-visible:outline-offset-4"
-            href="#projects"
-          >
-            Projects
-          </a>
-        </li>
-        <li>
-          <a
-            class="text-blue-800 underline underline-offset-2 focus-visible:outline-2 focus-visible:outline-offset-4"
-            href="#experiences"
-          >
-            Experiences
-          </a>
-        </li>
-      </ul>
-    </nav>
-  </header>
-  <main id="main-content">
-    <section id="hero" class="my-12" aria-labelledby="intro-title">
-      <p class="my-4">{info.greeting}</p>
-      <h1 id="intro-title" class="my-5 text-3xl font-bold leading-tight">
-        {info.title}
-      </h1>
-      <p class="my-4">{info.introduction}</p>
-      <p class="my-4">
-        <a
-          class="text-blue-800 underline underline-offset-2 focus-visible:outline-2 focus-visible:outline-offset-4"
-          href={info.resume}
-        >
-          View Resume
-        </a>
-      </p>
-      <h2 class="my-5 text-2xl font-bold leading-tight">
-        {info.contactsTitle}
-      </h2>
-      <ul class="my-4 flex flex-wrap gap-x-5 gap-y-2">
-        {info.contacts.map((contact) => (
-          <li>
-            <a
-              class="text-blue-800 underline underline-offset-2 focus-visible:outline-2 focus-visible:outline-offset-4"
-              href={contact.url}
-            >
-              {contact.name}
-            </a>
-          </li>
-        ))}
-      </ul>
-    </section>
-    <section id="projects" class="my-12" aria-labelledby="projects-title">
-      <h2 id="projects-title" class="my-5 text-2xl font-bold leading-tight">
-        {info.projectsTitle}
-      </h2>
-      <!-- Render each project with the shared component. -->
-      {projects.map((project) => (
-        <ProjectEntry project={project} />
-      ))}
-    </section>
-    <section id="experiences" class="my-12" aria-labelledby="experiences-title">
-      <h2 id="experiences-title" class="my-5 text-2xl font-bold leading-tight">
-        {info.experiencesTitle}
-      </h2>
-      {experiences.map((experience) => (
-        <ExperienceEntry experience={experience} />
-      ))}
-    </section>
-  </main>
+  <!-- .aero-site paints the sky and water; Scene adds the waterline. -->
+  <div class="aero-site relative min-h-screen overflow-clip pt-5 pr-[max(16px,env(safe-area-inset-right,0px))] pb-16 pl-[max(16px,env(safe-area-inset-left,0px))] text-[13px] leading-[1.55]">
+    <Scene />
+    <div class="relative z-2 mx-auto max-w-[800px]">
+      <Hero />
+      <Toolbox />
+      <TabWindow />
+    </div>
+  </div>
+  <Balloon />
+  <Lightbox />
 </Layout>

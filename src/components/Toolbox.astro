@@ -1,0 +1,219 @@
+---
+import { portfolio as info, projects, experiences } from "../content";
+
+// Every technology with the entries that use it, most used first.
+const used: Record<string, string[]> = {};
+for (const project of projects)
+  for (const tech of project.technologies)
+    (used[tech] ||= []).push(project.title);
+for (const experience of experiences)
+  for (const tech of experience.technologies)
+    (used[tech] ||= []).push(
+      `${experience.position} at ${experience.company} (${experience.period.slice(-4)})`,
+    );
+const toolbox = Object.keys(used).sort(
+  (a, b) => used[b].length - used[a].length || a.localeCompare(b),
+);
+
+// A stable hue per name colours the chip's dot.
+function hue(name: string) {
+  let h = 0;
+  for (const c of name) h = (h * 31 + c.charCodeAt(0)) % 360;
+  return h;
+}
+---
+
+<!--
+  Ticker strip above the tab window. Chips glide left and slow to a stop under
+  the pointer or keyboard focus. A chip's balloon lists the entries that use
+  it; clicking it spotlights them. With reduced motion, chips wrap in place.
+-->
+<section
+  class="aero-tube relative mb-[18px] flex h-[50px] items-center gap-2.5 rounded-[25px] px-1.5 motion-reduce:h-auto motion-reduce:rounded-2xl motion-reduce:p-2 no-js:h-auto no-js:rounded-2xl no-js:p-2"
+  aria-labelledby="tk-label"
+>
+  <button
+    class="aero-play relative grid size-[38px] flex-none cursor-pointer place-items-center rounded-full motion-reduce:hidden no-js:hidden"
+    type="button"
+    aria-pressed="false"
+    aria-label="Pause scrolling"
+  >
+    <svg
+      class="relative size-4 fill-white drop-shadow-[0_1px_1px_rgba(0,30,70,0.8)]"
+      viewBox="0 0 20 20"
+      aria-hidden="true"
+    >
+      <g class="ic-pause">
+        <rect x="5" y="4" width="3.6" height="12" rx="1"></rect>
+        <rect x="11.4" y="4" width="3.6" height="12" rx="1"></rect>
+      </g>
+      <path class="ic-play" d="M6.5 4l9.5 6-9.5 6z"></path>
+    </svg>
+  </button>
+  <h2
+    class="aero-lcd flex-none rounded-md px-2 pt-1 pb-[3px] font-pixel text-[9px] leading-[1.2] tracking-[0.08em] whitespace-nowrap uppercase max-sm:hidden"
+    id="tk-label"
+  >
+    {info.toolboxTitle}
+  </h2>
+  <div class="tk-view aero-fade-x relative flex min-w-0 flex-auto items-center self-stretch overflow-hidden motion-reduce:[mask-image:none] no-js:[mask-image:none]">
+    <!-- The chips form one tab stop; arrow keys move between them. -->
+    <div
+      class="tk-track flex gap-2 px-5 will-change-transform motion-reduce:flex-wrap motion-reduce:px-0 no-js:flex-wrap no-js:px-0"
+      role="toolbar"
+      aria-labelledby="tk-label"
+    >
+      {toolbox.map((tech, i) => (
+        <button
+          class="aero-chip flex flex-none cursor-pointer items-center gap-1.5 rounded-[14px] py-1 pr-[5px] pl-[7px] font-head text-xs font-bold whitespace-nowrap"
+          type="button"
+          tabindex={i === 0 ? 0 : -1}
+          data-tech={tech}
+          data-tip-title={tech}
+          data-tip-body={`Used in ${used[tech].length}: ${used[tech].join(", ")}`}
+        >
+          <i
+            class="aero-chip-dot size-[11px] rounded-full"
+            style={`--h: ${hue(tech)}`}
+            aria-hidden="true"
+          />
+          {tech}
+          <b class="aero-count min-w-[18px] rounded-[9px] px-[5px] py-px text-center text-[10px]">
+            {used[tech].length}
+          </b>
+        </button>
+      ))}
+    </div>
+  </div>
+</section>
+
+<script>
+  import { selectTab } from "../scripts/tabs";
+  import { sfx } from "../scripts/sound";
+
+  const view = document.querySelector<HTMLElement>(".tk-view")!;
+  const track = document.querySelector<HTMLElement>(".tk-track")!;
+  const playBtn = document.querySelector<HTMLElement>(".aero-play")!;
+  const chipGap = 8;
+  let offset = 0;
+
+  playBtn.addEventListener("click", () => {
+    const paused = playBtn.getAttribute("aria-pressed") !== "true";
+    playBtn.setAttribute("aria-pressed", String(paused));
+    playBtn.setAttribute(
+      "aria-label",
+      paused ? "Resume scrolling" : "Pause scrolling",
+    );
+    sfx("click");
+  });
+
+  // The first chip moves to the end once it has scrolled out, so the loop has
+  // no seam and no duplicate chips.
+  function wrapChips() {
+    while (true) {
+      const first = track.firstElementChild as HTMLElement;
+      const width = first.offsetWidth + chipGap;
+      if (-offset < width) break;
+      track.append(first);
+      offset += width;
+    }
+    while (offset > 0) {
+      const last = track.lastElementChild as HTMLElement;
+      track.prepend(last);
+      offset -= last.offsetWidth + chipGap;
+    }
+    track.style.transform = `translateX(${offset.toFixed(2)}px)`;
+  }
+
+  if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    // Speed eases to zero under the pointer, on focus, or when paused.
+    // Pointer events track hover, because :hover does not update while
+    // content moves under a still pointer.
+    let speed = 0;
+    let lastFrame = performance.now();
+    let pointerIn = false;
+    view.addEventListener("pointerenter", () => (pointerIn = true));
+    view.addEventListener("pointerleave", () => (pointerIn = false));
+    const roll = (time: number) => {
+      const dt = Math.min(0.05, (time - lastFrame) / 1000);
+      lastFrame = time;
+      const hold =
+        pointerIn ||
+        playBtn.getAttribute("aria-pressed") === "true" ||
+        view.matches(":focus-within");
+      speed += ((hold ? 0 : 38) - speed) * Math.min(1, dt * 3);
+      if (hold && speed < 0.5) speed = 0;
+      offset -= speed * dt;
+      wrapChips();
+      requestAnimationFrame(roll);
+    };
+    requestAnimationFrame(roll);
+
+    // Keyboard focus slides the chip into view instead of letting the
+    // browser scroll the clipped strip.
+    view.addEventListener("focusin", (e) => {
+      const v = view.getBoundingClientRect();
+      const r = (e.target as Element).getBoundingClientRect();
+      if (r.left < v.left + 28) offset += v.left + 28 - r.left;
+      else if (r.right > v.right - 28) offset -= r.right - (v.right - 28);
+      wrapChips();
+    });
+    // If the browser scrolls the strip anyway, fold that into the offset so
+    // nothing jumps when the scroll is undone.
+    view.addEventListener("scroll", () => {
+      offset -= view.scrollLeft;
+      view.scrollLeft = 0;
+      wrapChips();
+    });
+  }
+
+  // One tab stop for the chips: the last focused chip keeps it, and arrow
+  // keys, Home and End move between chips in their on-screen order.
+  track.addEventListener("focusin", (e) => {
+    for (const chip of track.children)
+      (chip as HTMLElement).tabIndex = chip === e.target ? 0 : -1;
+  });
+  track.addEventListener("keydown", (e) => {
+    const chips = [...track.children] as HTMLElement[];
+    const i = chips.indexOf(document.activeElement as HTMLElement);
+    const n = chips.length;
+    const moves: Record<string, number> = {
+      ArrowRight: (i + 1) % n,
+      ArrowLeft: (i - 1 + n) % n,
+      Home: 0,
+      End: n - 1,
+    };
+    const j = moves[e.key];
+    if (i < 0 || j === undefined) return;
+    e.preventDefault();
+    chips[j].focus();
+  });
+
+  // A chip spotlights every entry that uses it, switching to the tab that
+  // holds them when the current one has none.
+  const spotTimers = new Map<Element, number>();
+  track.addEventListener("click", (e) => {
+    const chip = (e.target as Element).closest<HTMLElement>(".aero-chip");
+    if (!chip) return;
+    const hits = [
+      ...document.querySelectorAll<HTMLElement>(".aero-entry"),
+    ].filter((el) => el.dataset.tech!.split("|").includes(chip.dataset.tech!));
+    const panelOf = (el: Element) =>
+      el.closest<HTMLElement>("[role=tabpanel]")!;
+    const current = "p-" + document.documentElement.dataset.tab;
+    const target = hits.find((el) => panelOf(el).id === current) ?? hits[0];
+    selectTab(panelOf(target).id.slice(2));
+    for (const el of hits) {
+      clearTimeout(spotTimers.get(el));
+      el.classList.remove("spot");
+      void el.offsetWidth; // restart the pulse
+      el.classList.add("spot");
+      spotTimers.set(
+        el,
+        window.setTimeout(() => el.classList.remove("spot"), 2800),
+      );
+    }
+    target.scrollIntoView({ block: "center" });
+    sfx("bubble");
+  });
+</script>

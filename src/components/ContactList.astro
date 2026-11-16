@@ -1,0 +1,44 @@
+---
+import { portfolio as info } from "../content";
+
+// Tile colour class and icon for each known contact name. Other names get the
+// email look.
+const looks: Record<string, [string, string]> = {
+  Email: ["tile-email", "envelope"],
+  GitHub: ["tile-github", "github"],
+  LinkedIn: ["tile-linkedin", "linkedin"],
+  Discord: ["tile-discord", "discord"],
+};
+---
+
+<ul class="grid grid-cols-4 gap-2.5 max-sm:grid-cols-2">
+  {info.contacts.map((contact) => {
+    const [tile, icon] = looks[contact.name] ?? looks.Email;
+    // The envelope is a full-colour icon; brand glyphs are white.
+    const glyph =
+      icon === "envelope"
+        ? "size-[26px] drop-shadow-[0_1px_1px_rgba(0,40,90,0.4)]"
+        : "size-5 fill-white drop-shadow-[0_1px_1px_rgba(0,0,0,0.35)]";
+    return (
+      <li>
+        <a
+          class="aero-contact flex items-center gap-2.5 rounded-[10px] px-2 py-1.5 font-bold"
+          href={contact.url}
+        >
+          <span
+            class:list={[
+              "aero-tile relative grid size-[34px] flex-none place-items-center rounded-[9px]",
+              tile,
+            ]}
+            aria-hidden="true"
+          >
+            <svg class:list={["relative", glyph]}>
+              <use href={`#i-${icon}`} />
+            </svg>
+          </span>
+          {contact.name}
+        </a>
+      </li>
+    );
+  })}
+</ul>

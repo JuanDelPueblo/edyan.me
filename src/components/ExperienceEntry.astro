@@ -9,20 +9,26 @@ const { position, company, period, accomplishments, technologies } =
   Astro.props.experience;
 ---
 
-<article class="my-10">
-  <h3 class="my-4 text-xl font-bold leading-tight">{position}</h3>
-  <p class="my-4">
+<!-- data-tech lets a toolbox chip find the entries that use it. -->
+<article
+  class="aero-entry relative -mx-2 block rounded-lg px-2.5 py-3"
+  data-tech={technologies.join("|")}
+>
+  <h3 class="mb-1 font-head text-base font-bold text-heading">{position}</h3>
+  <p class="mb-1.5 text-[11px] text-ink-soft">
     {company} · {period}
   </p>
   <!-- Render the accomplishments list as bullet points. -->
   {accomplishments.length > 0 && (
-    <ul class="my-4 list-disc pl-10">
+    <ul class="mt-1 mb-1.5 list-disc pl-[18px]">
       {accomplishments.map((accomplishment) => (
         <li>{accomplishment}</li>
       ))}
     </ul>
   )}
   {technologies.length > 0 && (
-    <p class="my-4">Technologies: {technologies.join(", ")}</p>
+    <p class="text-[11px] text-ink-soft">
+      <b>Technologies:</b> {technologies.join(", ")}
+    </p>
   )}
 </article>
