@@ -11,9 +11,10 @@ resume: https://drive.google.com/file/d/1zN4vLOaH-EQquWTEVSJRbRAEb7-VgGHk/view?u
 contactsTitle: Get in Touch
 projectsTitle: My Projects
 experiencesTitle: My Experiences
-# Tab labels. The third tab uses contactsTitle.
+# Tab labels. The panels use the titles above.
 projectsTab: Projects
 experiencesTab: Experiences
+contactTab: Contact
 # Header orb. Set avatar to an image in public/, such as /images/avatar.jpg, to
 # show a photo instead of the monogram.
 monogram: EC

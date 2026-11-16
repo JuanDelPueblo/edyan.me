@@ -6,6 +6,7 @@ let soundOn = false;
 let audio: AudioContext | null = null;
 let bus: GainNode;
 let lastBlip = 0;
+let idleTimer = 0;
 
 export function isSoundOn() {
   return soundOn;
@@ -117,6 +118,11 @@ const sounds = {
     note(880, 880, 0.25, 0.07);
     note(1318.5, 1318.5, 0.35, 0.06, 0.06);
   },
+  // The open chime in reverse.
+  close() {
+    note(1318.5, 1318.5, 0.2, 0.05);
+    note(880, 880, 0.3, 0.06, 0.06);
+  },
   // An E major arpeggio with an octave shimmer.
   on() {
     [659.3, 830.6, 987.8, 1318.5].forEach((f, i) => {
@@ -142,4 +148,8 @@ export function sfx(name: keyof typeof sounds) {
   } catch {
     // Audio is decoration; ignore browsers that refuse it.
   }
+  // Suspend the audio thread about 2 s after the last sound ends. The
+  // longest sound with its echo lasts about 1.6 s; audioOut() resumes it.
+  clearTimeout(idleTimer);
+  idleTimer = window.setTimeout(() => audio?.suspend(), 3600);
 }

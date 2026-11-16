@@ -29,6 +29,18 @@ function icon(tech: string) {
   return found;
 }
 
+// Bead colour for an icon chip. Near-black brands get a graphite bead, since
+// a black sphere would hide the white glyph.
+function bead(hex: string) {
+  const channel = (i: number) => {
+    const c = parseInt(hex.slice(i, i + 2), 16) / 255;
+    return c <= 0.04 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+  };
+  const luminance =
+    0.2126 * channel(0) + 0.7152 * channel(2) + 0.0722 * channel(4);
+  return luminance < 0.02 ? "#3a434d" : `#${hex}`;
+}
+
 // A stable hue per name colours the dot of a chip without an icon.
 function hue(name: string) {
   let h = 0;
@@ -51,9 +63,11 @@ function hue(name: string) {
     type="button"
     aria-pressed="false"
     aria-label="Pause scrolling"
+    data-tip-title="Pause scrolling"
+    data-tip-body="Off"
   >
     <svg
-      class="relative size-4 fill-white drop-shadow-[0_1px_1px_rgba(0,30,70,0.8)]"
+      class="relative size-4 fill-white drop-shadow-glyph"
       viewBox="0 0 20 20"
       aria-hidden="true"
     >
@@ -70,34 +84,36 @@ function hue(name: string) {
   >
     {info.toolboxTitle}
   </h2>
-  <div class="tk-view aero-fade-x relative flex min-w-0 flex-auto items-center self-stretch overflow-hidden motion-reduce:[mask-image:none] no-js:[mask-image:none]">
-    <!-- The chips form one tab stop; arrow keys move between them. -->
-    <div
-      class="tk-track flex gap-2 px-5 will-change-transform motion-reduce:flex-wrap motion-reduce:px-0 no-js:flex-wrap no-js:px-0"
-      role="toolbar"
-      aria-labelledby="tk-label"
-    >
-      {toolbox.map((tech, i) => (
+  <div class="tk-view aero-fade-x relative flex min-w-0 flex-auto items-center self-stretch overflow-hidden motion-reduce:mask-none no-js:mask-none">
+    <!-- The chips form one tab stop; arrow keys move between them. The script
+         adds the toolbar role and the tab stop, so without JavaScript the
+         chips are a plain, inert list. -->
+    <div class="tk-track flex gap-2 px-5 will-change-transform motion-reduce:flex-wrap motion-reduce:px-0 no-js:flex-wrap no-js:px-0">
+      {toolbox.map((tech) => (
         <button
-          class="aero-chip flex flex-none cursor-pointer items-center gap-1.5 rounded-[14px] py-1 pr-[5px] pl-[7px] font-head text-xs font-bold whitespace-nowrap"
+          class="aero-chip flex flex-none cursor-pointer items-center gap-1.5 rounded-[14px] py-1 pr-[5px] pl-[5px] font-head text-xs font-bold whitespace-nowrap no-js:pointer-events-none"
           type="button"
-          tabindex={i === 0 ? 0 : -1}
+          tabindex="-1"
           data-tech={tech}
           data-tip-title={tech}
           data-tip-body={`Used in ${used[tech].length}: ${used[tech].join(", ")}`}
         >
           {icon(tech) ? (
-            <svg
-              class="size-3.5 flex-none drop-shadow-[0_1px_0_#fff]"
-              viewBox="0 0 24 24"
-              fill={`#${icon(tech)!.hex}`}
+            <i
+              class="aero-chip-icon relative grid size-4 flex-none place-items-center rounded-full"
+              style={`--c: ${bead(icon(tech)!.hex)}`}
               aria-hidden="true"
             >
-              <path d={icon(tech)!.path} />
-            </svg>
+              <svg
+                class="relative size-2.5 fill-white drop-shadow-brand"
+                viewBox="0 0 24 24"
+              >
+                <path d={icon(tech)!.path} />
+              </svg>
+            </i>
           ) : (
             <i
-              class="aero-chip-dot size-[11px] rounded-full"
+              class="aero-chip-dot mx-[2.5px] size-[11px] flex-none rounded-full"
               style={`--h: ${hue(tech)}`}
               aria-hidden="true"
             />
@@ -122,14 +138,19 @@ function hue(name: string) {
   const chipGap = 8;
   let offset = 0;
 
+  // The chips become one toolbar with a single tab stop.
+  track.setAttribute("role", "toolbar");
+  track.setAttribute("aria-labelledby", "tk-label");
+  (track.firstElementChild as HTMLElement).tabIndex = 0;
+
+  // The label stays fixed; aria-pressed and the balloon report the state.
+  let wake = () => {};
   playBtn.addEventListener("click", () => {
     const paused = playBtn.getAttribute("aria-pressed") !== "true";
     playBtn.setAttribute("aria-pressed", String(paused));
-    playBtn.setAttribute(
-      "aria-label",
-      paused ? "Resume scrolling" : "Pause scrolling",
-    );
+    playBtn.dataset.tipBody = paused ? "On" : "Off";
     sfx("click");
+    wake();
   });
 
   // The first chip moves to the end once it has scrolled out, so the loop has
@@ -154,11 +175,13 @@ function hue(name: string) {
     // Speed eases to zero under the pointer, on focus, or when paused.
     // Pointer events track hover, because :hover does not update while
     // content moves under a still pointer.
+    // The frame loop stops once the strip is held still or offscreen, and
+    // wake() restarts it.
     let speed = 0;
-    let lastFrame = performance.now();
+    let lastFrame = 0;
+    let running = false;
+    let onScreen = false;
     let pointerIn = false;
-    view.addEventListener("pointerenter", () => (pointerIn = true));
-    view.addEventListener("pointerleave", () => (pointerIn = false));
     const roll = (time: number) => {
       const dt = Math.min(0.05, (time - lastFrame) / 1000);
       lastFrame = time;
@@ -170,9 +193,25 @@ function hue(name: string) {
       if (hold && speed < 0.5) speed = 0;
       offset -= speed * dt;
       wrapChips();
+      running = onScreen && !(hold && speed === 0);
+      if (running) requestAnimationFrame(roll);
+    };
+    wake = () => {
+      if (running || !onScreen) return;
+      running = true;
+      lastFrame = performance.now();
       requestAnimationFrame(roll);
     };
-    requestAnimationFrame(roll);
+    view.addEventListener("pointerenter", () => (pointerIn = true));
+    view.addEventListener("pointerleave", () => {
+      pointerIn = false;
+      wake();
+    });
+    view.addEventListener("focusout", wake);
+    new IntersectionObserver(([entry]) => {
+      onScreen = entry.isIntersecting;
+      wake();
+    }).observe(view);
 
     // Keyboard focus slides the chip into view instead of letting the
     // browser scroll the clipped strip.
@@ -223,8 +262,7 @@ function hue(name: string) {
     const hits = [
       ...document.querySelectorAll<HTMLElement>(".aero-entry"),
     ].filter((el) => el.dataset.tech!.split("|").includes(chip.dataset.tech!));
-    const panelOf = (el: Element) =>
-      el.closest<HTMLElement>("[role=tabpanel]")!;
+    const panelOf = (el: Element) => el.closest<HTMLElement>(".aero-box")!;
     const current = "p-" + document.documentElement.dataset.tab;
     const target = hits.find((el) => panelOf(el).id === current) ?? hits[0];
     selectTab(panelOf(target).id.slice(2));

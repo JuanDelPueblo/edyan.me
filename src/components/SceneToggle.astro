@@ -1,31 +1,40 @@
 ---
-// Fixed corner button that hides the page content to show the background on
-// its own. The content keeps its height, so the page still scrolls through
-// the whole scene. Escape also brings the content back.
+// Glass button that hides the page content to show the background on its
+// own. The content keeps its height, so the page still scrolls through the
+// whole scene. Escape also brings the content back.
 ---
 
+<!--
+  Wide windows: fixed in the bottom-right corner, beside the content column.
+  Narrower windows: in the sky at the top right, where it covers nothing, and
+  fixed there while the content is hidden so it stays in reach.
+-->
 <button
-  class="aero-peek fixed right-[max(16px,env(safe-area-inset-right,0px))] bottom-[max(16px,env(safe-area-inset-bottom,0px))] z-50 grid size-11 place-items-center rounded-full no-js:hidden"
+  class="aero-peek absolute top-[max(16px,env(safe-area-inset-top,0px))] right-[max(16px,env(safe-area-inset-right,0px))] z-50 grid size-11 cursor-pointer place-items-center rounded-full in-[.scene-only]:fixed max-sm:size-10 lg:fixed lg:top-auto lg:bottom-[max(16px,env(safe-area-inset-bottom,0px))] no-js:hidden"
   id="scene-toggle"
   type="button"
   aria-pressed="false"
   aria-label="Hide page content"
   data-tip-title="Hide page content"
+  data-tip-body="Off"
 >
-  <!-- Eye: open while the content shows, struck through while it is hidden. -->
+  <!-- Eye: open while the content shows, struck through while it is hidden.
+       The mask cuts a gap around the slash. -->
   <svg
-    class="relative z-2 size-6 drop-shadow-[0_1px_1px_rgba(0,40,90,0.6)]"
+    class="relative z-2 size-6 fill-white drop-shadow-glyph"
     viewBox="0 0 24 24"
-    fill="none"
-    stroke="#fff"
-    stroke-width="2"
-    stroke-linecap="round"
-    stroke-linejoin="round"
     aria-hidden="true"
   >
-    <path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z"></path>
-    <circle cx="12" cy="12" r="3"></circle>
-    <path class="eye-off" d="M4 4l16 16"></path>
+    <mask id="eye-cut">
+      <rect width="24" height="24" fill="#fff"></rect>
+      <path d="M3.5 2.5l18 18" stroke="#000" stroke-width="5"></path>
+    </mask>
+    <path
+      class="eye"
+      fill-rule="evenodd"
+      d="M12 5C6.8 5 3 9 1.5 12 3 15 6.8 19 12 19s9-4 10.5-7C21 9 17.2 5 12 5zm0 2.8a4.2 4.2 0 1 0 0 8.4 4.2 4.2 0 1 0 0-8.4zm0 2.2a2 2 0 1 1 0 4 2 2 0 1 1 0-4z"
+    ></path>
+    <path class="eye-off" d="M4.2 2.8l17 17-1.4 1.4-17-17z"></path>
   </svg>
 </button>
 
@@ -34,14 +43,13 @@
 
   const toggle = document.getElementById("scene-toggle")!;
   const site = document.querySelector<HTMLElement>(".aero-site")!;
+  const balloon = document.getElementById("balloon")!;
 
+  // aria-pressed and the balloon report the state; the label stays the same.
   function setHidden(hidden: boolean) {
     site.classList.toggle("scene-only", hidden);
     toggle.setAttribute("aria-pressed", String(hidden));
-    // aria-pressed reports the state, so the label stays the same.
-    toggle.dataset.tipTitle = hidden
-      ? "Show page content"
-      : "Hide page content";
+    toggle.dataset.tipBody = hidden ? "On" : "Off";
   }
 
   // Add ?scene to the address to start with the content hidden.
@@ -51,8 +59,20 @@
     setHidden(!site.classList.contains("scene-only"));
     sfx("click");
   });
-  addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && site.classList.contains("scene-only"))
-      setHidden(false);
-  });
+  // Escape restores the content only when it has nothing else to close: an
+  // open balloon, popover or dialog takes it first. The capture listener
+  // runs before Balloon.astro hides its balloon.
+  addEventListener(
+    "keydown",
+    (e) => {
+      if (
+        e.key === "Escape" &&
+        site.classList.contains("scene-only") &&
+        balloon.hidden &&
+        !document.querySelector("dialog[open], :popover-open")
+      )
+        setHidden(false);
+    },
+    { capture: true },
+  );
 </script>

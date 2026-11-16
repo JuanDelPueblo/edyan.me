@@ -17,8 +17,8 @@ const looks: Record<string, [string, string]> = {
     // The envelope is a full-colour icon; brand glyphs are white.
     const glyph =
       icon === "envelope"
-        ? "size-[26px] drop-shadow-[0_1px_1px_rgba(0,40,90,0.4)]"
-        : "size-5 fill-white drop-shadow-[0_1px_1px_rgba(0,0,0,0.35)]";
+        ? "size-[26px] drop-shadow-icon"
+        : "size-5 fill-white drop-shadow-brand";
     return (
       <li>
         <a

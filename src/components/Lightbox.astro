@@ -17,7 +17,7 @@
     </button>
   </form>
   <img
-    class="mx-auto block h-auto max-h-[74vh] w-auto max-w-full rounded border border-[#9cc6de]"
+    class="mx-auto block h-auto max-h-[74vh] w-auto max-w-full rounded border border-rule"
     src=""
     alt=""
   />
@@ -49,4 +49,6 @@
   lightbox.addEventListener("click", (e) => {
     if (e.target === lightbox) lightbox.close();
   });
+  // One sound for every way of closing: the button, Escape or the backdrop.
+  lightbox.addEventListener("close", () => sfx("click"));
 </script>

@@ -1,6 +1,7 @@
 ---
 // Tab panel with a glossy title bar. CSS shows only the selected panel; see
-// the data-tab rules in global.css.
+// the data-tab rules in global.css. The tab strip script adds the tabpanel
+// role, so without JavaScript the panels are plain sections.
 interface Props {
   tabKey: string;
   title: string;
@@ -12,16 +13,10 @@ const { tabKey, title, icon } = Astro.props;
 
 <section
   class="aero-box relative overflow-hidden rounded-lg"
-  role="tabpanel"
   id={`p-${tabKey}`}
-  aria-labelledby={`t-${tabKey}`}
-  tabindex="0"
 >
   <h2 class="aero-titlebar relative flex min-h-9 items-center gap-2 overflow-hidden px-2.5 py-1.5 font-head text-sm leading-[1.3] font-bold">
-    <svg
-      class="size-5 flex-none drop-shadow-[0_1px_1px_rgba(0,40,90,0.35)]"
-      aria-hidden="true"
-    >
+    <svg class="size-5 flex-none drop-shadow-icon" aria-hidden="true">
       <use href={`#i-${icon}`}></use>
     </svg>
     {title}

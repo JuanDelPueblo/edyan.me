@@ -33,6 +33,7 @@ interface Portfolio {
   experiencesTitle: string;
   projectsTab: string;
   experiencesTab: string;
+  contactTab: string;
   monogram: string;
   avatar?: string;
   timeZone: string;

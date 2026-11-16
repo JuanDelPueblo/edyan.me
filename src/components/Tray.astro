@@ -21,7 +21,7 @@ const zoneName = zoned({ timeZoneName: "short" })
      centres in the whole strip rather than beside the tabs. -->
 <div class="aero-tray -mt-2.5 max-sm:-mt-2 flex flex-none items-center gap-0.5 self-center rounded-[14px] p-0.5 font-head text-xs font-bold tabular-nums no-js:hidden">
   <button
-    class="aero-tray-btn flex min-h-[26px] items-center rounded-xl px-[5px] py-px"
+    class="aero-tray-btn flex min-h-[26px] cursor-pointer items-center rounded-xl px-[5px] py-px"
     id="sound"
     type="button"
     aria-pressed="false"
@@ -30,11 +30,7 @@ const zoneName = zoned({ timeZoneName: "short" })
     data-tip-body="Off"
   >
     <!-- Speaker: waves when on, a red mute badge when off. -->
-    <svg
-      class="size-5 drop-shadow-[0_1px_1px_rgba(0,40,90,0.35)]"
-      viewBox="0 0 24 24"
-      aria-hidden="true"
-    >
+    <svg class="size-5 drop-shadow-icon" viewBox="0 0 24 24" aria-hidden="true">
       <path
         d="M3 9h3.8l5-4.2v14.4l-5-4.2H3z"
         fill="url(#ck-rim)"
@@ -70,7 +66,7 @@ const zoneName = zoned({ timeZoneName: "short" })
     </svg>
   </button>
   <button
-    class="aero-tray-btn flex min-h-[26px] items-center gap-1.5 rounded-xl py-px pr-[9px] pl-[3px] max-sm:pr-[3px]"
+    class="aero-tray-btn flex min-h-[26px] cursor-pointer items-center gap-1.5 rounded-xl py-px pr-[9px] pl-[3px] max-sm:pr-[3px]"
     id="tray-clock"
     type="button"
     data-time-zone={info.timeZone}
@@ -78,7 +74,7 @@ const zoneName = zoned({ timeZoneName: "short" })
   >
     <!-- 3px of padding keeps the 20px face concentric with the rounded end of
          the 26px-tall hover highlight. -->
-    <Clock class="mini-clock size-5 drop-shadow-[0_1px_1px_rgba(0,40,90,0.35)]" />
+    <Clock class="mini-clock size-5 drop-shadow-icon" />
     <span class="sr-only">{info.clockPlace} time: </span>
     <!-- Narrow screens show only the clock face; screen readers still get the time. -->
     <span class="tray-time max-sm:sr-only"></span>
@@ -89,6 +85,7 @@ const zoneName = zoned({ timeZoneName: "short" })
   class="aero-flyout fixed inset-auto m-0 w-[228px] rounded-[10px] px-3.5 pt-3.5 pb-3 text-center text-xs leading-normal"
   id="clock-flyout"
   popover
+  role="dialog"
   aria-label="Clock"
 >
   <Clock
@@ -100,7 +97,7 @@ const zoneName = zoned({ timeZoneName: "short" })
   <p class="text-[11px] text-ink-soft">
     {info.clockPlace} ({zoneName})
   </p>
-  <p class="mt-2.5 border-t border-dotted border-[#8fc0dc] pt-2 text-[11px] text-balance text-ink-soft">
+  <p class="mt-2.5 border-t border-dotted border-rule pt-2 text-[11px] text-balance text-ink-soft">
     Site last updated {updated}
   </p>
 </div>
@@ -137,7 +134,7 @@ const zoneName = zoned({ timeZoneName: "short" })
   // A glassy click for buttons and links across the page.
   document.addEventListener("click", (e) => {
     const target = e.target as Element;
-    if (target.closest(".aero-pill, a.aero-leaf, .aero-contact, .aero-close"))
+    if (target.closest(".aero-pill, a.aero-leaf, .aero-contact, .aero-badge a"))
       sfx("click");
   });
 
@@ -188,16 +185,23 @@ const zoneName = zoned({ timeZoneName: "short" })
   tick();
   setInterval(tick, 1000);
 
-  // Place the flyout under the clock button, right-aligned, inside the window.
+  // Place the flyout under the clock button, right-aligned, inside the window
+  // and clear of notches (--safe-* in global.css).
   function placeFlyout() {
     const r = trayClock.getBoundingClientRect();
     const w = parseFloat(getComputedStyle(flyout).width);
+    const root = getComputedStyle(document.documentElement);
+    const left = 12 + (parseFloat(root.getPropertyValue("--safe-left")) || 0);
+    const right = 12 + (parseFloat(root.getPropertyValue("--safe-right")) || 0);
     flyout.style.top = r.bottom + 8 + "px";
     flyout.style.left =
-      Math.max(12, Math.min(r.right - w, innerWidth - w - 12)) + "px";
+      Math.max(left, Math.min(r.right - w, innerWidth - w - right)) + "px";
   }
   flyout.addEventListener("beforetoggle", (e) => {
-    if ((e as ToggleEvent).newState !== "open") return;
+    if ((e as ToggleEvent).newState !== "open") {
+      sfx("close");
+      return;
+    }
     placeFlyout();
     sfx("open");
   });

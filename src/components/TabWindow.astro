@@ -11,7 +11,7 @@ import Tray from "./Tray.astro";
 const tabs = [
   ["projects", info.projectsTab, "folder"],
   ["experiences", info.experiencesTab, "briefcase"],
-  ["contact", info.contactsTitle, "envelope"],
+  ["contact", info.contactTab, "envelope"],
 ];
 ---
 
@@ -34,7 +34,7 @@ const tabs = [
           tabindex={i === 0 ? 0 : -1}
         >
           <svg
-            class="size-5 flex-none drop-shadow-[0_1px_1px_rgba(0,40,90,0.35)] max-sm:hidden"
+            class="size-5 flex-none drop-shadow-icon max-sm:hidden"
             aria-hidden="true"
           >
             <use href={`#i-${icon}`} />
@@ -74,6 +74,13 @@ const tabs = [
   const frame = document.querySelector<HTMLElement>(".aero-frame")!;
   const strip = document.querySelector(".aero-tabstrip")!;
   const tabs = tabKeys.map((key) => document.getElementById("t-" + key)!);
+  // Panels become tab panels only with JavaScript, which shows the tabs.
+  for (const key of tabKeys) {
+    const panel = document.getElementById("p-" + key)!;
+    panel.setAttribute("role", "tabpanel");
+    panel.setAttribute("aria-labelledby", "t-" + key);
+    panel.tabIndex = 0;
+  }
   markTabs();
 
   function chooseTab(tab: HTMLElement) {
