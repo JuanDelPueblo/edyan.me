@@ -11,7 +11,7 @@ const quadCorners = new Float32Array([
 // each one as a sphere. Larger bubbles flatten and wobble as they rise.
 const wobble = /* glsl */ `
 vec2 bubbleShape(float radius, float t) {
-  float squash = smoothstep(0.012, 0.06, radius) * (0.07 + 0.05 * sin(t));
+  float squash = smoothstep(0.012, 0.06, radius) * (0.06 + 0.04 * sin(t));
   return radius * vec2(1.0 + squash, 1.0 - squash);
 }
 `;
@@ -92,14 +92,19 @@ void main() {
   vec3 n = nv * mat3(viewMatrix);
   vec3 eye = vec3(0.0, 0.0, 1.0) * mat3(viewMatrix);
 
-  // Mirror strength: slight in the middle, full towards the rim.
-  float skin = 0.04 + 0.96 * smoothstep(0.8, 0.25, nv.z);
+  // Mirror strength: slight in the middle, full towards the rim. The
+  // mirrored water is pushed apart a little, lighter above and darker
+  // below, so that small bubbles keep their shading.
+  float skin = 0.04 + 0.96 * smoothstep(0.88, 0.3, nv.z);
+  float up = smoothstep(-0.7, 0.7, n.y);
   vec3 film = 0.5 + 0.5 * cos(6.2832 * (nv.z * 1.3 + vSeed + vec3(0.0, 0.33, 0.67)));
-  vec3 col = around(reflect(-eye, n)) * mix(vec3(1.0), film * 1.5, 0.3) * skin;
+  vec3 col = around(reflect(-eye, n)) * mix(0.5, 1.25, up)
+    * mix(vec3(1.0), film * 1.5, 0.3) * skin;
   float a = skin * 0.85;
-  // A fine bright line where the skin turns edge-on.
-  float line = smoothstep(0.4, 0.08, nv.z);
-  col += S(0.72, 0.94, 1.0) * line * 0.32;
+  // A bright line just inside the edge, where the skin turns edge-on. It
+  // is strongest on the lit side.
+  float line = smoothstep(0.6, 0.3, nv.z);
+  col += S(0.72, 0.94, 1.0) * line * mix(0.15, 0.85, up);
   a = max(a, line * 0.9);
   // The middle works as a lens that takes in a wide view of the water.
   vec3 through = around(normalize(n - eye * 0.6));
@@ -116,10 +121,9 @@ void main() {
   col += S(1.0, 0.99, 0.94) * (gloss + glint);
   a = max(a, min(gloss + glint, 1.0));
 
-  // A soft edge instead of a hard cut.
-  a *= smoothstep(1.0, 0.86, rr) * vFade;
-  col *= smoothstep(1.0, 0.86, rr) * vFade;
-  gl_FragColor = vec4(col, a);
+  // The outermost pixel fades out instead of ending in a hard cut.
+  float keep = smoothstep(1.0, 1.0 - min(fwidth(rr), 0.5), rr) * vFade;
+  gl_FragColor = vec4(col, a) * keep;
 }
 `;
 
