@@ -290,112 +290,13 @@
     animation: aero-ring 1.6s ease-out 0.5s 1 both;
   }
 
-  /* Messenger display picture (HeroMessenger.astro): a glossy green frame
-     that glows for the "available" status, around a face in the orb's
-     blue glass. */
-  .aero-dp {
-    background: linear-gradient(
-      180deg,
-      #e4ffc4 0%,
-      #8be04f 40%,
-      #3fa818 52%,
-      #5cc62a 100%
-    );
-    box-shadow:
-      0 0 0 1px #2c7d0e,
-      0 0 16px 3px rgba(140, 240, 80, 0.75),
-      0 10px 22px rgba(0, 50, 110, 0.35),
-      inset 0 1px 0 rgba(255, 255, 255, 0.95);
-  }
-  .aero-dp-face {
-    border: 1px solid rgba(255, 255, 255, 0.95);
-    background: radial-gradient(
-      circle at 50% 100%,
-      rgba(190, 250, 255, 0.98) 0%,
-      rgba(60, 180, 240, 0.8) 45%,
-      rgba(10, 90, 190, 0.92) 100%
-    );
-    box-shadow: inset 0 -8px 14px rgba(200, 255, 255, 0.7);
-    color: #fff;
-    text-shadow: 0 2px 3px rgba(0, 50, 100, 0.7);
-  }
-  .aero-dp-face::before {
-    content: "";
-    position: absolute;
-    z-index: 1;
-    inset: 0 0 52%;
-    background: linear-gradient(
-      180deg,
-      rgba(255, 255, 255, 0.75),
-      rgba(255, 255, 255, 0.08)
-    );
-  }
-  .aero-dp-face:has(img)::before {
-    opacity: 0.5;
-  }
-  /* Messenger status capsule: white glass with a green status light. */
-  .aero-status {
-    color: var(--color-ink);
-    background: linear-gradient(
-      180deg,
-      rgba(255, 255, 255, 0.95),
-      rgba(220, 242, 255, 0.85)
-    );
-    border: 1px solid rgba(255, 255, 255, 0.95);
-    box-shadow:
-      0 2px 5px rgba(0, 50, 110, 0.3),
-      inset 0 -2px 4px rgba(160, 210, 240, 0.4);
-  }
-  .aero-status-dot {
-    background: radial-gradient(
-      circle at 40% 30%,
-      #f0ffd8 0%,
-      #7fdc3c 35%,
-      #2f9a0c 100%
-    );
-    box-shadow:
-      0 0 0 1px #2a7a0c,
-      0 0 6px rgba(120, 230, 60, 0.9);
-  }
-  /* Messenger personal message: a pale text field with an inset edge. */
-  .aero-pm {
-    color: var(--color-ink);
-    background: linear-gradient(180deg, #ffffff, #eef7fd);
-    border: 1px solid #9cc2dc;
-    box-shadow:
-      inset 0 1px 2px rgba(0, 40, 90, 0.18),
-      0 4px 12px rgba(0, 50, 110, 0.2);
-  }
-  /* Round contact buttons (ContactOrbs.astro) round off the tile gloss. */
-  .aero-tile-round::before {
-    border-radius: 50% 50% 45% 45% / 60% 60% 40% 40%;
-    left: 4px;
-    right: 4px;
-  }
-
-  /* Green gloss: the resume button, and the flatter greeting label. */
-  .aero-leaf,
-  .aero-greet {
+  /* Green gloss: the resume button. */
+  .aero-leaf {
     color: #fff;
     text-shadow:
       0 1px 1px rgba(10, 50, 0, 0.9),
       0 0 2px rgba(10, 50, 0, 0.6);
     border: 1px solid #1d5f08;
-  }
-  .aero-greet {
-    background: linear-gradient(
-      180deg,
-      #b8f07a 0%,
-      #5cbf24 14%,
-      #3f9e16 49%,
-      #24750a 51%,
-      #2c840c 100%
-    );
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.9),
-      0 2px 4px rgba(0, 60, 0, 0.35);
-  }
-  .aero-leaf {
     background: linear-gradient(
       180deg,
       #b8f07a 0%,

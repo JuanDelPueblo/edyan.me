@@ -220,8 +220,7 @@ export function startScene(canvas: HTMLCanvasElement, site: HTMLElement) {
   let dirty = true;
   const banner = site.querySelector(".aero-banner");
   const title = site.querySelector(".aero-title");
-  // The header orb, or the framed display picture in the Messenger hero.
-  const orb = site.querySelector(".aero-orb, .aero-dp");
+  const orb = site.querySelector(".aero-orb");
   new ResizeObserver(() => (dirty = true)).observe(site);
   addEventListener("resize", () => (dirty = true));
   document.fonts?.ready.then(() => (dirty = true));

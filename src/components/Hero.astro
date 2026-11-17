@@ -27,7 +27,8 @@ const hasWave = info.greeting.includes("👋");
       )}
     </div>
     <div class="relative z-1 grid min-w-0 flex-auto justify-items-start gap-2.5">
-      <p class="aero-greet rounded-[14px] px-3.5 py-[3px] font-head text-sm font-bold">
+      <!-- The greeting sits on its own line above the name in the title. -->
+      <h1 class="aero-title relative font-head text-[42px] leading-[1.1] font-bold text-balance max-sm:text-[30px]">
         {hasWave ? (
           <>
             {beforeWave}
@@ -37,8 +38,7 @@ const hasWave = info.greeting.includes("👋");
         ) : (
           info.greeting
         )}
-      </p>
-      <h1 class="aero-title relative font-head text-[42px] leading-[1.1] font-bold text-balance max-sm:text-[30px]">
+        <br />
         {info.title}
       </h1>
       <p class="aero-glass-card max-w-[34rem] rounded-xl px-3.5 py-2 text-[13px] leading-[1.55]">
@@ -57,5 +57,17 @@ const hasWave = info.greeting.includes("👋");
 </header>
 
 <script>
-  import "../scripts/waterline";
+  const banner = document.querySelector(".aero-banner")!;
+
+  // Keep the waterline at the header's bottom edge, which moves with text
+  // wrapping and font loading.
+  const site = document.querySelector<HTMLElement>(".aero-site")!;
+  function placeWaterline() {
+    const wl =
+      banner.getBoundingClientRect().bottom - site.getBoundingClientRect().top;
+    site.style.setProperty("--wl", Math.round(wl) + "px");
+  }
+  placeWaterline();
+  new ResizeObserver(placeWaterline).observe(site);
+  document.fonts?.ready.then(placeWaterline);
 </script>

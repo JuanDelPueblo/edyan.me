@@ -219,11 +219,7 @@ const zoneName = zoned({ timeZoneName: "short" })
   // A glassy click for buttons and links across the page.
   document.addEventListener("click", (e) => {
     const target = e.target as Element;
-    if (
-      target.closest(
-        ".aero-pill, a.aero-leaf, a.aero-tile, .aero-contact, .aero-badge a",
-      )
-    )
+    if (target.closest(".aero-pill, a.aero-leaf, .aero-contact, .aero-badge a"))
       sfx("click");
   });
 
