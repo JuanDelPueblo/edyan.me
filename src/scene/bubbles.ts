@@ -7,14 +7,25 @@ const quadCorners = new Float32Array([
   -1, -1, 0, 1, -1, 0, 1, 1, 0, -1, -1, 0, 1, 1, 0, -1, 1, 0,
 ]);
 
+// Bubbles are flat quads that face the camera; the fragment shader shades
+// each one as a sphere. Larger bubbles flatten and wobble as they rise.
+const wobble = /* glsl */ `
+vec2 bubbleShape(float radius, float t) {
+  float squash = smoothstep(0.012, 0.06, radius) * (0.07 + 0.05 * sin(t));
+  return radius * vec2(1.0 + squash, 1.0 - squash);
+}
+`;
+
 // Streams of bubbles that rise from the seabed to the surface and repeat.
 const streamVertex = /* glsl */ `
 ${common}
 ${underwater}
+${wobble}
 attribute vec4 iB; // x, z, radius, phase
 attribute vec3 iC; // speed, wobble width, wobble rate
 varying vec2 vUv;
 varying float vFade;
+varying float vSeed;
 void main() {
   float range = max(-uFloorY - 0.3, 0.5);
   float f = fract(uTime * iC.x / range + iB.w);
@@ -26,8 +37,9 @@ void main() {
   );
   vec4 mv = viewMatrix * vec4(center, 1.0);
   float radius = iB.z * (0.55 + 0.75 * f);
-  mv.xy += position.xy * radius;
+  mv.xy += position.xy * bubbleShape(radius, wob * 4.0);
   vUv = position.xy;
+  vSeed = iB.w;
   float d = length(mv.xyz);
   vFade = smoothstep(0.0, 0.04, f) * smoothstep(1.0, 0.985, f) * exp(-d * 0.045);
   gl_Position = projectionMatrix * mv;
@@ -36,37 +48,78 @@ void main() {
 
 // Bubbles released by a click. Their positions come from the script.
 const burstVertex = /* glsl */ `
+${wobble}
+uniform float uTime;
 attribute vec4 iB; // position, radius
 attribute float iAge; // 0..1, hidden at 1
 varying vec2 vUv;
 varying float vFade;
+varying float vSeed;
 void main() {
   vec4 mv = viewMatrix * vec4(iB.xyz, 1.0);
-  mv.xy += position.xy * iB.w;
+  vSeed = fract(iB.w * 613.0);
+  mv.xy += position.xy * bubbleShape(iB.w, uTime * 9.0 + vSeed * 40.0);
   vUv = position.xy;
   vFade = smoothstep(0.0, 0.05, iAge) * smoothstep(1.0, 0.7, iAge);
   gl_Position = projectionMatrix * mv;
 }
 `;
 
-// A glassy ball: bright rim, clear middle, one crisp highlight.
+// A bubble shaded as a sphere of air. Seen at a slant its skin is a mirror,
+// so the rim shows the water around it: the bright surface along the top,
+// the deep along the bottom. The middle is nearly clear. The sun leaves a
+// glossy patch on its side of the bubble and a fainter glint on the far
+// wall, and the skin carries a little soap-film colour.
 const bubbleFragment = /* glsl */ `
 ${common}
+${underwater}
 varying vec2 vUv;
 varying float vFade;
+varying float vSeed;
+
+// What a bubble mirrors in a direction: the water, and the surface overhead.
+vec3 around(vec3 dir) {
+  float dk = exp(-uCamDepth * 0.05);
+  return waterColor(dir)
+    + S(0.82, 0.97, 1.0) * smoothstep(0.35, 0.95, dir.y) * (0.3 + 0.6 * dk);
+}
+
 void main() {
-  float r = length(vUv);
-  if (r > 1.0) discard;
-  float rim = smoothstep(0.5, 1.0, r);
-  float edge = smoothstep(1.0, 0.9, r);
-  vec3 col = S(0.72, 0.95, 1.0) * (0.12 + rim);
-  float a = (0.07 + rim * 0.7) * edge;
-  float shine = smoothstep(0.27, 0.1, distance(vUv, vec2(-0.36, 0.42)));
-  float glow = smoothstep(0.2, 0.04, distance(vUv, vec2(0.38, -0.44)));
-  col += vec3(1.8) * shine + vec3(0.7) * glow;
-  a = max(a, max(shine, glow * 0.5));
-  a *= vFade;
-  gl_FragColor = vec4(col * a, a);
+  float rr = dot(vUv, vUv);
+  if (rr > 1.0) discard;
+  // The sphere's normal in view space, then in world space.
+  vec3 nv = vec3(vUv, sqrt(1.0 - rr));
+  vec3 n = nv * mat3(viewMatrix);
+  vec3 eye = vec3(0.0, 0.0, 1.0) * mat3(viewMatrix);
+
+  // Mirror strength: slight in the middle, full towards the rim.
+  float skin = 0.04 + 0.96 * smoothstep(0.8, 0.25, nv.z);
+  vec3 film = 0.5 + 0.5 * cos(6.2832 * (nv.z * 1.3 + vSeed + vec3(0.0, 0.33, 0.67)));
+  vec3 col = around(reflect(-eye, n)) * mix(vec3(1.0), film * 1.5, 0.3) * skin;
+  float a = skin * 0.85;
+  // A fine bright line where the skin turns edge-on.
+  float line = smoothstep(0.4, 0.08, nv.z);
+  col += S(0.72, 0.94, 1.0) * line * 0.32;
+  a = max(a, line * 0.9);
+  // The middle works as a lens that takes in a wide view of the water.
+  vec3 through = around(normalize(n - eye * 0.6));
+  col += through * 0.1 * (1.0 - skin);
+  a += 0.1 * (1.0 - skin);
+
+  // Sun: a glossy patch with a hot core on the near wall, and the glint
+  // that comes back off the far wall on the opposite side.
+  vec3 h = normalize(uSunU + eye);
+  float toSun = dot(n, h);
+  float gloss = smoothstep(0.9, 0.95, toSun) * 0.42 + pow(max(toSun, 0.0), 600.0) * 1.5;
+  vec3 back = vec3(-nv.xy, nv.z) * mat3(viewMatrix);
+  float glint = smoothstep(0.955, 0.985, dot(back, h)) * 0.22;
+  col += S(1.0, 0.99, 0.94) * (gloss + glint);
+  a = max(a, min(gloss + glint, 1.0));
+
+  // A soft edge instead of a hard cut.
+  a *= smoothstep(1.0, 0.86, rr) * vFade;
+  col *= smoothstep(1.0, 0.86, rr) * vFade;
+  gl_FragColor = vec4(col, a);
 }
 `;
 
@@ -145,6 +198,7 @@ export function createBubbles() {
     makeMaterial({
       vertexShader: burstVertex,
       fragmentShader: bubbleFragment,
+      uniforms: underUniforms(),
       ...blending,
     }),
   );
