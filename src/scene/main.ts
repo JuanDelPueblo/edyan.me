@@ -137,6 +137,10 @@ export function startScene(canvas: HTMLCanvasElement, site: HTMLElement) {
   });
   const post = createPost(renderer, hdr);
   const landShade = createShade(1024);
+  // A narrow page shows a narrow strip of the reef, which a smaller map
+  // covers just as finely.
+  const reefShade = createShade(innerWidth < 700 ? 1024 : 2048);
+  const reefBox = new THREE.Box3();
   const readout = import.meta.env.DEV ? createReadout(renderer) : null;
 
   // Above the water.
@@ -393,9 +397,8 @@ export function startScene(canvas: HTMLCanvasElement, site: HTMLElement) {
 
   // Draws the shadow maps. The shaders that read a map draw into it too, so
   // they get an empty one meanwhile.
-  let baked = -1;
-  function bakeShade() {
-    baked = view.layout;
+  let baked = "";
+  function bakeShade(tallest: number) {
     U.tLandShade.value = null;
     U.uLandShade.value.y = landShade.bake(
       renderer,
@@ -405,6 +408,29 @@ export function startScene(canvas: HTMLCanvasElement, site: HTMLElement) {
       U.uLandShadeMat.value,
     );
     U.tLandShade.value = landShade.texture;
+
+    // The reef's map covers the seabed out to where the fog hides shadows,
+    // as wide as the reef is laid out there. It is drawn with the floor at
+    // zero, so it stays valid while the seabed moves, and with the plants
+    // standing still.
+    const far = 22;
+    const half = ((view.w / 2 + 160) * view.mpp * far) / D_REF;
+    reefBox.min.set(-half, -0.7, -far);
+    reefBox.max.set(half, Math.max(2.2, tallest) + 0.3, -1.5);
+    const floorY = U.uFloorY.value;
+    U.uFloorY.value = 0;
+    U.uSway.value = 0;
+    U.tReefShade.value = null;
+    U.uReefShade.value.y = reefShade.bake(
+      renderer,
+      seaScene,
+      reefBox,
+      U.uSunU.value,
+      U.uReefShadeMat.value,
+    );
+    U.tReefShade.value = reefShade.texture;
+    U.uSway.value = 1;
+    U.uFloorY.value = floorY;
   }
 
   // The page falls back to its CSS background while the context is lost.
@@ -419,7 +445,7 @@ export function startScene(canvas: HTMLCanvasElement, site: HTMLElement) {
     shown = false;
     drawn = "";
     // The maps come back empty.
-    baked = -1;
+    baked = "";
   });
 
   // Input keeps the full frame rate; scrolling draws on every display
@@ -628,11 +654,18 @@ export function startScene(canvas: HTMLCanvasElement, site: HTMLElement) {
       fish.startle(view, hoverX, frameY(hoverY), 80, 1.1);
       hoverX = -1;
     }
-    kelp.update(view);
+    // Plants taller than 7.7 m do not exist, so the cut-off matters below
+    // that only.
+    const tallest = Math.min(8, kelp.update(view));
     fish.update(view);
     jellies.update(view);
     bubbles.update(view);
-    if (baked !== view.layout) bakeShade();
+    // The shadow maps follow the layout and the plants' height.
+    const shadeKey = view.layout + "|" + tallest.toFixed(1);
+    if (shadeKey !== baked) {
+      baked = shadeKey;
+      bakeShade(tallest);
+    }
 
     skyCam.setViewOffset(w, lvh, 0, top - hz + lvh / 2, w, h);
     // The cameras drift a little and lean with the pointer, which shifts

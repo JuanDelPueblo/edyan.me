@@ -137,14 +137,31 @@ float causticAt(vec3 wpos) {
 }
 
 // Light arriving at a surface point: cyan light from above, a dimmer bounce
-// from below, and the sun dappled by caustics. dapple scales the caustics.
-vec3 underLight(vec3 wpos, vec3 n, float dapple) {
+// from below, and the sun dappled by caustics. dapple scales the caustics;
+// lit is the share of the sun left by shadows.
+vec3 underLight(vec3 wpos, vec3 n, float dapple, float lit) {
   float att = mix(0.66, 1.0, exp(wpos.y * 0.05));
   float up = n.y * 0.5 + 0.5;
   vec3 amb = mix(S(0.22, 0.44, 0.62), S(0.50, 0.80, 0.92), up) * 0.9;
   float ndl = max(dot(n, uSunU), 0.0);
   float ca = min(causticAt(wpos), 1.6) * smoothstep(-0.3, 0.5, n.y) * dapple;
-  vec3 sun = S(1.0, 0.98, 0.90) * (ndl * 0.42 + ca * 1.0);
-  return (amb + sun) * att;
+  vec3 sun = S(1.0, 0.98, 0.90) * (ndl * 0.42 + ca * 1.0) * lit;
+  // Whatever blocks the sun hides part of the bright water above as well.
+  return (amb * (0.7 + 0.3 * lit) + sun) * att;
+}
+`;
+
+// Sunlight left near the seabed after the baked shadows of the reef and the
+// plants; goes after the underwater block. The lookup starts a little off
+// the surface, towards the sun, so a surface does not shadow itself.
+export const reefShade = /* glsl */ `
+${shade}
+uniform sampler2DShadow tReefShade;
+uniform mat4 uReefShadeMat;
+uniform vec2 uReefShade;
+float reefLit(vec3 wpos, vec3 n) {
+  vec3 from = wpos - vec3(0.0, uFloorY, 0.0) + (n * 1.5 + uSunU) * uReefShade.y;
+  float lit = shadeAt(tReefShade, (uReefShadeMat * vec4(from, 1.0)).xyz);
+  return 1.0 - uReefShade.x * (1.0 - lit);
 }
 `;

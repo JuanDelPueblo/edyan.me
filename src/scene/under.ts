@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { common, underwater, waves } from "./glsl";
+import { common, reefShade, underwater, waves } from "./glsl";
 import { backdropVertex, makeMaterial, screenTriangle, U } from "./view";
 
 // Uniforms every underwater material needs.
@@ -9,6 +9,9 @@ export function underUniforms() {
     uCamDepth: U.uCamDepth,
     uFloorY: U.uFloorY,
     uSunU: U.uSunU,
+    tReefShade: U.tReefShade,
+    uReefShadeMat: U.uReefShadeMat,
+    uReefShade: U.uReefShade,
   };
 }
 
@@ -69,6 +72,7 @@ void main() {
 const sandFragment = /* glsl */ `
 ${common}
 ${underwater}
+${reefShade}
 varying vec3 vW;
 void main() {
   vec2 p = vW.xz;
@@ -82,7 +86,7 @@ void main() {
   n = normalize(n);
   vec3 alb = mix(S(1.0, 0.95, 0.80), S(0.88, 0.82, 0.64), fbm2(p * 0.55));
   alb *= 0.96 + 0.08 * hash21(floor(p * 80.0));
-  vec3 light = underLight(vW, n, 1.0);
+  vec3 light = underLight(vW, n, 1.0, reefLit(vW, n));
   vec3 col = alb * light;
   // Grains that catch the light.
   col += light * step(0.994, hash21(floor(p * 140.0))) * 0.8;

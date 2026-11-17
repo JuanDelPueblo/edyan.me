@@ -58,6 +58,12 @@ export const U = {
   tLandShade: { value: null as THREE.Texture | null },
   uLandShadeMat: { value: new THREE.Matrix4() },
   uLandShade: { value: new THREE.Vector2(0.62, 0.1) },
+  // The same for the reef. Its map is relative to the seabed.
+  tReefShade: { value: null as THREE.Texture | null },
+  uReefShadeMat: { value: new THREE.Matrix4() },
+  uReefShade: { value: new THREE.Vector2(0.9, 0.04) },
+  // 0 while the shadow maps are drawn, so plants cast from their rest pose.
+  uSway: { value: 1 },
 };
 
 // Small seeded generator so the scene looks the same on every load.

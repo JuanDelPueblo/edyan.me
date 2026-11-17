@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { common, underwater } from "./glsl";
 import { underUniforms } from "./under";
-import { D_REF, makeMaterial, rng, type View } from "./view";
+import { D_REF, makeMaterial, rng, U, type View } from "./view";
 
 const kelpVertex = /* glsl */ `
 ${common}
@@ -10,6 +10,7 @@ attribute vec4 aK; // height on the stalk, distance along the blade, across, kin
 attribute vec4 iBase; // x, z, height, phase
 attribute vec2 iLook; // colour mix, lean
 uniform float uTallest;
+uniform float uSway;
 varying vec3 vW;
 varying vec3 vN;
 varying vec4 vK;
@@ -28,11 +29,11 @@ void main() {
   vec2 sway = vec2(
     sin(t * 0.55 + h * 2.6 + ph) + 0.5 * sin(t * 0.93 + h * 5.1 + ph * 1.3),
     cos(t * 0.47 + h * 2.2 + ph * 0.7) + 0.5 * sin(t * 0.81 + h * 4.3 + ph)
-  ) * 0.055 * tall * pow(h, 1.4);
+  ) * 0.055 * tall * pow(h, 1.4) * uSway;
   sway.x += iLook.y * h * h * tall * 0.22;
   p.xz += sway;
   // Blades flutter towards their tips.
-  float flutter = sin(t * 1.8 + h * 13.0 + ph * 3.0) * aK.y * aK.w;
+  float flutter = sin(t * 1.8 + h * 13.0 + ph * 3.0) * aK.y * aK.w * uSway;
   p.y += flutter * 0.012 * tall;
   p.xz += n.xz * flutter * 0.01 * tall;
   vec2 base = iBase.xy;
@@ -63,7 +64,9 @@ void main() {
     // A darker midrib and paler edges.
     alb *= 0.72 + 0.28 * smoothstep(0.0, 0.3, abs(vK.z));
   }
-  vec3 col = alb * underLight(vW, n, 0.8);
+  // Plants cast shadows but take none: their thin blades would shadow
+  // themselves.
+  vec3 col = alb * underLight(vW, n, 0.8, 1.0);
   // Sunlight through the blade.
   col += alb * S(1.0, 1.0, 0.45) * max(dot(-n, uSunU), 0.0) * 0.55;
   gl_FragColor = vec4(applyFog(col, vW), 1.0);
@@ -228,6 +231,8 @@ function instanced(
   geo.setAttribute("aK", new THREE.Float32BufferAttribute(data.info, 4));
   const mesh = new THREE.Mesh(geo, material);
   mesh.frustumCulled = false;
+  // Layer 1 holds what the shadow map is drawn from.
+  mesh.layers.enable(1);
   return mesh;
 }
 
@@ -248,7 +253,11 @@ function setInstances(mesh: THREE.Mesh, rows: number[][]) {
 }
 
 export function createKelp() {
-  const uniforms = { ...underUniforms(), uTallest: { value: 10 } };
+  const uniforms = {
+    ...underUniforms(),
+    uTallest: { value: 10 },
+    uSway: U.uSway,
+  };
   const material = makeMaterial({
     vertexShader: kelpVertex,
     fragmentShader: kelpFragment,
@@ -327,8 +336,10 @@ export function createKelp() {
   }
 
   // Plants stay in the lower half of the water, however short the page is.
+  // Returns the height they are cut off at.
   function update(view: View) {
     uniforms.uTallest.value = Math.max(0.6, -view.floorY * 0.5);
+    return uniforms.uTallest.value;
   }
 
   return { kelp, grass, layout, update };

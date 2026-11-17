@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { mergeVertices } from "three/addons/utils/BufferGeometryUtils.js";
-import { common, underwater } from "./glsl";
+import { common, reefShade, underwater } from "./glsl";
 import { underUniforms } from "./under";
 import { D_REF, makeMaterial, rng, type View } from "./view";
 
@@ -35,6 +35,7 @@ void main() {
 const reefFragment = /* glsl */ `
 ${common}
 ${underwater}
+${reefShade}
 varying vec3 vW;
 varying vec3 vN;
 varying vec3 vO;
@@ -77,7 +78,7 @@ void main() {
     alb = mix(S(1.0, 0.36, 0.12), S(1.0, 0.80, 0.42), dots);
   }
   // Whiter light than the sand gets, so the warm colours stay warm.
-  vec3 light = underLight(vW, n, 0.9);
+  vec3 light = underLight(vW, n, 0.9, reefLit(vW, n));
   light = mix(light, vec3(dot(light, vec3(0.34))), 0.55) * 1.1;
   vec3 col = alb * light;
   gl_FragColor = vec4(applyFog(col, vW), 1.0);
@@ -228,6 +229,8 @@ function reefMesh(base: THREE.BufferGeometry, material: THREE.ShaderMaterial) {
   );
   const mesh = new THREE.Mesh(geo, material);
   mesh.frustumCulled = false;
+  // Layer 1 holds what the shadow map is drawn from.
+  mesh.layers.enable(1);
   return mesh;
 }
 

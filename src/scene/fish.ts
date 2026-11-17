@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { common, underwater } from "./glsl";
+import { common, reefShade, underwater } from "./glsl";
 import { underUniforms } from "./under";
 import { makeMaterial, rng, type View } from "./view";
 
@@ -468,6 +468,7 @@ void main() {
 const fishFragment = /* glsl */ `
 ${common}
 ${underwater}
+${reefShade}
 uniform float uKind;
 uniform vec3 uEye;
 varying vec3 vW;
@@ -584,7 +585,7 @@ void main() {
 
   vec3 view = normalize(cameraPosition - vW);
   // Whiter light than the surroundings get, so the colours stay vivid.
-  vec3 light = underLight(vW, n, 0.45);
+  vec3 light = underLight(vW, n, 0.45, reefLit(vW, n));
   light = mix(light, vec3(dot(light, vec3(0.34))), 0.6) * 1.12;
   vec3 col = alb * light;
   // Fins let light through.
