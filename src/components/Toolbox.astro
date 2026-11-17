@@ -50,16 +50,17 @@ function hue(name: string) {
 ---
 
 <!--
-  Ticker strip above the tab window. Chips glide left and slow to a stop under
+  Ticker strip docked to the top edge of the tab window, like a toolbar on
+  the window frame. Chips glide left and slow to a stop under
   the pointer or keyboard focus. A chip's balloon lists the entries that use
   it; clicking it spotlights them. With reduced motion, chips wrap in place.
 -->
 <section
-  class="aero-tube relative mb-[18px] flex h-[50px] items-center gap-2.5 rounded-[25px] px-1.5 motion-reduce:h-auto motion-reduce:rounded-2xl motion-reduce:p-2 no-js:h-auto no-js:rounded-2xl no-js:p-2"
+  class="aero-tube relative mx-5 flex h-[38px] items-center gap-2 rounded-t-[14px] px-1.5 max-sm:mx-2.5 motion-reduce:h-auto motion-reduce:py-1.5 no-js:h-auto no-js:py-1.5"
   aria-labelledby="tk-label"
 >
   <button
-    class="aero-play relative grid size-[38px] flex-none cursor-pointer place-items-center rounded-full motion-reduce:hidden no-js:hidden"
+    class="aero-play relative grid size-7 flex-none cursor-pointer place-items-center rounded-full motion-reduce:hidden no-js:hidden"
     type="button"
     aria-pressed="false"
     aria-label="Pause scrolling"
@@ -67,7 +68,7 @@ function hue(name: string) {
     data-tip-body="Off"
   >
     <svg
-      class="relative size-4 fill-white drop-shadow-glyph"
+      class="relative size-3 fill-white drop-shadow-glyph"
       viewBox="0 0 20 20"
       aria-hidden="true"
     >
@@ -91,7 +92,7 @@ function hue(name: string) {
     <div class="tk-track flex gap-2 px-5 will-change-transform motion-reduce:flex-wrap motion-reduce:px-0 no-js:flex-wrap no-js:px-0">
       {toolbox.map((tech) => (
         <button
-          class="aero-chip flex flex-none cursor-pointer items-center gap-1.5 rounded-[14px] py-1 pr-2.5 pl-[5px] font-head text-xs font-bold whitespace-nowrap no-js:pointer-events-none"
+          class="aero-chip flex flex-none cursor-pointer items-center gap-1.5 rounded-[14px] py-0.5 pr-2.5 pl-[5px] font-head text-xs font-bold whitespace-nowrap no-js:pointer-events-none"
           type="button"
           tabindex="-1"
           data-tech={tech}

@@ -385,9 +385,12 @@
 
   /* ===== Toolbox ticker ===== */
 
-  /* Dark glass media bar. */
+  /* Dark glass media bar docked on the window's top edge: no bottom border
+     or shadow where it meets the frame, and the frame's drop-in timing so
+     the two arrive together. */
   .aero-tube {
     border: 1px solid #041a30;
+    border-bottom: 0;
     background: linear-gradient(
       180deg,
       #2d71ad 0%,
@@ -398,17 +401,17 @@
     box-shadow:
       inset 0 1px 0 rgba(255, 255, 255, 0.5),
       inset 0 -3px 8px rgba(80, 190, 255, 0.35),
-      0 3px 8px rgba(0, 40, 90, 0.35);
-    animation: aero-drop-in 0.8s cubic-bezier(0.2, 1.4, 0.4, 1) 0.1s both;
+      0 -2px 8px rgba(0, 40, 90, 0.3);
+    animation: aero-drop-in 0.8s cubic-bezier(0.2, 1.4, 0.4, 1) both;
   }
   .aero-tube::before {
     content: "";
     position: absolute;
     top: 1px;
-    left: 18px;
-    right: 18px;
+    left: 12px;
+    right: 12px;
     height: 46%;
-    border-radius: 24px 24px 50% 50% / 24px 24px 8px 8px;
+    border-radius: 13px 13px 50% 50% / 13px 13px 6px 6px;
     background: linear-gradient(
       180deg,
       rgba(255, 255, 255, 0.32),
