@@ -45,12 +45,14 @@ void main() {
   // the ones in sight, so the normal leans that way. Left smooth, that
   // water would be a blur, so the lean varies in streaks a few pixels
   // tall: ripples of the lost strength at a size the pixels can show. The
-  // streaks are laid out by view angle, which fixes them to the water.
-  float ground = length(toCam.xz);
-  vec2 cell = vec2(vW.x / ground * uGrain.x, cameraPosition.y / ground * uGrain.y);
+  // streaks are laid out by screen row and by position across the water
+  // at that row. Neither changes for a point on the water while the
+  // camera slides sideways, so the streaks stay fixed to the water.
+  float ahead = cameraPosition.z - vW.z;
+  vec2 cell = vec2(vW.x, cameraPosition.y) / ahead * uGrain;
   float streak = 0.62 * vnoise(cell + uTime * vec2(0.12, 0.5))
     + 0.38 * vnoise(cell * vec2(1.9, 2.3) - uTime * vec2(0.2, 0.7));
-  vec2 near = toCam.xz / ground;
+  vec2 near = normalize(toCam.xz);
   streak = smoothstep(0.22, 0.78, streak);
   vec2 lean = near * rough * (0.5 + 2.6 * (streak - 0.5));
   vec3 n = normalize(vec3(lean.x - slope.x, 1.0, lean.y - slope.y));
