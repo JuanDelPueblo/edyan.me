@@ -44,14 +44,18 @@ float fbm(vec2 p) {
 // the four taps is already blended over 2 x 2 texels by the sampler.
 export const shade = /* glsl */ `
 float shadeAt(sampler2DShadow map, vec3 at) {
+  // Nothing casts onto points outside the map or nearer the sun than it
+  // starts, which is most of the open water.
+  vec2 edge = min(at.xy, 1.0 - at.xy);
+  float inside = min(edge.x, edge.y);
+  if (inside <= 0.0 || at.z <= 0.0) return 1.0;
   float r = 0.75 / float(textureSize(map, 0).x);
   float lit = texture(map, vec3(at.xy + vec2(-r, -r), at.z))
     + texture(map, vec3(at.xy + vec2(r, -r), at.z))
     + texture(map, vec3(at.xy + vec2(-r, r), at.z))
     + texture(map, vec3(at.xy + vec2(r, r), at.z));
   // Casters are cut off at the map's edge, so shadows fade out before it.
-  vec2 edge = min(at.xy, 1.0 - at.xy);
-  return mix(1.0, lit * 0.25, smoothstep(0.0, 0.05, min(edge.x, edge.y)));
+  return mix(1.0, lit * 0.25, smoothstep(0.0, 0.05, inside));
 }
 `;
 

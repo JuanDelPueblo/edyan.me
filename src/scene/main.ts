@@ -142,6 +142,11 @@ export function startScene(canvas: HTMLCanvasElement, site: HTMLElement) {
   const reefShade = createShade(innerWidth < 700 ? 1024 : 2048);
   const reefBox = new THREE.Box3();
   const readout = import.meta.env.DEV ? createReadout(renderer) : null;
+  // Development only: `?load=8` draws every frame eight times, which costs
+  // about what one frame costs on a GPU eight times slower.
+  const load = import.meta.env.DEV
+    ? Number(new URLSearchParams(location.search).get("load")) || 1
+    : 1;
 
   // Above the water.
   const skyScene = new THREE.Scene();
@@ -709,29 +714,6 @@ export function startScene(canvas: HTMLCanvasElement, site: HTMLElement) {
     const skyRows = Math.max(0, Math.min(dh, Math.round((wl - top) * pr)));
     U.uPage.value.set(1 / pr, top + h, 1);
 
-    if (skyRows > 0) {
-      ocean.visible = false;
-      U.uPage.value.z = 0;
-      renderer.setRenderTarget(mirror);
-      renderer.clear();
-      renderer.render(skyScene, mirrorCam);
-      ocean.visible = true;
-      U.uPage.value.z = 1;
-
-      main.scissorTest = true;
-      main.scissor.set(0, dh - skyRows, dw, skyRows);
-      renderer.setRenderTarget(main);
-      renderer.clear();
-      renderer.render(skyScene, skyCam);
-    }
-    if (skyRows < dh) {
-      main.scissorTest = true;
-      main.scissor.set(0, 0, dw, dh - skyRows);
-      renderer.setRenderTarget(main);
-      renderer.clear();
-      renderer.render(seaScene, seaCam);
-    }
-
     const p = post.uniforms;
     p.uTop.value = top;
     p.uWl.value = wl;
@@ -741,7 +723,31 @@ export function startScene(canvas: HTMLCanvasElement, site: HTMLElement) {
       0,
       Math.min(1, (p.uSun.value.y - scroll + 70) / 110),
     );
-    post.render(main, level < 2);
+    for (let pass = 0; pass < load; pass++) {
+      if (skyRows > 0) {
+        ocean.visible = false;
+        U.uPage.value.z = 0;
+        renderer.setRenderTarget(mirror);
+        renderer.clear();
+        renderer.render(skyScene, mirrorCam);
+        ocean.visible = true;
+        U.uPage.value.z = 1;
+
+        main.scissorTest = true;
+        main.scissor.set(0, dh - skyRows, dw, skyRows);
+        renderer.setRenderTarget(main);
+        renderer.clear();
+        renderer.render(skyScene, skyCam);
+      }
+      if (skyRows < dh) {
+        main.scissorTest = true;
+        main.scissor.set(0, 0, dw, dh - skyRows);
+        renderer.setRenderTarget(main);
+        renderer.clear();
+        renderer.render(seaScene, seaCam);
+      }
+      post.render(main, level < 2);
+    }
     readout?.end(level, pace);
 
     // Shaders are compiled before the loop starts, so the first picture is
