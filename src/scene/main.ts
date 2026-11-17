@@ -342,6 +342,11 @@ export function startScene(canvas: HTMLCanvasElement, site: HTMLElement) {
     );
     mirrorCam.projectionMatrixInverse.copy(mirrorCam.projectionMatrix).invert();
     ocean.material.uniforms.uReflMap.value.set(1 / (2 * half), 1 / MIRROR_TAN);
+    // Streaks on the far water: about 28 px wide and 2.5 px tall.
+    ocean.material.uniforms.uGrain.value.set(
+      1 / (view.k * 28),
+      1 / (view.k * 2.5),
+    );
 
     sky.layout(view);
     islands.layout(view);

@@ -86,7 +86,7 @@ vec2 waveSlope(vec2 p, float t, float detail) {
 // variance that went with it.
 vec2 waveOver(vec2 p, float t, vec2 fx, vec2 fy, vec2 d, vec3 w, inout float lost) {
   float span = w.y * (abs(dot(fx, d)) + abs(dot(fy, d)));
-  float keep = exp(-span * span * 0.08);
+  float keep = exp(-span * span * 0.2);
   lost += w.x * w.x * 0.5 * (1.0 - keep * keep);
   return d * w.x * keep * cos(dot(p, d) * w.y + t * w.z);
 }

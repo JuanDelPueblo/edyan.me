@@ -20,6 +20,7 @@ ${common}
 ${waves}
 uniform sampler2D tRefl;
 uniform vec2 uReflMap;
+uniform vec2 uGrain; // streaks per unit of view tangent: across, down
 uniform vec3 uSunDir;
 uniform float uTime;
 varying vec3 vW;
@@ -41,9 +42,17 @@ void main() {
   float rough = 1.6 * sqrt(lost);
 
   // Of the waves a pixel cannot show, the faces turned to the camera are
-  // the ones in sight, so the normal leans that way.
-  vec2 near = normalize(toCam.xz);
-  vec2 lean = near * rough * 0.6;
+  // the ones in sight, so the normal leans that way. Left smooth, that
+  // water would be a blur, so the lean varies in streaks a few pixels
+  // tall: ripples of the lost strength at a size the pixels can show. The
+  // streaks are laid out by view angle, which fixes them to the water.
+  float ground = length(toCam.xz);
+  vec2 cell = vec2(vW.x / ground * uGrain.x, cameraPosition.y / ground * uGrain.y);
+  float streak = 0.62 * vnoise(cell + uTime * vec2(0.12, 0.5))
+    + 0.38 * vnoise(cell * vec2(1.9, 2.3) - uTime * vec2(0.2, 0.7));
+  vec2 near = toCam.xz / ground;
+  streak = smoothstep(0.22, 0.78, streak);
+  vec2 lean = near * rough * (0.5 + 2.6 * (streak - 0.5));
   vec3 n = normalize(vec3(lean.x - slope.x, 1.0, lean.y - slope.y));
   vec3 r = reflect(-view, n);
   r.y = abs(r.y);
@@ -51,7 +60,7 @@ void main() {
   vec2 uv = vec2(rt.x * uReflMap.x + 0.5, rt.y * uReflMap.y);
   // Rough water mirrors a tall strip of the sky: four taps up the mirror,
   // each from a mip level as coarse as the gap between them.
-  float spread = 2.0 * rough * uReflMap.y;
+  float spread = 0.5 * rough * uReflMap.y;
   float lod = log2(max(spread * 0.25 * float(textureSize(tRefl, 0).y), 1.0));
   vec3 refl = vec3(0.0);
   for (int i = 0; i < 4; i++) {
@@ -72,10 +81,12 @@ void main() {
   vec2 off = h.xz / h.y + slope;
   float var = rough * rough * 0.5 + 0.0005;
   float hit = exp(-dot(off, off) / (2.0 * var));
-  float sparkle = vnoise(vec2(vW.x / dist * 500.0, log(dist) * 16.0)
-    + uTime * vec2(0.4, 1.1));
+  // Sparkles are about two pixels across at any distance.
+  float sparkle = vnoise(cell * vec2(14.0, 1.25) + uTime * vec2(0.4, 1.1));
   col += S(1.0, 0.97, 0.86) * hit
     * (0.0016 / var + 5.0 * smoothstep(0.55, 0.9, sparkle));
+  // Away from the sun the same sparkles catch the bright sky, faintly.
+  col += refl * smoothstep(0.8, 0.95, sparkle) * rough * 5.0;
   col = mix(col, S(0.62, 0.88, 1.0), smoothstep(40.0, 1200.0, dist) * 0.6);
   gl_FragColor = vec4(col, 1.0);
 }
@@ -118,6 +129,7 @@ export function createOcean(reflection: THREE.Texture) {
       uniforms: {
         tRefl: { value: reflection },
         uReflMap: { value: new THREE.Vector2(1, 1) },
+        uGrain: { value: new THREE.Vector2(30, 300) },
         uSunDir: U.uSunDir,
         uTime: U.uTime,
       },
