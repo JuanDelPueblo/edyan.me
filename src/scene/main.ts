@@ -414,7 +414,13 @@ export function startScene(canvas: HTMLCanvasElement, site: HTMLElement) {
     }
     inputAt = now;
   }
-  for (const type of ["pointermove", "pointerdown", "keydown", "wheel"]) {
+  for (const type of [
+    "pointermove",
+    "pointerdown",
+    "click",
+    "keydown",
+    "wheel",
+  ]) {
     addEventListener(type, wake, { passive: true });
   }
   addEventListener(
@@ -491,9 +497,10 @@ export function startScene(canvas: HTMLCanvasElement, site: HTMLElement) {
 
     const still = reduced.matches || level === STILL;
     // A still picture changes only with scrolling, resizing or a panel
-    // switch, so between scrolls the page is checked ten times a second
-    // instead of on every frame.
-    if (still && !scrolling && !dirty && now - checkedAt < 100) {
+    // switch, so the page is checked on every frame shortly after input
+    // and ten times a second otherwise.
+    const quiet = !scrolling && !dirty && now - inputAt > 250;
+    if (still && quiet && now - checkedAt < 100) {
       last = 0;
       return;
     }
