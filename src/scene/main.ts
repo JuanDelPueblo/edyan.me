@@ -281,6 +281,7 @@ export function startScene(canvas: HTMLCanvasElement, site: HTMLElement) {
     const same =
       w === view.w && lvh === view.lvh && wl === view.wl && left === view.left;
     if (same && pr === view.pr) return;
+    if (!same) placed++;
     const resized = w !== view.w || h !== view.h || pr !== view.pr;
     view.w = w;
     view.h = h;
@@ -397,6 +398,9 @@ export function startScene(canvas: HTMLCanvasElement, site: HTMLElement) {
 
   // Draws the shadow maps. The shaders that read a map draw into it too, so
   // they get an empty one meanwhile.
+  // Counts changes of the page's sizes. A change of resolution alone, as a
+  // quality step makes, leaves the maps as they are.
+  let placed = 0;
   let baked = "";
   function bakeShade(tallest: number) {
     U.tLandShade.value = null;
@@ -660,8 +664,8 @@ export function startScene(canvas: HTMLCanvasElement, site: HTMLElement) {
     fish.update(view);
     jellies.update(view);
     bubbles.update(view);
-    // The shadow maps follow the layout and the plants' height.
-    const shadeKey = view.layout + "|" + tallest.toFixed(1);
+    // The shadow maps follow the page's sizes and the plants' height.
+    const shadeKey = placed + "|" + tallest.toFixed(1);
     if (shadeKey !== baked) {
       baked = shadeKey;
       bakeShade(tallest);
