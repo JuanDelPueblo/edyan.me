@@ -39,6 +39,22 @@ float fbm(vec2 p) {
 }
 `;
 
+// Share of the sunlight that reaches a point, from a depth map drawn from
+// the sun's side (shade.ts). The point is given in the map's space. Each of
+// the four taps is already blended over 2 x 2 texels by the sampler.
+export const shade = /* glsl */ `
+float shadeAt(sampler2DShadow map, vec3 at) {
+  float r = 0.75 / float(textureSize(map, 0).x);
+  float lit = texture(map, vec3(at.xy + vec2(-r, -r), at.z))
+    + texture(map, vec3(at.xy + vec2(r, -r), at.z))
+    + texture(map, vec3(at.xy + vec2(-r, r), at.z))
+    + texture(map, vec3(at.xy + vec2(r, r), at.z));
+  // Casters are cut off at the map's edge, so shadows fade out before it.
+  vec2 edge = min(at.xy, 1.0 - at.xy);
+  return mix(1.0, lit * 0.25, smoothstep(0.0, 0.05, min(edge.x, edge.y)));
+}
+`;
+
 // Sum of directional sine waves. Returns the surface slope (dh/dx, dh/dz);
 // detail fades with the given factor so distant water does not shimmer.
 export const waves = /* glsl */ `

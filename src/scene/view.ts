@@ -52,6 +52,12 @@ export const U = {
   uFloorY: { value: -10 },
   // Size of the sun's disc and glow; smaller on narrow pages.
   uSunSize: { value: 1 },
+  // Baked shadow map of the island: the depth texture, the matrix from
+  // world space into it, and x: the share of sunlight a shadow removes,
+  // y: the size of one texel in metres.
+  tLandShade: { value: null as THREE.Texture | null },
+  uLandShadeMat: { value: new THREE.Matrix4() },
+  uLandShade: { value: new THREE.Vector2(0.62, 0.1) },
 };
 
 // Small seeded generator so the scene looks the same on every load.

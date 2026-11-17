@@ -11,6 +11,7 @@ import { createOcean } from "./ocean";
 import { createPost } from "./post";
 import { createReadout } from "./readout";
 import { createSeabed } from "./seabed";
+import { createShade } from "./shade";
 import { createSky } from "./sky";
 import { createUnderwater } from "./under";
 import { sfx } from "../scripts/sound";
@@ -135,6 +136,7 @@ export function startScene(canvas: HTMLCanvasElement, site: HTMLElement) {
     magFilter: THREE.LinearFilter,
   });
   const post = createPost(renderer, hdr);
+  const landShade = createShade(1024);
   const readout = import.meta.env.DEV ? createReadout(renderer) : null;
 
   // Above the water.
@@ -389,6 +391,22 @@ export function startScene(canvas: HTMLCanvasElement, site: HTMLElement) {
     if (fish.startle(view, event.clientX, y, 210, 2.6)) sfx("blip");
   });
 
+  // Draws the shadow maps. The shaders that read a map draw into it too, so
+  // they get an empty one meanwhile.
+  let baked = -1;
+  function bakeShade() {
+    baked = view.layout;
+    U.tLandShade.value = null;
+    U.uLandShade.value.y = landShade.bake(
+      renderer,
+      skyScene,
+      islands.shadeBox,
+      U.uLight.value,
+      U.uLandShadeMat.value,
+    );
+    U.tLandShade.value = landShade.texture;
+  }
+
   // The page falls back to its CSS background while the context is lost.
   let lost = false;
   canvas.addEventListener("webglcontextlost", (event) => {
@@ -400,6 +418,8 @@ export function startScene(canvas: HTMLCanvasElement, site: HTMLElement) {
     lost = false;
     shown = false;
     drawn = "";
+    // The maps come back empty.
+    baked = -1;
   });
 
   // Input keeps the full frame rate; scrolling draws on every display
@@ -612,6 +632,7 @@ export function startScene(canvas: HTMLCanvasElement, site: HTMLElement) {
     fish.update(view);
     jellies.update(view);
     bubbles.update(view);
+    if (baked !== view.layout) bakeShade();
 
     skyCam.setViewOffset(w, lvh, 0, top - hz + lvh / 2, w, h);
     // The cameras drift a little and lean with the pointer, which shifts

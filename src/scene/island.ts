@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { common } from "./glsl";
+import { common, shade } from "./glsl";
 import {
   fillAttribute,
   makeMaterial,
@@ -17,6 +17,32 @@ vec3 airHaze(vec3 col, vec3 wpos) {
 }
 `;
 
+// Sunlight left on the land and the fort after the baked shadows of the
+// hill, the trees and the fort. The lookup starts a little off the surface,
+// towards the light, so a surface does not shadow itself. Faces turned from
+// the light keep their wrapped shading instead.
+const landShade = /* glsl */ `
+${shade}
+uniform vec3 uLight;
+uniform sampler2DShadow tLandShade;
+uniform mat4 uLandShadeMat;
+uniform vec2 uLandShade;
+float landLit(vec3 wpos, vec3 n) {
+  vec3 from = wpos + (n * 1.5 + uLight) * uLandShade.y;
+  float lit = shadeAt(tLandShade, (uLandShadeMat * vec4(from, 1.0)).xyz);
+  return 1.0 - uLandShade.x * (1.0 - lit) * smoothstep(0.0, 0.25, dot(n, uLight));
+}
+`;
+
+function landUniforms() {
+  return {
+    uLight: U.uLight,
+    tLandShade: U.tLandShade,
+    uLandShadeMat: U.uLandShadeMat,
+    uLandShade: U.uLandShade,
+  };
+}
+
 const landVertex = /* glsl */ `
 varying vec3 vW;
 varying vec3 vN;
@@ -31,7 +57,7 @@ void main() {
 const landFragment = /* glsl */ `
 ${common}
 ${haze}
-uniform vec3 uLight;
+${landShade}
 varying vec3 vW;
 varying vec3 vN;
 void main() {
@@ -43,7 +69,7 @@ void main() {
   vec3 sand = mix(S(0.99, 0.94, 0.76), S(0.86, 0.76, 0.56),
     smoothstep(0.5, 0.0, vW.y));
   vec3 alb = mix(grass, sand, smoothstep(2.4, 1.0, vW.y + nz * 1.2));
-  float ndl = clamp(dot(n, uLight) * 0.65 + 0.35, 0.0, 1.0);
+  float ndl = clamp(dot(n, uLight) * 0.65 + 0.35, 0.0, 1.0) * landLit(vW, n);
   vec3 col = alb * (S(0.50, 0.70, 0.92) * 0.5 + S(1.0, 0.97, 0.84) * 1.1 * ndl);
   gl_FragColor = vec4(airHaze(col, vW), 1.0);
 }
@@ -71,7 +97,7 @@ void main() {
 const fortFragment = /* glsl */ `
 ${common}
 ${haze}
-uniform vec3 uLight;
+${landShade}
 varying vec3 vW;
 varying vec3 vN;
 varying vec3 vInfo;
@@ -108,7 +134,7 @@ void main() {
     alb = mix(alb, vec3(1.0),
       step(length(vec2((vInfo.y - 0.2) * 1.5, t - 0.5)), 0.12));
   }
-  float ndl = clamp(dot(n, uLight) * 0.6 + 0.4, 0.0, 1.0);
+  float ndl = clamp(dot(n, uLight) * 0.6 + 0.4, 0.0, 1.0) * landLit(vW, n);
   vec3 col = alb * (S(0.50, 0.70, 0.92) * 0.5 + S(1.0, 0.97, 0.84) * 1.15 * ndl);
   gl_FragColor = vec4(airHaze(col, vW), 1.0);
 }
@@ -614,7 +640,7 @@ export function createIslands() {
   const landMaterial = makeMaterial({
     vertexShader: landVertex,
     fragmentShader: landFragment,
-    uniforms: { uLight: U.uLight },
+    uniforms: landUniforms(),
   });
   const hillSize = [150, 70];
   const caySize = [100, 46];
@@ -636,7 +662,7 @@ export function createIslands() {
     makeMaterial({
       vertexShader: fortVertex,
       fragmentShader: fortFragment,
-      uniforms: { uLight: U.uLight, uTime: U.uTime },
+      uniforms: { ...landUniforms(), uTime: U.uTime },
       side: THREE.DoubleSide,
     }),
   );
@@ -647,6 +673,10 @@ export function createIslands() {
   let fortRadius = 1;
   const broadleaf = treeMesh(broadleafGeometry());
   const palms = treeMesh(palmGeometry());
+  // Layer 1 holds what the shadow map is drawn from. Its box takes in the
+  // hill with its trees and the fort; the cay is too far off to need one.
+  for (const mesh of [hill, fort, broadleaf, palms]) mesh.layers.enable(1);
+  const shadeBox = new THREE.Box3();
 
   function layout(view: View) {
     const { w, hz, k, left } = view;
@@ -666,6 +696,9 @@ export function createIslands() {
     const hillX = (Math.max(left * 0.6, 44) - w / 2) * k * hillDist;
     hill.position.set(hillX, 0, -hillDist);
     hill.scale.setScalar(hillScale);
+    shadeBox.min.set(-75, -1.5, -35).multiplyScalar(hillScale);
+    shadeBox.max.set(75, 30, 35).multiplyScalar(hillScale);
+    shadeBox.translate(hill.position);
     fortAt.set(fortX, 6.5, fortZ).multiplyScalar(hillScale).add(hill.position);
     fortRadius = 10 * hillScale;
 
@@ -747,5 +780,5 @@ export function createIslands() {
     );
   }
 
-  return { hill, cay, broadleaf, palms, layout, onFort };
+  return { hill, cay, broadleaf, palms, shadeBox, layout, onFort };
 }
