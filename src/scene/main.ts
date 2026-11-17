@@ -9,6 +9,7 @@ import { createJellies } from "./jelly";
 import { createKelp } from "./kelp";
 import { createOcean } from "./ocean";
 import { createPost } from "./post";
+import { createReadout } from "./readout";
 import { createSeabed } from "./seabed";
 import { createSky } from "./sky";
 import { createUnderwater } from "./under";
@@ -134,6 +135,7 @@ export function startScene(canvas: HTMLCanvasElement, site: HTMLElement) {
     magFilter: THREE.LinearFilter,
   });
   const post = createPost(renderer, hdr);
+  const readout = import.meta.env.DEV ? createReadout(renderer) : null;
 
   // Above the water.
   const skyScene = new THREE.Scene();
@@ -601,6 +603,7 @@ export function startScene(canvas: HTMLCanvasElement, site: HTMLElement) {
     drawn = key;
     drewAt = now;
 
+    readout?.begin();
     if (!still && hoverX >= 0) {
       fish.startle(view, hoverX, frameY(hoverY), 80, 1.1);
       hoverX = -1;
@@ -681,6 +684,7 @@ export function startScene(canvas: HTMLCanvasElement, site: HTMLElement) {
       Math.min(1, (p.uSun.value.y - scroll + 70) / 110),
     );
     post.render(main, level < 2);
+    readout?.end(level, pace);
 
     // Shaders are compiled before the loop starts, so the first picture is
     // complete.
