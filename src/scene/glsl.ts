@@ -79,6 +79,30 @@ vec2 waveSlope(vec2 p, float t, float detail) {
   s += d * 0.045 * detail * detail * cos(dot(p, d) * 11.9 + t * 4.3);
   return s;
 }
+
+// One wave averaged over a pixel. fx and fy are the change of p across the
+// pixel; w holds the wave's slope, frequency and speed. A wave finer than
+// the pixel fades out instead of flickering, and lost collects the slope
+// variance that went with it.
+vec2 waveOver(vec2 p, float t, vec2 fx, vec2 fy, vec2 d, vec3 w, inout float lost) {
+  float span = w.y * (abs(dot(fx, d)) + abs(dot(fy, d)));
+  float keep = exp(-span * span * 0.08);
+  lost += w.x * w.x * 0.5 * (1.0 - keep * keep);
+  return d * w.x * keep * cos(dot(p, d) * w.y + t * w.z);
+}
+
+// The waves of waveSlope for water seen from low above it, where a pixel
+// near the horizon covers metres of water.
+vec2 waveSlopeOver(vec2 p, float t, vec2 fx, vec2 fy, out float lost) {
+  lost = 0.0;
+  vec2 s = waveOver(p, t, fx, fy, vec2(0.86, 0.51), vec3(0.050, 0.55, 0.9), lost);
+  s += waveOver(p, t, fx, fy, vec2(-0.42, 0.91), vec3(0.045, 0.90, 1.2), lost);
+  s += waveOver(p, t, fx, fy, vec2(0.31, 0.95), vec3(0.060, 2.10, 1.9), lost);
+  s += waveOver(p, t, fx, fy, vec2(-0.77, 0.64), vec3(0.060, 3.70, 2.6), lost);
+  s += waveOver(p, t, fx, fy, vec2(0.97, -0.24), vec3(0.050, 7.30, 3.4), lost);
+  s += waveOver(p, t, fx, fy, vec2(0.12, 0.99), vec3(0.045, 11.9, 4.3), lost);
+  return s;
+}
 `;
 
 // Everything lit below the surface: water colour by view direction and depth,

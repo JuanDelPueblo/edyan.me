@@ -129,10 +129,12 @@ export function startScene(canvas: HTMLCanvasElement, site: HTMLElement) {
     minFilter: THREE.LinearFilter,
     magFilter: THREE.LinearFilter,
   });
+  // The water reads blurred reflections from the mirror's mip levels.
   const mirror = new THREE.WebGLRenderTarget(4, 4, {
     type: colorType,
     depthBuffer: true,
-    minFilter: THREE.LinearFilter,
+    generateMipmaps: true,
+    minFilter: THREE.LinearMipmapLinearFilter,
     magFilter: THREE.LinearFilter,
   });
   const post = createPost(renderer, hdr);
