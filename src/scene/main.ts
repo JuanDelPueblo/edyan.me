@@ -308,6 +308,7 @@ export function startScene(canvas: HTMLCanvasElement, site: HTMLElement) {
       const dw = canvas.width;
       const dh = canvas.height;
       main.setSize(dw, dh);
+      ocean.material.uniforms.uTarget.value.set(dw, dh);
       mirror.setSize(Math.min(768, Math.round(dw / 2.5)), 160);
       post.resize(dw, dh);
       post.uniforms.uSize.value.set(w, h);
@@ -342,10 +343,14 @@ export function startScene(canvas: HTMLCanvasElement, site: HTMLElement) {
     );
     mirrorCam.projectionMatrixInverse.copy(mirrorCam.projectionMatrix).invert();
     ocean.material.uniforms.uReflMap.value.set(1 / (2 * half), 1 / MIRROR_TAN);
-    // Streaks on the far water: about 28 px wide and 2.5 px tall.
+    // Streaks on the far water: about 28 px wide and 2.5 px tall. A large
+    // window is drawn at less than one canvas pixel per CSS px; the sizes
+    // then count in canvas pixels, which are the ones that have to show
+    // the streaks.
+    const grain = view.k * Math.max(1, 1 / pr);
     ocean.material.uniforms.uGrain.value.set(
-      1 / (view.k * 28),
-      1 / (view.k * 2.5),
+      1 / (grain * 28),
+      1 / (grain * 2.5),
     );
 
     sky.layout(view);

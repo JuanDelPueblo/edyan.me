@@ -3,9 +3,7 @@ import { common, waves } from "./glsl";
 import { makeMaterial, U } from "./view";
 
 const oceanVertex = /* glsl */ `
-varying vec3 vW;
 void main() {
-  vW = position;
   gl_Position = projectionMatrix * viewMatrix * vec4(position, 1.0);
 }
 `;
@@ -18,13 +16,24 @@ void main() {
 const oceanFragment = /* glsl */ `
 ${common}
 ${waves}
+uniform mat4 projectionMatrix;
+uniform vec2 uTarget; // size of the render target, device px
 uniform sampler2D tRefl;
 uniform vec2 uReflMap;
 uniform vec2 uGrain; // streaks per unit of view tangent: across, down
 uniform vec3 uSunDir;
 uniform float uTime;
-varying vec3 vW;
 void main() {
+  // Where this pixel's view ray meets the water. Interpolating the position
+  // across the plane's two huge triangles is too coarse near the horizon:
+  // the result jumps by pixels whenever the camera moves a little.
+  vec2 ndc = gl_FragCoord.xy / uTarget * 2.0 - 1.0;
+  vec3 ray = vec3(
+    (ndc.x + projectionMatrix[2][0]) / projectionMatrix[0][0],
+    (ndc.y + projectionMatrix[2][1]) / projectionMatrix[1][1],
+    -1.0
+  ) * mat3(viewMatrix);
+  vec3 vW = cameraPosition + ray * min(cameraPosition.y / max(-ray.y, 1e-6), 9000.0);
   vec3 toCam = cameraPosition - vW;
   float dist = length(toCam);
   vec3 view = toCam / dist;
@@ -132,6 +141,7 @@ export function createOcean(reflection: THREE.Texture) {
         tRefl: { value: reflection },
         uReflMap: { value: new THREE.Vector2(1, 1) },
         uGrain: { value: new THREE.Vector2(30, 300) },
+        uTarget: { value: new THREE.Vector2(1, 1) },
         uSunDir: U.uSunDir,
         uTime: U.uTime,
       },
